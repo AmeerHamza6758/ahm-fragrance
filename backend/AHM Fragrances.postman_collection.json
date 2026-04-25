@@ -1,0 +1,1379 @@
+{
+  "info": {
+    "_postman_id": "c3f4054d-5756-4a8d-9f4a-536e925c1bae",
+    "name": "AHM Fragrances",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "53954860",
+    "_collection_link": "https://go.postman.co/collection/53954860-c3f4054d-5756-4a8d-9f4a-536e925c1bae?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Cart Flow",
+      "item": [
+        {
+          "name": "get cart",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OWU0NzVkZmY0MmVhMTQwMjA5NzA2MmUiLCJlbWFpbCI6ImxhaWJhYUB5b3BtYWlsLmNvbSIsImlhdCI6MTc3NjYwODQwNywiZXhwIjoxNzc3MjEzMjA3fQ.0jri4C3WMXWACDL2vcq7I2wH-8_5xS0G6Z1dd0lulDI",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/cart/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "cart",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "add cart",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OWU0NzVkZmY0MmVhMTQwMjA5NzA2MmUiLCJlbWFpbCI6ImxhaWJhYUB5b3BtYWlsLmNvbSIsImlhdCI6MTc3NjYwODQwNywiZXhwIjoxNzc3MjEzMjA3fQ.0jri4C3WMXWACDL2vcq7I2wH-8_5xS0G6Z1dd0lulDI",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"productId\": \"69e5074bb5fd2e38fdbf08b5\",\r\n    \"quantity\": \"3\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/cart/add",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "cart",
+                "add"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "update cart",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OWU0NzVkZmY0MmVhMTQwMjA5NzA2MmUiLCJlbWFpbCI6ImxhaWJhYUB5b3BtYWlsLmNvbSIsImlhdCI6MTc3NjYwODQwNywiZXhwIjoxNzc3MjEzMjA3fQ.0jri4C3WMXWACDL2vcq7I2wH-8_5xS0G6Z1dd0lulDI",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"quantity\": 5\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/cart//update/69e5074bb5fd2e38fdbf08b5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "cart",
+                "",
+                "update",
+                "69e5074bb5fd2e38fdbf08b5"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "remove item from cart",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OWU0NzVkZmY0MmVhMTQwMjA5NzA2MmUiLCJlbWFpbCI6ImxhaWJhYUB5b3BtYWlsLmNvbSIsImlhdCI6MTc3NjYwODQwNywiZXhwIjoxNzc3MjEzMjA3fQ.0jri4C3WMXWACDL2vcq7I2wH-8_5xS0G6Z1dd0lulDI",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/cart/remove/69e5074bb5fd2e38fdbf08b5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "cart",
+                "remove",
+                "69e5074bb5fd2e38fdbf08b5"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "APIS",
+      "item": [
+        {
+          "name": "Get Apis",
+          "item": [
+            {
+              "name": "http://localhost:3000/api/product/getProducts",
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/api/product/getProducts?filter=him",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "api",
+                    "product",
+                    "getProducts"
+                  ],
+                  "query": [
+                    {
+                      "key": "filter",
+                      "value": "him"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "http://localhost:3000/api/product/getProducts",
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/api/product/getProducts",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "api",
+                    "product",
+                    "getProducts"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "http://localhost:3000/api/product/getProducts",
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/api/product/getProducts?filter=him&sort=desc",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "api",
+                    "product",
+                    "getProducts"
+                  ],
+                  "query": [
+                    {
+                      "key": "filter",
+                      "value": "him"
+                    },
+                    {
+                      "key": "sort",
+                      "value": "desc"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "http://localhost:3000/api/product/getProducts",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"brandName\" : \"J.\",\r\n    \"description\" : \"Powered by Junaid Jamshaad\",\r\n    \"country\" : \"Pakistan\",\r\n    \"address\" : \"All over Pakistan\"\r\n}"
+                },
+                "url": {
+                  "raw": "http://localhost:3000/api/product/getProducts?rating=desc",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "api",
+                    "product",
+                    "getProducts"
+                  ],
+                  "query": [
+                    {
+                      "key": "rating",
+                      "value": "desc"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "http://localhost:3000/api/product/getProducts",
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/api/product/getProducts?price=asc",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "api",
+                    "product",
+                    "getProducts"
+                  ],
+                  "query": [
+                    {
+                      "key": "price",
+                      "value": "asc"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "http://localhost:3000/api/product/getProducts",
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/api/product/getProducts?price=desc",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "api",
+                    "product",
+                    "getProducts"
+                  ],
+                  "query": [
+                    {
+                      "key": "price",
+                      "value": "desc"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "http://localhost:3000/api/product/getProducts",
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/api/product/getProducts?tag=inspired",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "api",
+                    "product",
+                    "getProducts"
+                  ],
+                  "query": [
+                    {
+                      "key": "tag",
+                      "value": "inspired"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "http://localhost:3000/api/product/getProducts",
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/api/product/getProducts?tag=oud series",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "api",
+                    "product",
+                    "getProducts"
+                  ],
+                  "query": [
+                    {
+                      "key": "tag",
+                      "value": "oud series"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "http://localhost:3000/api/product/getProducts",
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/api/product/getProducts?tag=Limited Edition",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "api",
+                    "product",
+                    "getProducts"
+                  ],
+                  "query": [
+                    {
+                      "key": "tag",
+                      "value": "Limited Edition"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "http://localhost:3000/api/product/getProducts",
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/api/product/getProducts?filter=him,unisex&price=asc",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "api",
+                    "product",
+                    "getProducts"
+                  ],
+                  "query": [
+                    {
+                      "key": "filter",
+                      "value": "him,unisex"
+                    },
+                    {
+                      "key": "price",
+                      "value": "asc"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "http://localhost:3000/api/product/getProductById",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"name\": \"Janan \",\r\n  \"price\": 5000,\r\n  \"discountPercentage\": 0,\r\n  \"description\": \"Best for men\",\r\n  \"brand_id\": \"69dd6a7749973998635d91e2\",\r\n  \"category_id\": \"69dd61f21782c9c4f1938b64\",\r\n  \"tag_id\": \"69e0c8eac41056ad7871cc09\"\r\n}"
+                },
+                "url": {
+                  "raw": "http://localhost:3000/api/product/getProductById?id=69e408da1a781a2179a1f058",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "api",
+                    "product",
+                    "getProductById"
+                  ],
+                  "query": [
+                    {
+                      "key": "id",
+                      "value": "69e408da1a781a2179a1f058"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "http://localhost:3000/api/auth/signUp",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"userName\" : \"usman\",\r\n    \"email\" : \"usman@gmail.com\",\r\n    \"password\" : \"12345\",\r\n    \"phone\" : \"123456789\",\r\n    \"gender\" : \"male\",\r\n    \"dateOfBirth\" : \"29 may 2003\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/auth/signUp",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "auth",
+                "signUp"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:3000/api/auth/signIn",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\" : \"usman@gmail.com\",\r\n    \"password\" : \"12345\"\r\n\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/auth/signIn",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "auth",
+                "signIn"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:3000/api/category/creatCatagory",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\":\"men\",   // valid enum : men women unisex\r\n    \"description\" : \"Best for men\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/category/creatCategory",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "category",
+                "creatCategory"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:3000/api/category/updateCategory",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"description\" : \"Best for men\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/category/updateCategory?id=69dd3155e5eccd29021decf0",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "category",
+                "updateCategory"
+              ],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "69dd3155e5eccd29021decf0"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:3000/api/category/getCategoryById",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/api/category/getCategoryById?id=69dd319ae5eccd29021decf2",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "category",
+                "getCategoryById"
+              ],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "69dd319ae5eccd29021decf2"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:3000/api/category/getCategory",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/api/category/getCategory",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "category",
+                "getCategory"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:3000/api/category/deleteCategory",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/api/category/deleteCategory?id=69dd3155e5eccd29021decf0",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "category",
+                "deleteCategory"
+              ],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "69dd3155e5eccd29021decf0"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:3000/api/brand/creatBrand",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"brandName\" : \"Armaf\",\r\n    \"description\" : \"Budget-friendly alternatives inspired by premium perfumes.\",\r\n    \"country\" : \"Dubai\" ,\r\n    \"address\" : \"United Arab Emirates (UAE)\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/brand/creatBrand",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "brand",
+                "creatBrand"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:3000/api/product/addProduct",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "  {\r\n   \"name\": \"J'adore Eau de Parfum\",\r\n    \"price\": 9000,\r\n    \"discountPrice\": 8600,\r\n    \"description\": \"Best for Women\",\r\n    \"brand_id\": \"69e403911a781a2179a1f03a\",\r\n    \"category_id\": \"69dd319ae5eccd29021decf2\",\r\n    \"tag_id\": \"69e0c94fc41056ad7871cc0d\",\r\n    \"rating\": 0,\r\n    \"image_id\": \"69e4079a1a781a2179a1f04c\"\r\n  }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/product/addProduct",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "product",
+                "addProduct"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:3000/api/brand/getBrandById",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/api/brand/getBrandById?id=69dd6a7749973998635d91e2",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "brand",
+                "getBrandById"
+              ],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "69dd6a7749973998635d91e2"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:3000/api/brand/updateBrand",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"description\" : \"Powered By Junaid Jamshaad\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/brand/updateBrand?id=69dd6a7749973998635d91e2",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "brand",
+                "updateBrand"
+              ],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "69dd6a7749973998635d91e2"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:3000/api/brand/deleteBrand",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"description\" : \"Powered By Junaid Jamshaad\"\r\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/brand/deleteBrand?id=69de552e5daccbc13968a5ad",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "brand",
+                "deleteBrand"
+              ],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "69de552e5daccbc13968a5ad"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:3000/api/tag/createTag",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\" : \"Limited Edition\",\r\n    \"description\" : \"World's limited fragrances.\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/tag/createTag",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "tag",
+                "createTag"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:3000/api/tag/getTags",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\" : \"Limited Edition\",\r\n    \"description\" : \"World's limited fragrances.\"\r\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/tag/getTags",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "tag",
+                "getTags"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:3000/api/tag/getTagById",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\" : \"Limited Edition\",\r\n    \"description\" : \"World's limited fragrances.\"\r\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/tag/getTagById?id=69e0c8eac41056ad7871cc09",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "tag",
+                "getTagById"
+              ],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "69e0c8eac41056ad7871cc09"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:3000/api/product/updateProduct",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    // update api can be used to update any data for the product but the main thing is to update discount price\r\n  \"discountPercentage\": 10\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/product/updateProduct?id=69e13dd73dbd4b18012d308a",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "product",
+                "updateProduct"
+              ],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "69e13dd73dbd4b18012d308a"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:3000/api/product/addProduct",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"Janan \",\r\n  \"price\": 5000,\r\n  \"discountPercentage\": 0,\r\n  \"description\": \"Best for men\",\r\n  \"brand_id\": \"69dd6a7749973998635d91e2\",\r\n  \"category_id\": \"69dd61f21782c9c4f1938b64\",\r\n  \"tag_id\": \"69e0c8eac41056ad7871cc09\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/product/addProduct",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "product",
+                "addProduct"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:3000/single",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "image",
+                  "type": "file",
+                  "uuid": "0ab00de9-7fc0-4095-b9fa-c173c9ca7c3d",
+                  "src": "/C:/Users/Microsoft/OneDrive/Desktop/fragrances/Miss Dior Blooming Bouquet.jpg"
+                }
+              ]
+            },
+            "url": {
+              "raw": "http://localhost:3000/single?",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "single"
+              ],
+              "query": [
+                {
+                  "key": "",
+                  "value": null,
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:3000/api/auth/test",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OWU0MGFkM2Q2ZTY3MWIwNWJlNzAyZGEiLCJlbWFpbCI6InVzbWFuQGdtYWlsLmNvbSIsImlhdCI6MTc3NjU1NDMxMywiZXhwIjoxNzc2NTU0MzczfQ.YlIie8X8erKOfPD5oxwMMpCPm7lfL2cfG-Fbwe8M5qM",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\" : \"usman@gmail.com\",\r\n    \"password\" : \"12345\"\r\n\r\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/auth/test",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "auth",
+                "test"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Order Flow",
+      "item": [
+        {
+          "name": "checkout",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OWU0NzVkZmY0MmVhMTQwMjA5NzA2MmUiLCJlbWFpbCI6ImxhaWJhYUB5b3BtYWlsLmNvbSIsImlhdCI6MTc3NjYwODQwNywiZXhwIjoxNzc3MjEzMjA3fQ.0jri4C3WMXWACDL2vcq7I2wH-8_5xS0G6Z1dd0lulDI",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/order/checkout",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "order",
+                "checkout"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "create order",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OWU0NzVkZmY0MmVhMTQwMjA5NzA2MmUiLCJlbWFpbCI6ImxhaWJhYUB5b3BtYWlsLmNvbSIsImlhdCI6MTc3NjYwODQwNywiZXhwIjoxNzc3MjEzMjA3fQ.0jri4C3WMXWACDL2vcq7I2wH-8_5xS0G6Z1dd0lulDI",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"items\": [\r\n    {\r\n      \"productId\": \"69e4e205943d28da9ba28802\",\r\n      \"quantity\": 1\r\n    },\r\n    {\r\n      \"productId\": \"69e5074bb5fd2e38fdbf08b5\",\r\n      \"quantity\": 3\r\n    }\r\n  ],\r\n  \"customerInfo\": {\r\n    \"name\": \"Test Customer\",\r\n    \"phone\": \"03123456789\",\r\n    \"email\": \"test@example.com\",\r\n    \"address\": \"456 Main Boulevard\",\r\n    \"city\": \"Karachi\",\r\n    \"postalCode\": \"75500\",\r\n    \"province\": \"Sindh\"\r\n  },\r\n  \"agreedToTerms\": true\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/order/create",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "order",
+                "create"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cancel order",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OWU0NzVkZmY0MmVhMTQwMjA5NzA2MmUiLCJlbWFpbCI6ImxhaWJhYUB5b3BtYWlsLmNvbSIsImlhdCI6MTc3NjYwODQwNywiZXhwIjoxNzc3MjEzMjA3fQ.0jri4C3WMXWACDL2vcq7I2wH-8_5xS0G6Z1dd0lulDI",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"items\": [\r\n    {\r\n      \"productId\": \"69e4e205943d28da9ba28802\",\r\n      \"quantity\": 1\r\n    },\r\n    {\r\n      \"productId\": \"69e5074bb5fd2e38fdbf08b5\",\r\n      \"quantity\": 3\r\n    }\r\n  ],\r\n  \"customerInfo\": {\r\n    \"name\": \"Test Customer\",\r\n    \"phone\": \"03123456789\",\r\n    \"email\": \"test@example.com\",\r\n    \"address\": \"456 Main Boulevard\",\r\n    \"city\": \"Karachi\",\r\n    \"postalCode\": \"75500\",\r\n    \"province\": \"Sindh\"\r\n  },\r\n  \"agreedToTerms\": true\r\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/order/69e51941af22b7d92d6e6670/cancel",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "order",
+                "69e51941af22b7d92d6e6670",
+                "cancel"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "stock",
+      "item": [
+        {
+          "name": "manage stock / add",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OWU0ZWJiMjQ0MDA4YzFmNDI5ZTdlZTAiLCJlbWFpbCI6ImFkbWluQHlvcG1haWwuY29tIiwiaWF0IjoxNzc2NjE0OTMzLCJleHAiOjE3NzcyMTk3MzN9.ECiszcjV272TcLg82fHblHn20xtgh8ozGxtcza9V8zE",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"productId\": \"69e5074bb5fd2e38fdbf08b5\",\r\n    \"operation\": \"add\",\r\n    \"quantity\": 30\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/stock/manage",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "stock",
+                "manage"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "manage stock / deduct",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OWU0ZWJiMjQ0MDA4YzFmNDI5ZTdlZTAiLCJlbWFpbCI6ImFkbWluQHlvcG1haWwuY29tIiwiaWF0IjoxNzc2NjE0OTMzLCJleHAiOjE3NzcyMTk3MzN9.ECiszcjV272TcLg82fHblHn20xtgh8ozGxtcza9V8zE",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"productId\": \"69e5074bb5fd2e38fdbf08b5\",\r\n    \"operation\": \"deduct\",\r\n    \"quantity\": 10\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/stock/manage",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "stock",
+                "manage"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get stock",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OWU0ZWJiMjQ0MDA4YzFmNDI5ZTdlZTAiLCJlbWFpbCI6ImFkbWluQHlvcG1haWwuY29tIiwiaWF0IjoxNzc2NjE0OTMzLCJleHAiOjE3NzcyMTk3MzN9.ECiszcjV272TcLg82fHblHn20xtgh8ozGxtcza9V8zE",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/stock/get?productId=69e4e205943d28da9ba28802",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "stock",
+                "get"
+              ],
+              "query": [
+                {
+                  "key": "productId",
+                  "value": "69e4e205943d28da9ba28802"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

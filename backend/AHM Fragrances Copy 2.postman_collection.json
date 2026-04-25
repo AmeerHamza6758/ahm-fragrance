@@ -1,0 +1,123 @@
+{
+  "info": {
+    "_postman_id": "c062f534-89ba-4c70-aad2-c4ee0a13626b",
+    "name": "AHM Fragrances Copy 2",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "47125047",
+    "_collection_link": "https://go.postman.co/collection/47125047-c062f534-89ba-4c70-aad2-c4ee0a13626b?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Whislist Copy",
+      "item": [
+        {
+          "name": "add favorite",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OWU0NzVkZmY0MmVhMTQwMjA5NzA2MmUiLCJlbWFpbCI6ImxhaWJhYUB5b3BtYWlsLmNvbSIsImlhdCI6MTc3NjYwODQwNywiZXhwIjoxNzc3MjEzMjA3fQ.0jri4C3WMXWACDL2vcq7I2wH-8_5xS0G6Z1dd0lulDI",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"productId\": \"69e75f4aaf49b1cf5105885f\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/favorite/toggle",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "favorite",
+                "toggle"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get all favorite",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OWU0NzVkZmY0MmVhMTQwMjA5NzA2MmUiLCJlbWFpbCI6ImxhaWJhYUB5b3BtYWlsLmNvbSIsImlhdCI6MTc3NjYwODQwNywiZXhwIjoxNzc3MjEzMjA3fQ.0jri4C3WMXWACDL2vcq7I2wH-8_5xS0G6Z1dd0lulDI",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/favorite/get",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "favorite",
+                "get"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Ratings and reviews Copy",
+      "item": [
+        {
+          "name": "Add Rating",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "Get all reviews",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/rating-review/all-reviews",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "rating-review",
+                "all-reviews"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "specific product rating",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
