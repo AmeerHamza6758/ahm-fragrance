@@ -51,7 +51,7 @@ export default function MensPage() {
   const hasMore = totalItems > 50 && !!hasNextPage;
 
   return (
-    <main className="bg-background min-h-screen pt-10">
+    <main className="bg-background min-h-screen pt-6 pb-10 md:pt-10 md:pb-16">
       {/* Hero Header */}
       <section className="text-center pb-4 px-4">
         <h1 className="text-[#7E525C] text-5xl sm:text-6xl md:text-7xl font-noto font-normal">
@@ -114,7 +114,7 @@ export default function MensPage() {
       </section>
 
       {/* Products Grid */}
-      <section className="w-full px-4 sm:px-6 lg:px-8 xl:px-10 2xl:px-12 pt-5 pb-20">
+      <section className="w-full px-4 sm:px-6 lg:px-8 xl:px-10 2xl:px-12 pt-5">
         {isLoading && (
           <div className="flex justify-center items-center py-24">
             <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
@@ -135,9 +135,9 @@ export default function MensPage() {
 
         {!isLoading && !isError && filteredProducts.length > 0 && (
           <>
-            <div className="grid grid-cols-[repeat(auto-fit,minmax(220px,260px))] justify-start gap-x-5 gap-y-10">
+            <div className="grid grid-cols-1 md:grid-cols-[repeat(auto-fit,minmax(220px,260px))] justify-items-center md:justify-items-stretch md:justify-start gap-x-5 gap-y-10">
               {filteredProducts.map((product) => (
-                <div key={product._id || product.id} className="w-full max-w-[260px]">
+                <div key={product._id || product.id} className="w-full max-w-[340px] md:max-w-[260px]">
                   <ProductCard product={product} />
                 </div>
               ))}

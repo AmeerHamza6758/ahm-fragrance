@@ -6,23 +6,47 @@ const STATIC_FALLBACK = [
   {
     _id: "1",
     rating: 5,
-    review:
+    reviewText:
       "I'm amazed by the quality of Ocean Drift. It lasts literally 12+ hours on my skin. Definitely my new go-to fragrance.",
-    userId: { userName: "Ahmed Khan" },
+    userName: "Ahmed Khan",
+    productName: "Ocean Drift",
+    avatarUrl: "https://i.pravatar.cc/96?img=12",
   },
   {
     _id: "2",
     rating: 5,
-    review:
+    reviewText:
       "The Velvet Peony is identical to my favorite high-end designer perfume. I can't believe I can get this quality for this price.",
-    userId: { userName: "Sara Malik" },
+    userName: "Sara Malik",
+    productName: "Velvet Peony",
+    avatarUrl: "https://i.pravatar.cc/96?img=5",
   },
   {
     _id: "3",
     rating: 4,
-    review:
+    reviewText:
       "Premium packaging and fast delivery. Reached me in Lahore in just 2 days. Highly recommend AHM for luxury lovers.",
-    userId: { userName: "Bilal Sheikh" },
+    userName: "Bilal Sheikh",
+    productName: "Amber Reserve",
+    avatarUrl: "https://i.pravatar.cc/96?img=15",
+  },
+  {
+    _id: "4",
+    rating: 5,
+    reviewText:
+      "Elegant scent profile and excellent projection. I received compliments all evening at a wedding event.",
+    userName: "Hira Nadeem",
+    productName: "Rose Noir",
+    avatarUrl: "https://i.pravatar.cc/96?img=32",
+  },
+  {
+    _id: "5",
+    rating: 4,
+    reviewText:
+      "Beautiful presentation and authentic fragrance notes. Great value for anyone building a premium fragrance collection.",
+    userName: "Usman Tariq",
+    productName: "Cedar Bloom",
+    avatarUrl: "https://i.pravatar.cc/96?img=22",
   },
 ];
 
@@ -48,47 +72,52 @@ export default function Reviews() {
     return raw.length > 0 ? raw.slice(0, 6) : STATIC_FALLBACK;
   })();
 
+  const getInitials = (name = "Anonymous") =>
+    name
+      .split(" ")
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase() || "")
+      .join("");
+
   return (
     <section className="reviews-section">
       <h2 className="reviews-heading">Voices of Luxury</h2>
 
       {isLoading ? (
         <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            padding: "40px 0",
-          }}
+          className="flex justify-center py-10"
         >
           <div className="w-8 h-8 border-4 border-[#7e525c] border-t-transparent rounded-full animate-spin" />
         </div>
       ) : (
         <div className="reviews-grid">
           {reviews.map((review) => {
-            const name = review.userName || "Anonymous";
+            const name = review.userName || "Anonymous User";
             const productName = review.productName || "";
-            const text =
-              review.reviewText || review.review || review.comment || "";
+            const text = review.reviewText || review.review || "";
+            const avatarUrl = review.avatarUrl || "";
 
             return (
               <div key={review.reviewId ?? review._id} className="review-card">
+                <div className="flex flex-col items-start gap-2">
                 <StarRating rating={review.rating ?? 5} />
                 {productName && (
-                  <p
-                    style={{
-                      fontSize: "11px",
-                      color: "#b09090",
-                      marginBottom: "6px",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.08em",
-                    }}
+                  <p className="text-xs sm:text-sm text-secondary font-manrope uppercase tracking-wide" 
                   >
                     {productName}
                   </p>
                 )}
-                <p className="review-text">&ldquo;{text}&rdquo;</p>
+                </div>
+                <p className="text-base sm:text-lg text-muted font-manrope">&ldquo;{text}&rdquo;</p>
                 <div className="review-user">
-                  <div className="review-user-circle" />
+                  <div className="review-user-circle">
+                    {avatarUrl ? (
+                      <img src={avatarUrl} alt={name} className="review-user-image" />
+                    ) : (
+                      <span className="review-user-initials">{getInitials(name)}</span>
+                    )}
+                  </div>
                   <div>
                     <h4>{name}</h4>
                     <span>Verified Buyer</span>

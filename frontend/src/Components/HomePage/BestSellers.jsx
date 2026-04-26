@@ -52,14 +52,16 @@ export default function BestSellers() {
         </div>
       </div>
 
-      <div className="grid grid-cols-[repeat(auto-fit,minmax(220px,260px))] justify-start gap-x-5 gap-y-10">
-        {isLoading ? (
-          <div>Loading...</div>
-        ) : (
-          visibleProducts.map((product) => (
+      {isLoading ? (
+        <div className="w-full max-w-[1184px] mx-auto flex justify-center items-center py-12">
+          <div className="w-9 h-9 border-4 border-[#7e525c] border-t-transparent rounded-full animate-spin" />
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 md:grid-cols-[repeat(auto-fit,minmax(220px,260px))] justify-items-center md:justify-items-stretch md:justify-start gap-x-5 gap-y-10">
+          {visibleProducts.map((product) => (
             <div
               key={product._id || product.id}
-              className="w-full max-w-[260px] relative group"
+              className="w-full max-w-[340px] md:max-w-[260px] relative group"
             >
               <Link
                 href={`/product/${product._id || product.id}`}
@@ -76,13 +78,18 @@ export default function BestSellers() {
                       unoptimized
                     />
                   </div>
-                  <p className="product-category">
-                    {product.category_id?.name || "-"}
-                  </p>
-                  <h3 className="product-name">{product.name}</h3>
-                  <p className="product-price">
-                    Rs. {product.price?.toLocaleString()}
-                  </p>
+                  <div className="flex flex-col items-start gap-2">
+                    <p className="product-category">
+                      {product.category_id?.name || "-"}
+                    </p>
+                    <h3 className="product-name">{product.name}</h3>
+                    <p className="product-notes text-xs sm:text-sm text-muted font-manrope tracking-wide">
+                      {product.description?.trim() || "A premium signature fragrance crafted for lasting elegance."}
+                    </p>
+                    <p className="product-price">
+                      Rs. {product.price?.toLocaleString()}
+                    </p>
+                  </div>
                 </div>
               </Link>
               <button
@@ -106,9 +113,9 @@ export default function BestSellers() {
                 />
               </button>
             </div>
-          ))
-        )}
-      </div>
+          ))}
+        </div>
+      )}
     </section>
   );
 }

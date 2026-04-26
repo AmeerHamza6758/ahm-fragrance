@@ -8,7 +8,7 @@ import about_bg from "/public/Images/Background.jpg.jpeg";
 
 export default function AboutUsPage() {
   return (
-    <main className="bg-[#fdf9f5] w-full min-h-screen pt-21">
+    <main className="bg-[#fdf9f5] w-full min-h-screen page-main-spacing">
       {/* Hero Section with Text Overlay */}
       <section className="relative w-full h-125 sm:h-150 md:h-175 flex items-center justify-center overflow-hidden">
         <Image

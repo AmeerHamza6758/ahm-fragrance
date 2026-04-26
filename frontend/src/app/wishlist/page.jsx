@@ -77,7 +77,7 @@ export default function WishlistPage() {
   };
 
   return (
-    <main className="min-h-screen bg-background pt-10 pb-16 overflow-x-hidden">
+    <main className="min-h-screen bg-background pt-6 pb-10 md:pt-10 md:pb-16 overflow-x-hidden">
       {/* Breadcrumb */}
       <div className="mx-auto max-w-7xl px-18 p lg:px-8 md:px-6 sm:px-5">
         <nav className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.9px] text-secondary/60 md:text-[10px] sm:flex-wrap sm:gap-2">

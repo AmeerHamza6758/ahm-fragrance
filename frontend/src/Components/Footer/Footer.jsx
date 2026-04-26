@@ -42,13 +42,6 @@ export default function Footer() {
             Instagram
           </a>
           <a
-            href="https://pinterest.com"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Pinterest
-          </a>
-          <a
             href="https://facebook.com"
             target="_blank"
             rel="noopener noreferrer"

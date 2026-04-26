@@ -34,7 +34,7 @@ export default function ContactPage() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-[#fdf9f5] pb-24 pt-24">
+    <main className="min-h-screen bg-[#fdf9f5] page-main-spacing">
       {/* Hero Section */}
       <section className="w-full bg-[#fdf9f5] relative">
         <div className="absolute inset-0 h-75 w-full bg-[url('/Images/best-1.svg')] bg-cover bg-center opacity-10 pointer-events-none" />

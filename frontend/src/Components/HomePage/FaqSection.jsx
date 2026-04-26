@@ -54,7 +54,7 @@ export default function FaqSection() {
             faqs.map((faq, idx) => (
               <div key={faq._id}>
                 <div
-                  className="flex items-start justify-between w-full cursor-pointer py-4"
+                  className="flex items-start justify-between w-full cursor-pointer py-1"
                   onClick={() => toggleFaq(faq._id)}
                   role="button"
                   tabIndex={0}
@@ -63,23 +63,21 @@ export default function FaqSection() {
                   }
                 >
                   <span
-                    className="font-bold text-[1.6rem] leading-snug text-[#23201c]"
-                    style={{ fontFamily: "Arial, sans-serif" }}
+                    className="font-bold font-noto text-lg leading-snug text-[#23201c]"
                   >
                     {faq.question}
                   </span>
                   <span
-                    className="text-[2rem] font-bold text-[#7e525c] select-none"
+                    className="text-2xl font-bold text-[#7e525c] select-none"
                     style={{ lineHeight: 1 }}
                   >
                     {expandedId === faq._id ? "−" : "+"}
                   </span>
                 </div>
                 {expandedId === faq._id && (
-                  <div className="pl-2 pt-2 pb-4">
+                  <div className="pt-2 pb-4">
                     <div
-                      className="text-[1.25rem] text-[#5a524a] font-normal leading-[1.5]"
-                      style={{ fontFamily: "Arial, sans-serif" }}
+                      className="text-base font-manrope text-[#5a524a] font-normal leading-[1.5]"
                     >
                       {faq.answer}
                     </div>

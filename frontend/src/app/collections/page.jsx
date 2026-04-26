@@ -59,8 +59,7 @@ export default function CollectionsPage() {
   }
 
   return (
-    <main className="collections-main">
-
+    <main className="collections-main page-main-spacing">
       <section className="text-center pb-4 px-4">
           <h1 className="text-[#7E525C] text-5xl sm:text-6xl md:text-7xl font-noto font-normal">
           Our Collection
@@ -76,14 +75,14 @@ export default function CollectionsPage() {
 
       {/* Category Cards */}
       <section className="mx-auto px-4 sm:px-6 py-8">
-        <div className="grid grid-cols-3 gap-4 sm:gap-8">
-          <div className="relative overflow-hidden h-[300px] w-full rounded-[48px_16px_48px_16px]">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-8">
+          <div className="relative overflow-hidden h-[220px] sm:h-[300px] w-full rounded-[32px_12px_32px_12px] sm:rounded-[48px_16px_48px_16px]">
             <Image
               src={img_1}
               alt="For Men"
               fill
-              sizes="(max-width: 640px) 33vw, 33vw"
-              className="object-fill"
+              sizes="(max-width: 639px) 100vw, 33vw"
+              className="object-cover object-center"
             />
             <div className="absolute bottom-6 left-6 flex flex-col items-start justify-start">
               <h3 className="text-white text-base sm:text-lg md:text-2xl font-noto font-normal mb-1">
@@ -93,13 +92,13 @@ export default function CollectionsPage() {
             </div>
           </div>
 
-          <div className="relative overflow-hidden h-[300px] w-full rounded-[48px_16px_48px_16px]">
+          <div className="relative overflow-hidden h-[220px] sm:h-[300px] w-full rounded-[32px_12px_32px_12px] sm:rounded-[48px_16px_48px_16px]">
             <Image
               src={img_2}
               alt="For Women"
               fill
-              sizes="(max-width: 640px) 33vw, 33vw"
-              className="object-fill object-center"
+              sizes="(max-width: 639px) 100vw, 33vw"
+              className="object-cover object-center"
             />
             <div className="absolute bottom-6 left-6 flex flex-col items-start justify-start">
               <h3 className="text-white text-base sm:text-lg md:text-2xl font-noto font-normal mb-1">
@@ -109,12 +108,12 @@ export default function CollectionsPage() {
             </div>
           </div>
 
-          <div className="relative overflow-hidden h-[300px] w-full rounded-[48px_16px_48px_16px]">
+          <div className="relative overflow-hidden h-[220px] sm:h-[300px] w-full rounded-[32px_12px_32px_12px] sm:rounded-[48px_16px_48px_16px]">
             <Image
               src={img_3}
               alt="Best Sellers"
               fill
-              sizes="(max-width: 640px) 33vw, 33vw"
+              sizes="(max-width: 639px) 100vw, 33vw"
               className="object-cover object-center"
             />
             <div className="absolute bottom-6 left-6 flex flex-col items-start justify-start">
@@ -129,12 +128,12 @@ export default function CollectionsPage() {
 
       {/* Filters and Sort */}
       <section className="w-full px-4 sm:px-6 lg:px-8 py-4">
-        <div className="w-full flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 lg:gap-8">
-          <div className="filter-tabs">
+        <div className="w-full flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between lg:gap-8">
+          <div className="filter-tabs w-full overflow-x-auto pb-1">
             {categories.map((cat) => (
               <button
                 key={cat.id}
-                className={`filter-tab ${activeCategory === cat.id ? "active" : ""}`}
+                className={`filter-tab min-w-max ${activeCategory === cat.id ? "active" : ""}`}
                 onClick={() => setActiveCategory(cat.id)}
               >
                 {cat.label}
@@ -142,18 +141,18 @@ export default function CollectionsPage() {
             ))}
           </div>
 
-          <div className="sort-container">
+          <div className="sort-container w-full lg:w-auto justify-between lg:justify-start">
             <span className="sort-label">SORT:</span>
-            <div className="sort-dropdown">
+            <div className="sort-dropdown w-full sm:w-auto">
               <button
-                className="sort-button"
+                className="sort-button w-full sm:w-auto justify-between border border-[#7E525C33] rounded-full px-4 py-2"
                 onClick={() => setSortOpen(!sortOpen)}
               >
                 {sortOptions.find((opt) => opt.id === sortBy)?.label}
                 <ChevronDown size={18} />
               </button>
               {sortOpen && (
-                <div className="sort-menu">
+                <div className="sort-menu left-0 right-0 sm:left-auto sm:right-0">
                   {sortOptions.map((opt) => (
                     <button
                       key={opt.id}
@@ -194,9 +193,9 @@ export default function CollectionsPage() {
         )}
 
         {!isLoading && !isError && products.length > 0 && (
-          <div className="grid grid-cols-[repeat(auto-fit,minmax(220px,260px))] justify-start gap-x-5 gap-y-10">
+          <div className="grid grid-cols-1 md:grid-cols-[repeat(auto-fit,minmax(220px,260px))] justify-items-center md:justify-items-stretch md:justify-start gap-x-5 gap-y-10">
             {products.map((product) => (
-              <div key={product._id} className="w-full max-w-[260px]">
+              <div key={product._id} className="w-full max-w-[340px] md:max-w-[260px]">
                 <ProductCard product={product} />
               </div>
             ))}

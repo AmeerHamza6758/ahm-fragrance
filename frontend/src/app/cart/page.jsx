@@ -36,7 +36,7 @@ export default function CartPage() {
   };
 
   return (
-    <main className="cart-page-main  pt-4 pb-10 sm:pt-10 sm:pb-16">
+    <main className="cart-page-main">
       <section className="cart-section">
         <div className="cart-container">
           {/* Cart Items */}
