@@ -14,7 +14,7 @@ export interface GetFavoritesResponse {
 export interface ToggleFavoriteResponse {
   success: boolean;
   message: string;
-  isFavorited: boolean;
+  isFavorited?: boolean;
   data?: unknown;
 }
 
@@ -24,20 +24,38 @@ const normalizeFavoriteProducts = (payload: unknown): Product[] => {
 
   if (Array.isArray(payload)) {
     return payload
-      .map((item: any) => item?.product_id || item?.product || item)
+      .map(
+        (item: any) =>
+          item?.product ||
+          item?.productId ||
+          item?.product_id ||
+          item
+      )
       .filter(Boolean);
   }
 
   const responseData = (payload as any)?.data;
   if (Array.isArray(responseData)) {
     return responseData
-      .map((item: any) => item?.product_id || item?.product || item)
+      .map(
+        (item: any) =>
+          item?.product ||
+          item?.productId ||
+          item?.product_id ||
+          item
+      )
       .filter(Boolean);
   }
 
   if (Array.isArray((payload as any)?.items)) {
     return (payload as any).items
-      .map((item: any) => item?.product_id || item?.product || item)
+      .map(
+        (item: any) =>
+          item?.product ||
+          item?.productId ||
+          item?.product_id ||
+          item
+      )
       .filter(Boolean);
   }
 

@@ -2,6 +2,7 @@ import { Manrope, Noto_Serif } from "next/font/google";
 import "./globals.css";
 import Header from "@/Components/Header/Header";
 import Footer from "@/Components/Footer/Footer";
+import RouteLoader from "@/Components/RouteLoader";
 import { Providers } from "./providers";
 
 const manrope = Manrope({
@@ -30,6 +31,7 @@ export default function RootLayout({ children }) {
     >
       <body className="min-h-full flex flex-col bg-background text-foreground font-sans">
         <Providers>
+          <RouteLoader />
           <Header />
           {children}
           <Footer />

@@ -124,7 +124,7 @@ function ResetPasswordInner() {
   const isFull = code.every((d) => d !== "");
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-linear-to-br from-[#f8f0ed] via-[#f4e8e4] to-[#ede3de] px-2 py-8 pt-24">
+    <main className="flex items-center justify-center bg-linear-to-br from-[#f8f0ed] via-[#f4e8e4] to-[#ede3de] px-2 pb-16 pt-10">
       <div
         className="w-full max-w-md bg-white rounded-3xl shadow-2xl px-8 py-8 flex flex-col items-center"
         style={{ boxShadow: "0 12px 64px 0 rgba(80,30,40,0.12)" }}

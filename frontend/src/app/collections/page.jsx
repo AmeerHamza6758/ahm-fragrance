@@ -1,14 +1,10 @@
 "use client";
 import ProductCard from "@/Components/ProductCard";
-// import img_1 from "/public/Images/colection_img_1.jpg";
-// import img_2 from "/public/Images/colection_img_2.jpg";
-// import img_3 from "/public/Images/colection_img_3.jpg";
 
 import { useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { ChevronDown } from "lucide-react";
-import { useProducts } from "@/lib/api";
+import { useInfiniteProducts } from "@/lib/api";
 
 
 const img_1 = "/Images/colection_img_1.jpg";
@@ -17,10 +13,10 @@ const img_3 = "/Images/colection_img_3.jpg";
 
 const categories = [
   { id: "all", label: "All Collection" },
-  { id: "inspired", label: "Inspired" },
-  { id: "signature", label: "Signature" },
-  { id: "oud", label: "Oud Series" },
-  { id: "limited", label: "Limited Edition" },
+  { id: "Fresh", label: "Fresh" },
+  { id: "Woody", label: "Woody" },
+  { id: "Floral", label: "Floral" },
+  { id: "Oriental", label: "Oriental" },
 ];
 
 const sortOptions = [
@@ -39,17 +35,23 @@ export default function CollectionsPage() {
   if (sortBy === "price-asc") filters.price = "asc";
   if (sortBy === "price-desc") filters.price = "desc";
   if (activeCategory !== "all") {
-    // Use the label (with spaces/case) for tag filter (must match API exactly)
-    const tagLabel = categories.find((cat) => cat.id === activeCategory)?.label;
-    filters.tag = tagLabel;
+    // Backend expects exact tag names in `tag`.
+    filters.tag = activeCategory;
   }
 
   const {
-    data: products = [],
+    data,
     isLoading,
     isError,
     error,
-  } = useProducts(filters);
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteProducts(filters, 50);
+
+  const products = data?.pages?.flatMap((page) => page.data) ?? [];
+  const totalItems = data?.pages?.[0]?.pagination?.totalItems ?? products.length;
+  const showLoadMore = totalItems > 50 && !!hasNextPage;
 
   // Debug logging
   if (isError) {
@@ -58,66 +60,76 @@ export default function CollectionsPage() {
 
   return (
     <main className="collections-main">
-      {/* Header Section */}
-      <section className="collections-header">
-        <div className="collections-header-content">
-          <p className="fragrance-gallery">THE FRAGRANCE GALLERY</p>
-          <h1>Our Collection</h1>
-          <nav className="breadcrumb">
-            <Link href="/">Home</Link>
-            <span>&rsaquo;</span>
-            <span>Collection</span>
-          </nav>
+
+      <section className="text-center pb-4 px-4">
+          <h1 className="text-[#7E525C] text-5xl sm:text-6xl md:text-7xl font-noto font-normal">
+          Our Collection
+        </h1>
+        <div className="flex items-center justify-center gap-3 mt-3">
+          <span className="block h-px w-12 bg-[#D1C3C1]" />
+          <p className="text-[#4E4543] text-xs uppercase tracking-[4px] font-normal">
+          THE FRAGRANCE GALLERY        
+          </p>
+          <span className="block h-px w-12 bg-[#D1C3C1]" />
         </div>
       </section>
 
       {/* Category Cards */}
-      <section className="category-cards-section">
-        <div className="category-cards">
-          <div className="category-card">
+      <section className="mx-auto px-4 sm:px-6 py-8">
+        <div className="grid grid-cols-3 gap-4 sm:gap-8">
+          <div className="relative overflow-hidden h-[300px] w-full rounded-[48px_16px_48px_16px]">
             <Image
               src={img_1}
               alt="For Men"
               fill
-              className="category-card-image"
+              sizes="(max-width: 640px) 33vw, 33vw"
+              className="object-fill"
             />
-            <div className="category-overlay"></div>
-            <div className="category-content">
-              <h3>For Men</h3>
+            <div className="absolute bottom-6 left-6 flex flex-col items-start justify-start">
+              <h3 className="text-white text-base sm:text-lg md:text-2xl font-noto font-normal mb-1">
+                For Men
+              </h3>
+              <div className="w-16 h-0.5 bg-[#F0B8C3]" />
             </div>
           </div>
 
-          <div className="category-card">
+          <div className="relative overflow-hidden h-[300px] w-full rounded-[48px_16px_48px_16px]">
             <Image
               src={img_2}
               alt="For Women"
               fill
-              className="category-card-image"
+              sizes="(max-width: 640px) 33vw, 33vw"
+              className="object-fill object-center"
             />
-            <div className="category-overlay"></div>
-            <div className="category-content">
-              <h3>For Women</h3>
+            <div className="absolute bottom-6 left-6 flex flex-col items-start justify-start">
+              <h3 className="text-white text-base sm:text-lg md:text-2xl font-noto font-normal mb-1">
+                For Women
+              </h3>
+              <div className="w-16 h-0.5 bg-[#F0B8C3]" />
             </div>
           </div>
 
-          <div className="category-card">
+          <div className="relative overflow-hidden h-[300px] w-full rounded-[48px_16px_48px_16px]">
             <Image
               src={img_3}
               alt="Best Sellers"
               fill
-              className="category-card-image"
+              sizes="(max-width: 640px) 33vw, 33vw"
+              className="object-cover object-center"
             />
-            <div className="category-overlay"></div>
-            <div className="category-content">
-              <h3>Best Sellers</h3>
+            <div className="absolute bottom-6 left-6 flex flex-col items-start justify-start">
+              <h3 className="text-white text-base sm:text-lg md:text-2xl font-noto font-normal mb-1">
+                Best Sellers
+              </h3>
+              <div className="w-16 h-0.5 bg-[#F0B8C3]" />
             </div>
           </div>
         </div>
       </section>
 
       {/* Filters and Sort */}
-      <section className="filters-section">
-        <div className="filters-container">
+      <section className="w-full px-4 sm:px-6 lg:px-8 py-4">
+        <div className="w-full flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 lg:gap-8">
           <div className="filter-tabs">
             {categories.map((cat) => (
               <button
@@ -162,7 +174,7 @@ export default function CollectionsPage() {
       </section>
 
       {/* Products Grid */}
-      <section className="products-grid-section">
+      <section className="w-full px-4 sm:px-6 lg:px-8 py-8">
         {isLoading && (
           <div className="flex justify-center items-center py-20">
             <div className="w-10 h-10 border-4 border-black border-t-transparent rounded-full animate-spin" />
@@ -182,18 +194,28 @@ export default function CollectionsPage() {
         )}
 
         {!isLoading && !isError && products.length > 0 && (
-          <div className="products-grid">
+          <div className="grid grid-cols-[repeat(auto-fit,minmax(220px,260px))] justify-start gap-x-5 gap-y-10">
             {products.map((product) => (
-              <ProductCard key={product._id} product={product} />
+              <div key={product._id} className="w-full max-w-[260px]">
+                <ProductCard product={product} />
+              </div>
             ))}
           </div>
         )}
       </section>
 
       {/* Load More Button */}
-      <section className="load-more-section">
-        <button className="load-more-btn">Load More Fragrances</button>
-      </section>
+      {showLoadMore && (
+        <section className="w-full px-4 sm:px-6 lg:px-8 py-10 flex justify-center">
+          <button
+            className="load-more-btn"
+            onClick={() => fetchNextPage()}
+            disabled={isFetchingNextPage}
+          >
+            {isFetchingNextPage ? "Loading..." : "Load More Fragrances"}
+          </button>
+        </section>
+      )}
     </main>
   );
 }

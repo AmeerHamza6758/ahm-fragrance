@@ -2,100 +2,111 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import ProductCard from "@/Components/ProductCard";
-import { useProducts } from "@/lib/api";
-
-const ITEMS_PER_PAGE = 8;
+import { useInfiniteProducts } from "@/lib/api";
 
 export default function MensPage() {
-  const [activeCategory, setActiveCategory] = useState("all");
-  const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
+  const [activeCategory, setActiveCategory] = useState("men");
+  const router = useRouter();
 
   const filters = {};
-  if (activeCategory === "all") filters.category = "men";
+  if (activeCategory === "men" || activeCategory === "bestsellers") {
+    filters.category = "men";
+  }
   else if (activeCategory === "women") filters.category = "women";
+  if (activeCategory === "bestsellers") {
+    filters.rating = "desc";
+  }
   // bestsellers: no category filter, just all products
 
-  const { data: allProducts = [], isLoading, isError } = useProducts(filters);
+  const {
+    data,
+    isLoading,
+    isError,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteProducts(filters, 50);
+
+  const allProducts = data?.pages?.flatMap((page) => page.data) ?? [];
+  const totalItems = data?.pages?.[0]?.pagination?.totalItems ?? allProducts.length;
 
   // Client-side filter to ensure only men products show by default
   const filteredProducts = allProducts.filter((product) => {
-    if (activeCategory === "all") {
+    if (activeCategory === "men") {
       // Show only men's products
       return (
         product.category_id?.name?.toLowerCase() === "men" ||
         !product.category_id
       );
+    } else if (activeCategory === "bestsellers") {
+      return product.category_id?.name?.toLowerCase() === "men";
     } else if (activeCategory === "women") {
       return product.category_id?.name?.toLowerCase() === "women";
     }
     return true; // bestsellers: show all
   });
 
-  const visibleProducts = filteredProducts.slice(0, visibleCount);
-  const hasMore = visibleCount < filteredProducts.length;
+  const hasMore = totalItems > 50 && !!hasNextPage;
 
   return (
-    <main className="bg-[#fdf9f5] min-h-screen pt-21">
+    <main className="bg-background min-h-screen pt-10">
       {/* Hero Header */}
-      <section className="text-center pt-12 pb-4 px-4">
-        <h1
-          className="text-[#7e525c] text-5xl sm:text-6xl md:text-7xl font-serif font-normal"
-          style={{ fontFamily: "Noto Serif, Georgia, serif", fontWeight: 400 }}
-        >
+      <section className="text-center pb-4 px-4">
+        <h1 className="text-[#7E525C] text-5xl sm:text-6xl md:text-7xl font-noto font-normal">
           For Men
         </h1>
         <div className="flex items-center justify-center gap-3 mt-3">
-          <span className="block h-px w-12 bg-[#c4a99e]" />
-          <p
-            className="text-[#a08a8a] text-xs uppercase tracking-[4px] font-normal"
-            style={{
-              fontFamily: "Manrope, Arial, sans-serif",
-              letterSpacing: "4px",
-            }}
-          >
-            The Botanical Monograph of Masculinity
+          <span className="block h-px w-12 bg-[#D1C3C1]" />
+          <p className="text-[#4E4543] text-xs uppercase tracking-[4px] font-normal">
+            THE BOTANICAL MONOGRAPH OF MASCULINITY        
           </p>
-          <span className="block h-px w-12 bg-[#c4a99e]" />
+          <span className="block h-px w-12 bg-[#D1C3C1]" />
         </div>
       </section>
 
       {/* Category Filter Cards */}
-      <section className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
-        <div className="grid grid-cols-3 gap-4 sm:gap-6">
+      <section className="mx-auto px-4 sm:px-6 py-8">
+        <div className="grid grid-cols-3 gap-4 sm:gap-8">
           {[
-            { id: "all", label: "For Men", img: "/Images/for-him.svg" },
-            { id: "women", label: "For Women", img: "/Images/for-her.svg" },
+            { id: "men", label: "For Men", img: "/Images/c-mens-card.png" },
+            { id: "women", label: "For Women", img: "/Images/c-womens-card.png" },
             {
               id: "bestsellers",
               label: "Best Sellers",
-              img: "/Images/best-1.svg",
+              img: "/Images/c-best-sellter-card.png",
             },
           ].map((cat) => (
             <button
               key={cat.id}
               onClick={() => {
+                if (cat.id === "women") {
+                  router.push("/womens");
+                  return;
+                }
                 setActiveCategory(cat.id);
-                setVisibleCount(ITEMS_PER_PAGE);
               }}
-              className="relative rounded-2xl overflow-hidden aspect-4/3 group cursor-pointer outline-none border-0"
+              className="relative overflow-hidden h-[192px] w-full group cursor-pointer outline-none border-0 rounded-[48px_16px_48px_16px]"
             >
               <Image
                 src={cat.img}
                 alt={cat.label}
                 fill
-                className={`object-cover transition-all duration-300 ${activeCategory === cat.id ? "brightness-75" : "brightness-50 group-hover:brightness-75"}`}
+                className="object-cover transition-all duration-300"
+              />
+              <div
+                className={`absolute inset-0 transition-colors duration-300 ${activeCategory === cat.id ? "bg-transparent" : "bg-[#EBE7E4]/55"}`}
               />
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                {activeCategory === cat.id && (
-                  <span className="block w-6 h-px bg-white mb-1" />
-                )}
                 <span
-                  className="text-white text-sm sm:text-base md:text-lg font-serif font-normal"
-                  style={{ fontFamily: "Noto Serif, Georgia, serif" }}
+                  className={`${activeCategory === cat.id ? "text-white" : "text-[#4E4543]"} text-sm sm:text-base md:text-2xl font-noto font-normal`}
                 >
                   {cat.label}
                 </span>
+                {activeCategory === cat.id && (
+                  <span className="block w-12 h-px bg-white mb-1" />
+                )}
               </div>
             </button>
           ))}
@@ -103,15 +114,15 @@ export default function MensPage() {
       </section>
 
       {/* Products Grid */}
-      <section className="max-w-5xl mx-auto px-4 sm:px-6 pb-20">
+      <section className="w-full px-4 sm:px-6 lg:px-8 xl:px-10 2xl:px-12 pt-5 pb-20">
         {isLoading && (
           <div className="flex justify-center items-center py-24">
-            <div className="w-10 h-10 border-4 border-[#7e525c] border-t-transparent rounded-full animate-spin" />
+            <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
           </div>
         )}
 
         {isError && (
-          <div className="text-center py-20 text-red-500 text-sm">
+          <div className="text-center py-20 text-error text-sm">
             Failed to load products. Please try again.
           </div>
         )}
@@ -122,14 +133,13 @@ export default function MensPage() {
           </div>
         )}
 
-        {!isLoading && !isError && visibleProducts.length > 0 && (
+        {!isLoading && !isError && filteredProducts.length > 0 && (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-x-5 gap-y-10">
-              {visibleProducts.map((product) => (
-                <ProductCard
-                  key={product._id || product.id}
-                  product={product}
-                />
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(220px,260px))] justify-start gap-x-5 gap-y-10">
+              {filteredProducts.map((product) => (
+                <div key={product._id || product.id} className="w-full max-w-[260px]">
+                  <ProductCard product={product} />
+                </div>
               ))}
             </div>
 
@@ -137,14 +147,12 @@ export default function MensPage() {
             {hasMore && (
               <div className="flex justify-center mt-14">
                 <button
-                  onClick={() => setVisibleCount((c) => c + ITEMS_PER_PAGE)}
+                  onClick={() => fetchNextPage()}
+                  disabled={isFetchingNextPage}
                   className="px-12 py-3 rounded-full border border-[#1c1c19] text-[#1c1c19] text-sm font-semibold uppercase tracking-widest hover:bg-[#1c1c19] hover:text-white transition-colors duration-300"
-                  style={{
-                    fontFamily: "Manrope, Arial, sans-serif",
-                    letterSpacing: "0.12em",
-                  }}
+                  style={{ letterSpacing: "0.12em" }}
                 >
-                  Load More Fragrances
+                  {isFetchingNextPage ? "Loading..." : "Load More Fragrances"}
                 </button>
               </div>
             )}

@@ -11,6 +11,7 @@ import {
   useToggleFavorite,
   useAddToCart,
   useAddRatingReview,
+  queryClient,
 } from "@/lib/api";
 import ProductCard from "@/Components/ProductCard";
 import { buildProductImageUrl } from "@/lib/utils/imageUrl";
@@ -44,6 +45,7 @@ export default function ProductDetails() {
     }
     toggleFavorite(productId, {
       onSuccess: (res) => {
+        queryClient.invalidateQueries({ queryKey: ["favorites"] });
         setIsWishlisted(res.isFavorited ?? !isWishlisted);
       },
       onError: () => {
@@ -114,7 +116,7 @@ export default function ProductDetails() {
   };
 
   return (
-    <>
+    <div className="pt-4 pb-10 sm:pt-10 sm:pb-16 flex flex-col gap-10">
       <main className="product-details-main">
         <section className="product-details-section">
           <div className="product-details-container">
@@ -334,9 +336,8 @@ export default function ProductDetails() {
       </main>
 
       {/* Customer Reviews & Feedback */}
-      <section className="w-full bg-[#faf8f5] py-14 px-4 md:px-24">
-        <div className="max-w-full mx-auto">
-          <div className="text-center mb-8">
+      <section className="w-full bg-[#faf8f5] flex flex-col items-center justify-center">
+          <div className="text-center mb-8 w-1/2">
             <h2
               className="text-[1.9rem] text-[#7e525c] font-normal leading-tight mb-2"
               style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}
@@ -348,7 +349,7 @@ export default function ProductDetails() {
             </p>
           </div>
 
-          <div className="bg-white border border-[#e8dde0] rounded-2xl px-8 py-8 shadow-sm">
+          <div className="bg-white border border-[#e8dde0] rounded-2xl px-8 py-8 shadow-sm w-1/2 mx-auto">
             {reviewSuccess ? (
               <div className="text-center py-6">
                 <p
@@ -462,11 +463,10 @@ export default function ProductDetails() {
               </form>
             )}
           </div>
-        </div>
       </section>
 
       {/* You May Also Like */}
-      <section className="w-full bg-[#faf8f5] py-14 px-6">
+      <section className="w-full bg-[#faf8f5] pb-16">
         <div className="max-w-7xl mx-auto">
           <div className="flex justify-between items-center mb-8 sm:mb-10">
   <h2
@@ -507,6 +507,6 @@ export default function ProductDetails() {
           )}
         </div>
       </section>
-    </>
+    </div>
   );
 }

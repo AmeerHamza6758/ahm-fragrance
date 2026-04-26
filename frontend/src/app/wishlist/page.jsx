@@ -77,10 +77,10 @@ export default function WishlistPage() {
   };
 
   return (
-    <main className="min-h-screen bg-background pt-36 lg:pt-32 md:pt-44 sm:pt-48 overflow-x-hidden">
+    <main className="min-h-screen bg-background pt-10 pb-16 overflow-x-hidden">
       {/* Breadcrumb */}
-      <div className="mx-auto max-w-7xl px-18 pt-6 lg:px-8 md:px-6 sm:px-5">
-        <nav className="flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.9px] text-secondary/60 md:text-[10px] sm:flex-wrap sm:gap-2">
+      <div className="mx-auto max-w-7xl px-18 p lg:px-8 md:px-6 sm:px-5">
+        <nav className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.9px] text-secondary/60 md:text-[10px] sm:flex-wrap sm:gap-2">
           <Link href="/" className="hover:text-primary transition-colors">
             HOME
           </Link>
@@ -95,7 +95,7 @@ export default function WishlistPage() {
       {/* Page Title */}
       <div className="mx-auto max-w-7xl px-10 pt-5 pb-16 lg:px-8 md:px-6 sm:px-5">
         <h1
-          className="mb-5 font-bold leading-[1.05] text-primary md:mb-4 font-heading"
+          className="mb-5 font-bold leading-[1.05] text-primary md:mb-4 font-noto"
           style={{
             fontSize: "clamp(44px, 6vw, 56px)",
           }}
@@ -123,7 +123,7 @@ export default function WishlistPage() {
             Your wishlist is empty.
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-x-8 gap-y-12 md:grid-cols-2 xl:grid-cols-3 xl:gap-x-7">
+          <div className="grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 md:grid-cols-3 xl:gap-x-7">
             {enrichedWishlistProducts.map((product) => {
               const productId = getProductId(product);
               const image = getProductImage(product);
@@ -162,7 +162,7 @@ export default function WishlistPage() {
                   {/* Name + ADD TO BAG inline */}
                   <div className="mb-2 flex items-start justify-between gap-3 sm:flex-col sm:items-start">
                     <h3
-                      className="min-w-0 flex-1 text-[18px] font-bold leading-[1.05] text-foreground xl:text-[17px] font-heading"
+                      className="min-w-0 flex-1 text-[18px] font-bold leading-[1.05] text-foreground xl:text-[17px] font-noto"
                     >
                       {product.name}
                     </h3>
@@ -175,12 +175,12 @@ export default function WishlistPage() {
                   </div>
 
                   {/* Category */}
-                  <p className="mb-3 text-[11px] font-normal uppercase tracking-[0.9px] text-muted">
+                  <p className="mb-3 text-xs font-normal uppercase tracking-[0.9px] text-muted">
                     {category}
                   </p>
 
                   {/* Price */}
-                  <p className="text-[16px] font-semibold text-primary font-heading">
+                  <p className="text-[16px] font-semibold text-primary font-noto">
                     Rs. {price.toLocaleString()}
                   </p>
                 </div>
@@ -196,21 +196,21 @@ export default function WishlistPage() {
         <div className="mb-12 flex flex-row items-end justify-between gap-6 w-full">
           <div className="flex flex-col">
             <h2
-              className="font-bold text-foreground mb-2 font-heading"
+              className="font-bold text-foreground mb-2 font-noto"
               style={{
                 fontSize: "32px",
               }}
             >
               You May Also Like
             </h2>
-            <p className="text-[13px] text-muted">
+            <p className="text-sm text-muted">
               Based on your refined preferences
             </p>
           </div>
           <div className="flex-1 flex justify-end">
             <Link
               href="/collections"
-              className="text-[11px] font-semibold text-primary tracking-[1px] uppercase hover:text-primary underline transition-colors whitespace-nowrap"
+              className="text-xs font-semibold text-primary tracking-[1px] uppercase hover:text-primary underline transition-colors whitespace-nowrap"
             >
               VIEW ALL RECOMMENDATIONS
             </Link>
@@ -227,7 +227,7 @@ export default function WishlistPage() {
             No recommendations found.
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4 xl:gap-5">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:gap-5">
             {recommendedProducts.map((product) => {
               const productId = getProductId(product);
               const image = getProductImage(product);
@@ -251,7 +251,7 @@ export default function WishlistPage() {
                       className="object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   </div>
-                  <h3 className="text-[15px] font-bold text-foreground mb-2 font-heading">
+                  <h3 className="text-[15px] font-bold text-foreground mb-2 font-noto">
                     {product.name}
                   </h3>
                   <p className="text-[11px] font-normal text-muted tracking-[0.9px] uppercase">

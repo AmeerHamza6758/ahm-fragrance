@@ -4,7 +4,6 @@
  */
 
 import apiClient from "../client";
-import { ApiResponse } from "../types/api";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -46,10 +45,53 @@ export interface Product {
 
 export interface ProductFilters {
   price?: "asc" | "desc";
+  rating?: "asc" | "desc";
   tag?: string;
+  filter?: "him" | "her" | "unisex";
   category?: string;
   search?: string;
 }
+
+export interface ProductsPaginationMeta {
+  page: number;
+  limit: number;
+  totalItems: number;
+  totalPages: number;
+  hasMore: boolean;
+}
+
+export interface ProductsPaginatedResponse {
+  status: number;
+  data: Product[];
+  pagination: ProductsPaginationMeta;
+}
+
+export interface GetProductsPaginatedParams {
+  page?: number;
+  limit?: number;
+}
+
+const buildProductsQuery = (
+  filters?: ProductFilters,
+  pagination?: GetProductsPaginatedParams,
+) => {
+  const params = new URLSearchParams();
+
+  if (filters?.price) params.append("price", filters.price);
+  if (filters?.rating) params.append("rating", filters.rating);
+  if (filters?.tag) params.append("tag", filters.tag);
+  if (filters?.filter) params.append("filter", filters.filter);
+  if (filters?.category) {
+    const normalizedCategory = filters.category.toLowerCase();
+    if (normalizedCategory === "men") params.append("filter", "him");
+    if (normalizedCategory === "women") params.append("filter", "her");
+    if (normalizedCategory === "unisex") params.append("filter", "unisex");
+  }
+  if (pagination?.page) params.append("page", String(pagination.page));
+  if (pagination?.limit) params.append("limit", String(pagination.limit));
+
+  return params.toString();
+};
 
 // ─── Endpoints ────────────────────────────────────────────────────────────────
 
@@ -59,14 +101,7 @@ export interface ProductFilters {
  */
 export const getProducts = async (filters?: ProductFilters): Promise<Product[]> => {
   try {
-    const params = new URLSearchParams();
-
-    if (filters?.price) params.append("price", filters.price);
-    if (filters?.tag) params.append("tag", filters.tag);
-    if (filters?.category) params.append("category", filters.category);
-    if (filters?.search) params.append("search", filters.search);
-
-    const query = params.toString();
+    const query = buildProductsQuery(filters);
     const url = `/api/product/getProducts${query ? `?${query}` : ""}`;
 
     console.log("[API] Fetching products from:", url);
@@ -76,11 +111,11 @@ export const getProducts = async (filters?: ProductFilters): Promise<Product[]> 
     console.log("[API] Products response:", data);
     
     // Handle different response formats
-    if (Array.isArray(data)) {
-      return data;
+    if (Array.isArray(data)) return data;
+    if (Array.isArray((data as any)?.data)) {
+      return (data as any).data as Product[];
     }
-    
-    return data;
+    return [];
   } catch (error: any) {
     console.error("[API] Error fetching products:", {
       message: error?.message,
@@ -91,6 +126,34 @@ export const getProducts = async (filters?: ProductFilters): Promise<Product[]> 
     });
     throw error;
   }
+};
+
+export const getProductsPaginated = async (
+  filters?: ProductFilters,
+  pagination: GetProductsPaginatedParams = { page: 1, limit: 50 },
+): Promise<ProductsPaginatedResponse> => {
+  const page = pagination.page ?? 1;
+  const limit = Math.min(pagination.limit ?? 50, 50);
+  const query = buildProductsQuery(filters, { page, limit });
+  const url = `/api/product/getProducts${query ? `?${query}` : ""}`;
+  const { data } = await apiClient.get<ProductsPaginatedResponse | Product[]>(url);
+
+  if (Array.isArray(data)) {
+    const totalItems = data.length;
+    return {
+      status: 1,
+      data,
+      pagination: {
+        page: 1,
+        limit: totalItems || limit,
+        totalItems,
+        totalPages: 1,
+        hasMore: false,
+      },
+    };
+  }
+
+  return data;
 };
 
 /**

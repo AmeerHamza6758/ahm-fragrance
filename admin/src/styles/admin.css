@@ -1,0 +1,171 @@
+.admin-shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 260px 1fr;
+}
+
+.admin-sidebar {
+  background: #111827;
+  color: #f9fafb;
+  padding: 20px 16px;
+}
+
+.brand-block {
+  border-bottom: 1px solid #374151;
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+}
+
+.brand-block h2 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.brand-block p {
+  margin: 4px 0 0;
+  color: #9ca3af;
+  font-size: 0.9rem;
+}
+
+.admin-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.admin-nav-item {
+  display: block;
+  color: #d1d5db;
+  padding: 10px 12px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.admin-nav-item:hover,
+.admin-nav-item.active {
+  background: #1f2937;
+  color: #ffffff;
+}
+
+.admin-content-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-topbar {
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 18px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.admin-topbar h1 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.admin-topbar p {
+  margin: 6px 0 0;
+  color: #6b7280;
+  font-size: 0.95rem;
+}
+
+.action-btn {
+  border: none;
+  background: #2563eb;
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.admin-main {
+  padding: 24px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.stat-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 18px;
+}
+
+.stat-title {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.stat-value {
+  margin: 12px 0;
+  font-size: 1.6rem;
+}
+
+.stat-hint {
+  margin: 0;
+  color: #9ca3af;
+  font-size: 0.84rem;
+}
+
+.page-note {
+  margin-top: 18px;
+  color: #6b7280;
+  font-size: 0.95rem;
+}
+
+.page-section {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.page-section-header h2 {
+  margin: 0;
+}
+
+.page-section-header p {
+  margin: 8px 0 0;
+  color: #6b7280;
+}
+
+.endpoint-chip {
+  margin-top: 16px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.85rem;
+  background: #f3f4f6;
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px;
+  padding: 12px;
+  color: #334155;
+}
+
+@media (max-width: 1024px) {
+  .admin-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .admin-topbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+}

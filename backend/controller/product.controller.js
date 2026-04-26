@@ -186,7 +186,7 @@ const productController = {
 
     getProducts: async (req, res) => {
         try {
-            const { filter, rating, price, tag } = req.query;
+            const { filter, rating, price, tag, page, limit } = req.query;
 
             let query = {};
             let sortOption = {};
@@ -246,8 +246,14 @@ const productController = {
                 sortOption.createdAt = -1;
             }
 
+            const shouldPaginate = page !== undefined || limit !== undefined;
+            const parsedPage = Math.max(parseInt(page, 10) || 1, 1);
+            const requestedLimit = parseInt(limit, 10) || 50;
+            const parsedLimit = Math.min(Math.max(requestedLimit, 1), 50);
+            const skip = (parsedPage - 1) * parsedLimit;
+
             // 🔹 FINAL QUERY
-            const products = await Product.find(query)
+            let productsQuery = Product.find(query)
                 .populate('brand_id', 'brandName')
                 .populate('category_id', 'name')
                 .populate('tag_id', 'name')
@@ -259,7 +265,30 @@ const productController = {
                 })
                 .sort(sortOption);
 
-            res.json(products);
+            if (shouldPaginate) {
+                productsQuery = productsQuery.skip(skip).limit(parsedLimit);
+            }
+
+            const products = await productsQuery;
+
+            if (!shouldPaginate) {
+                return res.json(products);
+            }
+
+            const totalItems = await Product.countDocuments(query);
+            const totalPages = Math.ceil(totalItems / parsedLimit) || 1;
+
+            return res.json({
+                status: 1,
+                data: products,
+                pagination: {
+                    page: parsedPage,
+                    limit: parsedLimit,
+                    totalItems,
+                    totalPages,
+                    hasMore: parsedPage < totalPages
+                }
+            });
 
         } catch (err) {
             res.status(500).json({ error: err.message });

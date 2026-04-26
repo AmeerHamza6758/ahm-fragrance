@@ -3,7 +3,7 @@ import apiClient from "../client";
 export async function addToCart({ productId, quantity }: { productId: string; quantity: number }) {
   const response = await apiClient.post("/api/cart/add", {
     productId,
-    quantity: String(quantity),
+    quantity: Number(quantity),
   });
   return response.data;
 }

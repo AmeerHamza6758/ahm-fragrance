@@ -1,16 +1,19 @@
 "use client";
 
-import { usePathname } from "next/navigation";
-import { Heart, Menu, X } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { ArrowLeft, Heart, Menu, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useGetCart } from "@/lib/api";
+import { useFavorites, useGetCart } from "@/lib/api";
 import { useState } from "react";
 
 export default function Header() {
   const pathname = usePathname();
+  const router = useRouter();
   const { data: cartData } = useGetCart();
+  const { data: wishlistProducts = [] } = useFavorites();
   const [menuOpen, setMenuOpen] = useState(false);
+  const isAuthPage = pathname?.startsWith("/auth/");
 
   const isActive = (href) => {
     return pathname === href ? "active" : "";
@@ -23,6 +26,9 @@ export default function Header() {
     (sum, item) => sum + (item.quantity ?? 1),
     0,
   );
+  const wishlistCount = Array.isArray(wishlistProducts)
+    ? wishlistProducts.length
+    : 0;
 
   const navLinks = [
     { href: "/", label: "Home" },
@@ -32,6 +38,32 @@ export default function Header() {
     // { href: "/about-us", label: "About Us" },
     // { href: "/contact-us", label: "Contact Us" },
   ];
+
+  if (isAuthPage) {
+    return (
+      <header className="header">
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => {
+              if (typeof window !== "undefined" && window.history.length > 1) {
+                router.back();
+              } else {
+                router.push("/");
+              }
+            }}
+            aria-label="Go back"
+            className="inline-flex items-center justify-center"
+          >
+            <ArrowLeft size={24} color="#7e525c" />
+          </button>
+          <Link href="/" className="logo">
+            AHM Fragrances
+          </Link>
+        </div>
+      </header>
+    );
+  }
 
   return (
     <>
@@ -60,6 +92,9 @@ export default function Header() {
               strokeWidth={2}
               className="transition-colors"
             />
+            {wishlistCount > 0 && (
+              <span className="wishlist-count">{wishlistCount}</span>
+            )}
           </Link>
           <Link href="/cart" className="cart-icon-wrapper">
             <Image

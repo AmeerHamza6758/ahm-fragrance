@@ -1,7 +1,6 @@
-const { compare } = require("bcrypt");
 const userModel = require("../models/user.model");
 require("dotenv").config();
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const transporter = require("../config/transporter");

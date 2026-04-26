@@ -37,6 +37,7 @@ const toggleFavorite = async (req, res) => {
 
       return res.status(200).json({
         success: true,
+        isFavorited: false,
         message: `${product.name} removed from your favorites`,
         data: {
           action: 'removed',
@@ -54,6 +55,7 @@ const toggleFavorite = async (req, res) => {
 
       return res.status(201).json({
         success: true,
+        isFavorited: true,
         message: `❤️ ${product.name} added to your favorites`,
         data: {
           action: 'added',
@@ -86,7 +88,16 @@ const getFavorites = async (req, res) => {
     const userId = req.user.userId;
 
     const favoriteItems = await Favorite.find({ userId: userId })
-      .populate('productId', 'name price images tags rating discountPrice description');
+      .populate({
+        path: 'productId',
+        select: 'name price discountPercentage description variants rating image_id tag_id category_id brand_id isActive',
+        populate: [
+          { path: 'image_id', model: 'images', select: 'filename path' },
+          { path: 'tag_id', model: 'Tag', select: 'name' },
+          { path: 'category_id', model: 'Category', select: 'name' },
+          { path: 'brand_id', model: 'Brand', select: 'brandName' }
+        ]
+      });
 
     if (!favoriteItems || favoriteItems.length === 0) {
       return res.status(200).json({
@@ -97,18 +108,11 @@ const getFavorites = async (req, res) => {
       });
     }
 
-    const products = favoriteItems.map(item => ({
+    const products = favoriteItems
+      .filter((item) => item.productId)
+      .map(item => ({
       favoriteId: item._id,
-      product: {
-        id: item.productId._id,
-        name: item.productId.name,
-        price: item.productId.price,
-        discountPrice: item.productId.discountPrice,
-        image_id: item.productId.image_id || [],
-        tag_id: item.productId.tag_id || [],
-        // rating: item.productId.rating || 0,
-        description: item.productId.description
-      }
+      product: item.productId
     }));
 
     return res.status(200).json({

@@ -3,8 +3,13 @@
  * React Query hooks for all product-related API calls
  */
 
-import { useQuery } from "@tanstack/react-query";
-import { getProducts, getProductById, ProductFilters } from "../endpoints/products";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import {
+  getProducts,
+  getProductById,
+  getProductsPaginated,
+  ProductFilters,
+} from "../endpoints/products";
 
 const PRODUCTS_KEY = "products";
 
@@ -28,6 +33,24 @@ export const useProduct = (id: string) => {
     queryKey: [PRODUCTS_KEY, id],
     queryFn: () => getProductById(id),
     enabled: !!id,
+    staleTime: 5 * 60 * 1000,
+  });
+};
+
+export const useInfiniteProducts = (
+  filters?: ProductFilters,
+  pageSize: number = 50,
+) => {
+  return useInfiniteQuery({
+    queryKey: [PRODUCTS_KEY, "infinite", filters ?? {}, pageSize],
+    queryFn: ({ pageParam }) =>
+      getProductsPaginated(filters, {
+        page: Number(pageParam),
+        limit: pageSize,
+      }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) =>
+      lastPage.pagination.hasMore ? lastPage.pagination.page + 1 : undefined,
     staleTime: 5 * 60 * 1000,
   });
 };

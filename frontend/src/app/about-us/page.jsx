@@ -34,10 +34,7 @@ export default function AboutUsPage() {
           >
             Our Story
           </h1>
-          <p
-            className="text-white/90 text-lg sm:text-xl md:text-2xl font-light leading-relaxed"
-            style={{ fontFamily: "Manrope, Arial, sans-serif" }}
-          >
+          <p className="text-white/90 text-lg sm:text-xl md:text-2xl font-light leading-relaxed">
             Born from a passion for luxury fragrance — made affordable for
             everyone in Pakistan.
           </p>
@@ -72,10 +69,7 @@ export default function AboutUsPage() {
           >
             More Than Just a Fragrance
           </h2>
-          <p
-            className="text-[#4e4543] text-base md:text-lg leading-relaxed mb-4"
-            style={{ fontFamily: "Manrope, Arial, sans-serif" }}
-          >
+          <p className="text-[#4e4543] text-base md:text-lg leading-relaxed mb-4">
             At AHM Fragrances, we believe that luxury should be an experience
             accessible to all. Our journey began in the heart of Lahore, fueled
             by the desire to bridge the gap between high-end international
@@ -113,10 +107,7 @@ export default function AboutUsPage() {
           Affordable Price.
         </h2>
         <div className="bg-white/10 rounded-2xl px-4 sm:px-8 py-6 max-w-2xl mx-4 sm:mx-auto">
-          <p
-            className="text-[#f7e7e7] text-base sm:text-lg text-center font-normal"
-            style={{ fontFamily: "Manrope, Arial, sans-serif" }}
-          >
+          <p className="text-[#f7e7e7] text-base sm:text-lg text-center font-normal">
             To redefine the olfactory landscape of Pakistan by crafting premium,
             world-class fragrances that inspire confidence and elegance, without
             the luxury markup.
@@ -161,7 +152,6 @@ export default function AboutUsPage() {
             </span>
             <h4
               className="font-semibold text-[#1c1c19] mb-1"
-              style={{ fontFamily: "Manrope, Arial, sans-serif" }}
             >
               Authentic Ingredients
             </h4>
@@ -197,7 +187,6 @@ export default function AboutUsPage() {
             </span>
             <h4
               className="font-semibold text-[#1c1c19] mb-1"
-              style={{ fontFamily: "Manrope, Arial, sans-serif" }}
             >
               Fast Delivery
             </h4>
@@ -233,7 +222,6 @@ export default function AboutUsPage() {
             </span>
             <h4
               className="font-semibold text-[#1c1c19] mb-1"
-              style={{ fontFamily: "Manrope, Arial, sans-serif" }}
             >
               7-Day Return
             </h4>
@@ -267,7 +255,6 @@ export default function AboutUsPage() {
             </span>
             <h4
               className="font-semibold text-[#1c1c19] mb-1"
-              style={{ fontFamily: "Manrope, Arial, sans-serif" }}
             >
               Customer Support
             </h4>
@@ -334,7 +321,6 @@ export default function AboutUsPage() {
               <div
                 className="uppercase text-[13px] tracking-[3px] mb-1 font-normal text-[#b48b9b]"
                 style={{
-                  fontFamily: "Manrope, Arial, sans-serif",
                   letterSpacing: 3,
                 }}
               >
@@ -352,7 +338,6 @@ export default function AboutUsPage() {
               <Link href="/mens" className="block mt-2">
                 <button
                   className="w-55 text-[14px] rounded-full bg-white text-[#18171c] font-semibold text-base py-3 px-0 tracking-wide shadow-md hover:bg-gray-100 transition-colors duration-200"
-                  style={{ fontFamily: "Manrope, Arial, sans-serif" }}
                 >
                   SHOP THE COLLECTION
                 </button>
@@ -373,7 +358,6 @@ export default function AboutUsPage() {
               <div
                 className="uppercase text-[13px] tracking-[3px] mb-1 font-normal text-[#b48b9b]"
                 style={{
-                  fontFamily: "Manrope, Arial, sans-serif",
                   letterSpacing: 3,
                 }}
               >
@@ -391,7 +375,6 @@ export default function AboutUsPage() {
               <Link href="/womens" className="block mt-2">
                 <button
                   className="w-55 text-[14px] rounded-full bg-white text-[#18171c] font-semibold text-base py-3 px-0 tracking-wide shadow-md hover:bg-gray-100 transition-colors duration-200"
-                  style={{ fontFamily: "Manrope, Arial, sans-serif" }}
                 >
                   SHOP THE COLLECTION
                 </button>

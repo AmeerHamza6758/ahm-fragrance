@@ -51,8 +51,9 @@ const config = {
         danger: "rgb(var(--color-danger) / <alpha-value>)",
       },
       fontFamily: {
+        manrope: ["var(--font-manrope)", "Manrope", "Arial", "sans-serif"],
+        noto: ["var(--font-noto-serif)", '"Noto Serif"', "Georgia", "serif"],
         sans: ["var(--font-manrope)", "Manrope", "Arial", "sans-serif"],
-        heading: ["var(--font-noto-serif)", '"Noto Serif"', "Georgia", "serif"],
         serif: ["var(--font-noto-serif)", '"Noto Serif"', "Georgia", "serif"],
       },
       spacing: {

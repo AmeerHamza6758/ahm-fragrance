@@ -28,18 +28,17 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-[#f8f4f1] px-2 py-8 pt-24">
+    <main className="min-h-screen flex items-center justify-center bg-[#f8f4f1] px-2 pb-16pt-10">
       <div
-        className="w-full max-w-md bg-white rounded-3xl shadow-xl px-8 py-6 flex flex-col items-center"
+        className="w-full max-w-lg bg-white rounded-3xl shadow-xl p-16 flex flex-col items-center"
         style={{ boxShadow: "0 8px 48px 0 rgba(80,30,40,0.10)" }}
       >
         <h1
-          className="font-serif text-[2.15rem] text-[#7e525c] font-semibold mb-2 leading-tight text-center"
-          style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}
+          className="font-noto text-3xl sm:text-[48px] text-[#7e525c] font-bold mb-2 leading-tight text-center"
         >
           Welcome Back
         </h1>
-        <p className="text-[14px] text-[#7e525c] opacity-70 mb-8 text-center font-sans">
+        <p className="text-sm sm:text-base text-[#4E4543] mb-8 text-center font-normal">
           Return to AHM Fragrances, your peaceful place.
           <br />
           Start smelling the scents again.
@@ -49,7 +48,7 @@ export default function LoginPage() {
           <div className="flex flex-col gap-1">
             <label
               htmlFor="email"
-              className="text-xs font-semibold uppercase tracking-wider text-[#7e525c] font-sans"
+              className="text-xs font-semibold uppercase ml-2 mb-1 text-[#4E4543]"
             >
               Email Address
             </label>
@@ -69,13 +68,13 @@ export default function LoginPage() {
             <div className="flex items-center justify-between">
               <label
                 htmlFor="password"
-                className="text-xs font-semibold uppercase tracking-wider text-[#7e525c] font-sans"
+                className="text-xs font-semibold uppercase ml-2 mb-1 text-[#4E4543]"
               >
                 Password
               </label>
               <Link
                 href="/auth/forgot-password"
-                className="text-xs text-[#b09090] font-semibold hover:underline"
+                className="text-xs text-[#7E525C] font-semibold hover:underline"
               >
                 Forgot Password?
               </Link>

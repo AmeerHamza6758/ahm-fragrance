@@ -6,7 +6,7 @@ export default function GenderCategories() {
       <div className="gender-grid">
         <div className="gender-card gender-card-men">
           <div className="gender-overlay"></div>
-          <div className="gender-content">
+          <div className="gender-content ">
             <h3>For Him</h3>
             <p>
               Bold, sophisticated, and enduring scents designed for the modern
