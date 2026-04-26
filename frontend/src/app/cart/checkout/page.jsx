@@ -104,7 +104,7 @@ export default function CheckoutPage() {
 
   if (orderPlaced) {
     return (
-      <main className="min-h-screen bg-[#f5f0eb] pt-28 pb-16 px-4 md:px-8">
+      <main className="min-h-screen bg-[#FDF9F5] pt-10 pb-16 px-4 md:px-8">
         <div className="max-w-4xl mx-auto flex flex-col items-center">
           {/* Success Icon */}
           <div className="w-16 h-16 rounded-full border border-[#c9a84c] flex items-center justify-center mb-6">
@@ -337,9 +337,9 @@ export default function CheckoutPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f5f0eb] pt-32 pb-16 px-4 md:px-8">
+    <main className="min-h-screen bg-[#FDF9F5] pt-10 pb-16 px-4 md:px-8">
       {/* Breadcrumb */}
-      <div className="max-w-5xl mx-auto mb-8">
+      {/* <div className="max-w-5xl mx-auto mb-8">
         <p className="text-[10px] tracking-[0.18em] font-semibold text-[#6b6460] uppercase flex items-center gap-2">
           <Link href="/cart" className="hover:text-[#7e525c] transition">
             CART
@@ -349,7 +349,7 @@ export default function CheckoutPage() {
           <span className="text-[#b8a9a7]">&rsaquo;</span>
           <span>CONFIRMED</span>
         </p>
-      </div>
+      </div> */}
 
       {/* Step Indicator */}
       <div className="max-w-5xl mx-auto mb-12">

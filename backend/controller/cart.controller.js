@@ -3,6 +3,17 @@ const Cart = require('../models/cart.model');
 const Product = require('../models/product.model');
 const Stock = require('../models/stock.model');
 
+const normalizeSize = (size) => String(size || '50ml').trim().toLowerCase();
+
+const getVariantForSize = (product, size) => {
+  const normalizedSize = normalizeSize(size);
+  return (
+    product?.variants?.find(
+      (variant) => normalizeSize(variant?.size) === normalizedSize,
+    ) || null
+  );
+};
+
 const addToCart = async (req, res) => {
   try {
         console.log('Full req.user:', req.user);
@@ -10,7 +21,8 @@ const addToCart = async (req, res) => {
     console.log('req.user.id:', req.user?.id);
     const userId = req.user.userId;
 
-    const { productId, quantity = 1 } = req.body;
+    const { productId, quantity = 1, size = '50ml' } = req.body;
+    const normalizedSize = normalizeSize(size);
 
     if (!productId) {
       return res.status(400).json({
@@ -38,6 +50,15 @@ const addToCart = async (req, res) => {
       });
     }
 
+    if (Array.isArray(product.variants) && product.variants.length > 0) {
+      const selectedVariant = getVariantForSize(product, normalizedSize);
+      if (!selectedVariant) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid size selected for this product',
+        });
+      }
+    }
 
     const stock = await Stock.findOne({ productId: product._id });
     if (!stock || stock.quantity < quantity) {
@@ -50,7 +71,8 @@ const addToCart = async (req, res) => {
     // Check if product already in cart
     const existingCartItem = await Cart.findOne({
       customerId: userId,
-      productId: product._id
+      productId: product._id,
+      size: normalizedSize,
     });
 
     if (existingCartItem) {
@@ -69,13 +91,13 @@ const addToCart = async (req, res) => {
 
       return res.status(200).json({
         success: true,
-        message: `Cart updated. ${product.name} quantity increased to ${newQuantity}`,
+        message: `Cart updated. ${product.name} (${normalizedSize}) quantity increased to ${newQuantity}`,
         data: {
           cartItem: existingCartItem,
           product: {
             id: product._id,
             name: product.name,
-            price: product.price,
+            price: getVariantForSize(product, normalizedSize)?.price ?? product.price,
             image: product.images?.[0] || ''
           }
         }
@@ -86,6 +108,7 @@ const addToCart = async (req, res) => {
     const cartItem = new Cart({
       customerId: userId,
       productId: product._id,
+      size: normalizedSize,
       quantity
     });
 
@@ -95,13 +118,13 @@ const addToCart = async (req, res) => {
 
     return res.status(201).json({
       success: true,
-      message: `${product.name} added to cart successfully`,
+      message: `${product.name} (${normalizedSize}) added to cart successfully`,
       data: {
         cartItem: populatedCart,
         product: {
           id: product._id,
           name: product.name,
-          price: product.price,
+          price: getVariantForSize(product, normalizedSize)?.price ?? product.price,
           image: product.images?.[0] || ''
         }
       }
@@ -155,6 +178,7 @@ const getCart = async (req, res) => {
           name: product?.name || 'Product unavailable',
           price: product?.price || 0,
           quantity: item.quantity,
+          size: item.size || '50ml',
           image: product?.images?.[0] || '',
           total: 0,
           isAvailable: false,
@@ -169,8 +193,10 @@ const getCart = async (req, res) => {
       const stock = await Stock.findOne({ productId: product._id });
       const isOutOfStock = !stock || stock.quantity < item.quantity;
 
-      // Use latest price (Option B)
-      const currentPrice = product.price;
+      // Use latest price with selected variant when available
+      const selectedSize = item.size || '50ml';
+      const selectedVariant = getVariantForSize(product, selectedSize);
+      const currentPrice = selectedVariant?.price ?? product.price;
       const itemTotal = currentPrice * item.quantity;
       subtotal += itemTotal;
 
@@ -181,6 +207,7 @@ const getCart = async (req, res) => {
         price: currentPrice,
         originalPrice: product.discountPrice || currentPrice,
         quantity: item.quantity,
+        size: selectedSize,
         image: product.images?.[0] || '',
         total: itemTotal,
         isAvailable: !isOutOfStock,
@@ -287,8 +314,8 @@ const updateCartItem = async (req, res) => {
 
 
     let cartItem = await Cart.findOne({
+      _id: productId,
       customerId: userId,
-      productId: productObjectId || productId
     }).populate('productId');
 
 
@@ -370,7 +397,9 @@ const updateCartItem = async (req, res) => {
     });
 
     const updatedCart = await Cart.findById(cartItem._id).populate('productId');
-    const itemTotal = product.price * quantity;
+    const selectedVariant = getVariantForSize(product, cartItem.size || '50ml');
+    const unitPrice = selectedVariant?.price ?? product.price;
+    const itemTotal = unitPrice * quantity;
 
     return res.status(200).json({
       success: true,
@@ -380,7 +409,7 @@ const updateCartItem = async (req, res) => {
         product: {
           id: product._id,
           name: product.name,
-          price: product.price,
+          price: unitPrice,
           image: product.images?.[0] || ''
         },
         itemTotal,
@@ -418,10 +447,17 @@ const removeCartItem = async (req, res) => {
     // const userId = req.user._id;
     const productId = req.params.productId;
 
-    const cartItem = await Cart.findOne({
+    let cartItem = await Cart.findOne({
+      _id: productId,
       customerId: userId,
-      productId: productId
     }).populate('productId');
+
+    if (!cartItem) {
+      cartItem = await Cart.findOne({
+        customerId: userId,
+        productId: productId
+      }).populate('productId');
+    }
 
     if (!cartItem) {
       return res.status(404).json({

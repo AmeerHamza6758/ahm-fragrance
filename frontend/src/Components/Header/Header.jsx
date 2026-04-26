@@ -1,11 +1,11 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { ArrowLeft, Heart, Menu, X } from "lucide-react";
+import { ArrowLeft, Heart, House, Menu, User, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useFavorites, useGetCart } from "@/lib/api";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Header() {
   const pathname = usePathname();
@@ -13,6 +13,7 @@ export default function Header() {
   const { data: cartData } = useGetCart();
   const { data: wishlistProducts = [] } = useFavorites();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const isAuthPage = pathname?.startsWith("/auth/");
 
   const isActive = (href) => {
@@ -29,6 +30,27 @@ export default function Header() {
   const wishlistCount = Array.isArray(wishlistProducts)
     ? wishlistProducts.length
     : 0;
+
+  useEffect(() => {
+    const syncAuthState = () => {
+      const token =
+        typeof window !== "undefined" ? localStorage.getItem("token") : null;
+      setIsLoggedIn(Boolean(token));
+    };
+
+    syncAuthState();
+    window.addEventListener("storage", syncAuthState);
+    return () => window.removeEventListener("storage", syncAuthState);
+  }, [pathname]);
+
+  const handleLogout = () => {
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+    }
+    setIsLoggedIn(false);
+    router.push("/");
+  };
 
   const navLinks = [
     { href: "/", label: "Home" },
@@ -68,7 +90,9 @@ export default function Header() {
   return (
     <>
       <header className="header">
-        <div className="logo">AHM Fragrances</div>
+        <Link href="/" className="logo">
+          AHM Fragrances
+        </Link>
 
         {/* Desktop Nav */}
         <nav className="nav">
@@ -84,6 +108,7 @@ export default function Header() {
         </nav>
 
         <div className="header-icons">
+         
           <Link href="/wishlist" className="wishlist-icon-wrapper group">
             <Heart
               size={30}
@@ -96,6 +121,44 @@ export default function Header() {
               <span className="wishlist-count">{wishlistCount}</span>
             )}
           </Link>
+          <div className="relative group">
+            {isLoggedIn ? (
+              <button
+                type="button"
+                aria-label="User menu"
+                className="inline-flex items-center justify-center"
+              >
+                <User size={30} fill="#7e525c" stroke="#7e525c" strokeWidth={2} />
+              </button>
+            ) : (
+              <Link href="/auth/login" aria-label="Go to login">
+                <User
+                  size={30}
+                  fill={pathname === "/auth/login" ? "#7e525c" : "none"}
+                  stroke="#7e525c"
+                  strokeWidth={2}
+                />
+              </Link>
+            )}
+            {isLoggedIn && (
+              <div className="absolute right-0 top-full mt-1 z-50 min-w-[150px] rounded-xl border border-border bg-white shadow-lg py-2
+               opacity-0 invisible translate-y-1 transition-all duration-150 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0">
+                <Link
+                  href="/"
+                  className="block px-4 py-2 text-sm font-manrope text-foreground hover:bg-background"
+                >
+                  Profile
+                </Link>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="w-full text-left px-4 py-2 text-sm font-manrope text-error hover:bg-background"
+                >
+                  Logout
+                </button>
+              </div>
+            )}
+          </div>
           <Link href="/cart" className="cart-icon-wrapper">
             <Image
               src="/Icons/cart_icon.svg"
@@ -121,11 +184,7 @@ export default function Header() {
         </div>
       </header>
 
-      {/*
-        Rendered OUTSIDE <header> — the header has backdrop-filter which creates a
-        CSS stacking context, trapping any position:fixed child inside the header bounds.
-        As a sibling element this renders correctly over the full viewport.
-      */}
+
       {menuOpen && (
         <div className="mobile-nav-overlay" onClick={() => setMenuOpen(false)}>
           <nav className="mobile-nav" onClick={(e) => e.stopPropagation()}>

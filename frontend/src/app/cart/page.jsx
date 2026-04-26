@@ -36,7 +36,7 @@ export default function CartPage() {
   };
 
   return (
-    <main className="cart-page-main">
+    <main className="cart-page-main pt-10 pb-16">
       <section className="cart-section">
         <div className="cart-container">
           {/* Cart Items */}
@@ -59,6 +59,7 @@ export default function CartPage() {
                 </div>
               ) : (
                 cartItems.map((item, idx) => {
+                  const cartId = item.cartId ?? item._id ?? idx;
                   const productId =
                     item.productId?._id ?? item.productId ?? item._id ?? idx;
                   const name = item.productId?.name ?? item.name ?? "Product";
@@ -73,7 +74,7 @@ export default function CartPage() {
                     imageSrc = buildProductImageUrl(imageRaw);
                   }
                   return (
-                    <div key={`${productId}-${idx}`} className="cart-item">
+                    <div key={`${cartId}-${productId}-${idx}`} className="cart-item">
                       <div className="item-image">
                         <Image
                           src={imageSrc}
@@ -103,7 +104,7 @@ export default function CartPage() {
                         </p>
                         <button
                           className="remove-btn"
-                          onClick={() => removeItem(String(productId))}
+                          onClick={() => removeItem(String(cartId))}
                         >
                           <X size={20} />
                         </button>

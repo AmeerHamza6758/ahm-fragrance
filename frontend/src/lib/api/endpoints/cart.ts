@@ -1,9 +1,18 @@
 import apiClient from "../client";
 
-export async function addToCart({ productId, quantity }: { productId: string; quantity: number }) {
+export async function addToCart({
+  productId,
+  quantity,
+  size,
+}: {
+  productId: string;
+  quantity: number;
+  size?: string;
+}) {
   const response = await apiClient.post("/api/cart/add", {
     productId,
     quantity: Number(quantity),
+    size,
   });
   return response.data;
 }

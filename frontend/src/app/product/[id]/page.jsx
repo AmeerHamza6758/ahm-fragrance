@@ -98,6 +98,7 @@ export default function ProductDetails() {
     addToCartApi({
       productId: product._id,
       quantity,
+      size: selectedSize,
     });
   };
 

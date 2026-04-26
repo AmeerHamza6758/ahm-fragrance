@@ -18,7 +18,8 @@ const mongoose = require('mongoose');
   },
 
   description: {
-    type: String
+    type: String,
+    default: ""
   },
 
   // ✅ NEW FIELD

@@ -57,18 +57,18 @@ export default function BestSellers() {
           <div className="w-9 h-9 border-4 border-[#7e525c] border-t-transparent rounded-full animate-spin" />
         </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-[repeat(auto-fit,minmax(220px,260px))] justify-items-center md:justify-items-stretch md:justify-start gap-x-5 gap-y-10">
+        <div className="grid grid-cols-2 md:grid-cols-[repeat(auto-fit,minmax(220px,260px))] justify-start gap-x-4 sm:gap-x-5 md:gap-x-10 gap-y-10">
           {visibleProducts.map((product) => (
             <div
               key={product._id || product.id}
-              className="w-full max-w-[340px] md:max-w-[260px] relative group"
+              className="w-full max-w-none md:max-w-[260px] relative group"
             >
               <Link
                 href={`/product/${product._id || product.id}`}
                 className="best-seller-product-link"
               >
-                <div className="product-card">
-                  <div className="product-image-wrap">
+                <div className="product-card w-full">
+                  <div className="product-image-wrap w-full! h-[300px]!">
                     <Image
                       src={buildProductImageUrl(product.image_id?.path)}
                       alt={product.name}
