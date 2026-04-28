@@ -467,47 +467,56 @@ export default function ProductDetails() {
       </section>
 
       {/* You May Also Like */}
-      <section className="w-full bg-[#faf8f5] pb-16">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex justify-between items-center mb-8 sm:mb-10">
-  <h2
-    className="text-[#7e525c] font-normal leading-[1.1]
-               text-[24px] sm:text-[30px] md:text-[38px]
-               max-w-[180px] sm:max-w-none"
-    style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}
-  >
-    You May Also Like
-  </h2>
+   <section className="w-full bg-[#faf8f5] pb-16 overflow-x-hidden">
+  
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    
+    {/* HEADER */}
+    <div className="flex justify-between items-center mb-8 sm:mb-10 gap-4">
+      
+      <h2
+        className="text-[#7e525c] font-normal leading-tight
+                   text-[24px] sm:text-[30px] md:text-[38px]"
+        style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}
+      >
+        You May Also Like
+      </h2>
 
-  <Link
-    href="/collections"
-    className="text-[#7e525c] text-[13px] sm:text-[15px]
-               font-semibold font-sans flex items-center gap-1
-               whitespace-nowrap self-center"
-  >
-    View Collection <span className="text-[16px] sm:text-[18px]">→</span>
-  </Link>
-</div>
-          {recLoading ? (
-            <div className="flex justify-center py-10">
-              <div className="w-8 h-8 border-4 border-[#7e525c] border-t-transparent rounded-full animate-spin" />
-            </div>
-          ) : allProducts.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              {allProducts
-                .filter((p) => p._id !== productId)
-                .slice(0, 4)
-                .map((rec) => (
-                  <ProductCard key={rec._id} product={rec} />
-                ))}
-            </div>
-          ) : (
-            <div className="text-center py-10 text-[#7e525c]">
-              No recommendations found.
-            </div>
-          )}
-        </div>
-      </section>
+      <Link
+        href="/collections"
+        className="text-[#7e525c] text-[13px] sm:text-[15px]
+                   font-semibold flex items-center gap-1 whitespace-nowrap"
+      >
+        View Collection <span className="text-[16px] sm:text-[18px]">→</span>
+      </Link>
+
+    </div>
+
+    {/* CONTENT */}
+    {recLoading ? (
+      <div className="flex justify-center py-10">
+        <div className="w-8 h-8 border-4 border-[#7e525c] border-t-transparent rounded-full animate-spin" />
+      </div>
+    ) : allProducts.length > 0 ? (
+      
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {allProducts
+          .filter((p) => p._id !== productId)
+          .slice(0, 4)
+          .map((rec) => (
+            <ProductCard key={rec._id} product={rec} />
+          ))}
+      </div>
+
+    ) : (
+      <div className="text-center py-10 text-[#7e525c]">
+        No recommendations found.
+      </div>
+    )}
+
+  </div>
+
+</section>
     </div>
   );
 }

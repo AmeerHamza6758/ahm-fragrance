@@ -157,9 +157,9 @@ export default function CartPage() {
                     <Image
                       src={badge.src}
                       alt="icon"
-                      width={30}
-                      height={30}
-                      className="object-contain"
+                      width={40}
+                      height={40}
+                      className="object-contain h-6! max-w-6!"
                     />
                   </div>
                   <p className="text-[11px] uppercase tracking-[1.5px] text-[#4E4543] font-medium leading-tight max-w-[150px]">
