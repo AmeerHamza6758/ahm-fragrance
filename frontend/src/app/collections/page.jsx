@@ -141,11 +141,11 @@ export default function CollectionsPage() {
             ))}
           </div>
 
-          <div className="sort-container w-full lg:w-auto justify-between lg:justify-start">
-            <span className="sort-label">SORT:</span>
+          <div className="sort-container w-full lg:w-auto justify-center lg:justify-center  text-nowrap rounded-xs">
+            <span className="sort-label">SORT :</span>
             <div className="sort-dropdown w-full sm:w-auto">
               <button
-                className="sort-button w-full sm:w-auto justify-between border border-[#7E525C33] rounded-full px-4 py-2"
+                className="sort-button w-full sm:w-auto justify-between border border-[#7E525C33] rounded-xs"
                 onClick={() => setSortOpen(!sortOpen)}
               >
                 {sortOptions.find((opt) => opt.id === sortBy)?.label}

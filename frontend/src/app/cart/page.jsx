@@ -1,8 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { X } from "lucide-react";
-import { useState } from "react";
+import { X, Minus, Plus } from "lucide-react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import truck_icon from "/public/Icons/product-details-truck-icon.svg";
 import cash_icon from "/public/Icons/product-details-cash-icon.svg";
@@ -13,11 +13,14 @@ import { buildProductImageUrl } from "@/lib/utils/imageUrl";
 export default function CartPage() {
   const { data: cartData, isLoading: cartLoading } = useGetCart();
   const { mutate: removeItem } = useRemoveFromCart();
-  const [promoCode, setPromoCode] = useState("");
   const [discount] = useState(0);
   const router = useRouter();
 
-  // Support both { items: [...] } and direct array responses
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const cartItems = Array.isArray(cartData)
     ? cartData
     : (cartData?.items ?? cartData?.data?.items ?? []);
@@ -29,220 +32,187 @@ export default function CartPage() {
   );
   const total = subtotal - discount;
 
-  const handleApplyPromo = () => {
-    if (promoCode.trim()) {
-      setPromoCode("");
-    }
-  };
+  if (!mounted) return <div className="min-h-screen bg-[#FDF9F5]" />;
 
   return (
-    <main className="cart-page-main pt-10 pb-16">
-      <section className="cart-section">
-        <div className="cart-container">
-          {/* Cart Items */}
-          <div className="cart-items-section">
-          <div className="flex flex-col items-center text-center px-4 mb-12 md:mb-16">
-  <h1 
-    className="text-[#7e525c] font-noto leading-tight mb-4"
-    style={{ fontSize: "clamp(40px, 7vw, 50px)" }}
-  >
-    Your Shopping Bag
-  </h1>
-  <div className="w-12 h-[1px] bg-[#7e525c]/30 mb-4"></div> {/* Decorative Line */}
-  <p className="max-w-xl text-[13px] md:text-[15px] tracking-[0.2em] text-[#7e525c]/70 uppercase font-light leading-relaxed">
-    A curated collection of your memory selections and timeless elixirs
-  </p>
-</div>
-            <div className="cart-items-list">
-              {cartLoading ? (
-                <div className="flex justify-center py-10">
-                  <div className="w-8 h-8 border-4 border-[#7e525c] border-t-transparent rounded-full animate-spin" />
-                </div>
-              ) : cartItems.length === 0 ? (
-                <div className="empty-cart">
-                  <p>Your cart is empty</p>
-                  <a href="/collections">Continue Shopping</a>
-                </div>
-              ) : (
-                cartItems.map((item, idx) => {
-                  const cartId = item.cartId ?? item._id ?? idx;
-                  const productId =
-                    item.productId?._id ?? item.productId ?? item._id ?? idx;
-                  const name = item.productId?.name ?? item.name ?? "Product";
-                  const price = item.price ?? item.productId?.price ?? 0;
-                  const imageRaw =
-                    item.productId?.image_id?.path ??
-                    item.productId?.image ??
-                    item.image ??
-                    null;
-                  let imageSrc = "/Images/best-1.svg";
-                  if (imageRaw) {
-                    imageSrc = buildProductImageUrl(imageRaw);
-                  }
-                  return (
-                    <div
-                      key={`${cartId}-${productId}-${idx}`}
-                      className="cart-item"
-                    >
-                      <div className="item-image">
-                        <Image
-                          src={imageSrc}
-                          alt={name}
-                          width={100}
-                          height={100}
-                          className="item-image-img"
-                          onError={(e) => {
-                            e.target.src = "/Images/best-1.svg";
-                          }}
-                        />
-                      </div>
+    <main className="cart-page-main pt-10 pb-16 bg-[#FDF9F5]">
+      <section className="cart-section max-w-7xl mx-auto px-4 md:px-6">
+        {/* Page Title Section */}
+        <section className="text-center pb-12">
+          <h1 className="text-[#7E525C] text-5xl md:text-7xl font-serif font-normal">
+            Your Shopping Bag
+          </h1>
+          <div className="flex items-center justify-center gap-3 mt-6">
+            <span className="block h-px w-12 bg-[#D1C3C1]" />
+            <p className="text-[#4E4543] text-[10px] uppercase tracking-[2px] font-normal">
+              A curated collection of your memory selections and timeless
+              elixirs
+            </p>
+            <span className="block h-px w-12 bg-[#D1C3C1]" />
+          </div>
+        </section>
 
-                      <div className="item-details">
-                        <h3 className="item-name">{name}</h3>
-                        <p className="item-size">
-                          Eau de Parfum | {item.size ?? "50ml"}
-                        </p>
-                        <div className="item-quantity-control">
-                          <span>{item.quantity ?? 1}</span>
+        <div className="flex flex-col lg:flex-row gap-10">
+          {/* Left Side: Cart Items List */}
+          <div className="flex-1 space-y-6">
+            {cartLoading ? (
+              <div className="flex justify-center py-10">
+                <div className="w-8 h-8 border-4 border-[#7e525c] border-t-transparent rounded-full animate-spin" />
+              </div>
+            ) : cartItems.length === 0 ? (
+              <div className="bg-[#F9F6F2] rounded-[32px] p-20 text-center">
+                <p className="text-[#7E525C] font-serif text-xl mb-4">
+                  Your bag is empty
+                </p>
+                <button
+                  onClick={() => router.push("/collections")}
+                  className="text-[#4E4543] text-xs underline tracking-widest"
+                >
+                  CONTINUE SHOPPING
+                </button>
+              </div>
+            ) : (
+              cartItems.map((item, idx) => {
+                const cartId = item.cartId ?? item._id ?? idx;
+                const name = item.productId?.name ?? item.name ?? "Product";
+                const price = item.price ?? item.productId?.price ?? 0;
+                const imageRaw =
+                  item.productId?.image_id?.path ??
+                  item.productId?.image ??
+                  item.image;
+                const imageSrc = imageRaw
+                  ? buildProductImageUrl(imageRaw)
+                  : "/Images/best-1.svg";
+
+                return (
+                
+                  <div
+                    key={cartId}
+                    className="relative flex bg-[#F9F6F2] rounded-[32px] p-6 items-center gap-6 group"
+                  >
+                    {/* Product Image */}
+                    <div className="relative w-32 h-40 md:w-48 md:h-56 shrink-0 overflow-hidden rounded-[24px]">
+                      <Image
+                        src={imageSrc}
+                        alt={name}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+
+                    {/* Product Info & Controls */}
+                    <div className="flex flex-col flex-1 h-full justify-between py-2 min-h-[160px] md:min-h-[200px]">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h3 className="text-[#7E525C] text-xl md:text-2xl font-serif">
+                            {name}
+                          </h3>
+                          <p className="text-[#A69391] text-xs mt-1">
+                            Eau de Parfum | {item.size ?? "50ml"}
+                          </p>
                         </div>
-                      </div>
-
-                      <div className="item-price-section">
-                        <p className="item-price">
-                          PKR {(price * (item.quantity ?? 1)).toLocaleString()}
-                        </p>
+                        {/* Remove Button */}
                         <button
-                          className="remove-btn"
                           onClick={() => removeItem(String(cartId))}
+                          className="text-[#7e525c] hover:text-[#8b6f76] transition-colors cursor-pointer"
                         >
-                          <X size={20} />
+                          <X size={20} strokeWidth={1.5} />
                         </button>
                       </div>
+
+                      <div className="flex justify-between items-end">
+                        {/* Quantity Selector  */}
+                        <div className="flex items-center bg-white rounded-full px-5 py-2.5 w-fit gap-8 shadow-sm">
+                          <button className="text-[#D1C3C1] hover:text-[#7E525C]">
+                            <Minus size={14}  className="text-[#7E525C] cursor"  />
+                          </button>
+                          <span className="text-sm font-medium text-[#4E4543]">
+                            {item.quantity ?? 1}
+                          </span>
+                          <button className="text-[#D1C3C1] hover:text-[#7E525C]">
+                            <Plus size={14} className="text-[#7E525C] cursor-pointer"/>
+                          </button>
+                        </div>
+
+                        {/* Price */}
+                        <p className="text-[#7E525C] font-serif text-lg md:text-xl whitespace-nowrap mb-2">
+                          PKR {price.toLocaleString()}
+                        </p>
+                      </div>
                     </div>
-                  );
-                })
-              )}
-            </div>
+                  </div>
+                );
+              })
+            )}
 
             {/* Trust Badges */}
-            <div className="cart-badges m-8">
-              <div className="badge">
-                <span className="badge-icon">
-                  <Image
-                    src={truck_icon}
-                    alt="Delivery"
-                    width={20}
-                    height={20}
-                  />
-                </span>
-
-                <div>
-                  <p className="badge-title">Free Delivery All Over Pakistan</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-8">
+              {[
+                { src: truck_icon, text: "Free Delivery All Over Pakistan" },
+                { src: cash_icon, text: "Cash on Delivery Available" },
+                { src: auth_icon, text: "100% Authentic Products" },
+              ].map((badge, i) => (
+                <div key={i} className="flex items-center gap-4 py-2 px-4!">
+                  <div className="w-12 h-12 flex items-center justify-center shrink-0 bg-[#faedd9]  badge rounded">
+                    <Image
+                      src={badge.src}
+                      alt="icon"
+                      width={30}
+                      height={30}
+                      className="object-contain"
+                    />
+                  </div>
+                  <p className="text-[11px] uppercase tracking-[1.5px] text-[#4E4543] font-medium leading-tight max-w-[150px]">
+                    {badge.text}
+                  </p>
                 </div>
-              </div>
-
-              <div className="badge">
-                <span className="badge-icon">
-                  <Image
-                    src={cash_icon}
-                    alt="Cash on Delivery"
-                    width={20}
-                    height={20}
-                  />
-                </span>
-                <div>
-                  <p className="badge-title">Cash on Delivery Available</p>
-                </div>
-              </div>
-
-              <div className="badge">
-                <span className="badge-icon">
-                  <Image
-                    src={auth_icon}
-                    alt="Authentic Products"
-                    width={20}
-                    height={20}
-                  />
-                </span>
-                <div>
-                  <p className="badge-title">100% Authentic Products</p>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
 
-          {/* Order Summary */}
-          <div className="order-summary m-6 max-w-md mx-auto rounded-[32px] p-8">
+          {/* Right Side: Order Summary */}
+          <div className="lg:w-[400px]">
+            <div className="bg-[#F9F6F2] rounded-[40px] p-8 md:p-10 sticky top-10">
+              <h2 className="text-[#7E525C] text-3xl font-serif mb-10 text-center">
+                Order Summary
+              </h2>
 
-  <h2 className="  text-[#7e525c] md:mb-12 font-noto text-2xl md:text-4xl lg:text-4xl">Order Summary</h2>
+              <div className="space-y-5">
+                <div className="flex justify-between items-center text-[#4E4543]">
+                  <span className="text-[10px] uppercase tracking-[2px]">
+                    Subtotal
+                  </span>
+                  <span className="text-[#7E525C] font-semibold">
+                    PKR {subtotal.toLocaleString()}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center text-[#4E4543]">
+                  <span className="text-[10px] uppercase tracking-[2px]">
+                    Shipping
+                  </span>
+                  <span className="text-[#7E525C] font-medium uppercase tracking-widest text-[11px]">
+                    Free
+                  </span>
+                </div>
 
-  <div className="summary-content  space-x-5">
+                <div className="h-px bg-[#D1C3C1]/40 my-6" />
 
-    <div className="summary-row flex justify-between items-center">
-      <span className="summary-label">Subtotal</span>
-      <span className="summary-value">
-        PKR {subtotal.toLocaleString()}
-      </span>
-    </div>
+                <div className="flex justify-between items-center text-[#7E525C]">
+                  <span className="text-xl font-serif">Total</span>
+                  <span className="text-2xl font-serif font-bold">
+                    PKR {total.toLocaleString()}
+                  </span>
+                </div>
+              </div>
 
-    <div className="summary-row flex justify-between items-center">
-      <span className="summary-label">Shipping</span>
-      <span className="summary-value shipping-free">Free</span>
-    </div>
-
-    {discount > 0 && (
-      <div className="summary-row flex justify-between items-center discount">
-        <span className="summary-label">Discount</span>
-        <span className="summary-value">
-          -PKR {discount.toLocaleString()}
-        </span>
-      </div>
-    )}
-
-    {/* Divider */}
-    <div className="summary-divider  my-4"></div>
-
-    <div className=" total flex justify-between items-center mt-2">
-      <span className="summary-label text-lg">Total</span>
-      <span className="summary-value text-lg">
-        PKR {total.toLocaleString()}
-      </span>
-    </div>
-  </div>
-
-  {/* Button */}
-  <button
-    className="checkout-btn w-full mt-8 py-4 rounded-full text-sm tracking-widest"
-    onClick={() => router.push("/cart/checkout")}
-  >
-    PROCEED TO CHECKOUT
-  </button>
-
-  {/* Promo Section */}
-  <div className="promo-section mt-8">
-    <label className="promo-label block text-center mb-4">
-      Apply Promo Code
-    </label>
-
-    <div className="promo-input-group flex items-center gap-3">
-      <input
-        type="text"
-        placeholder="OFF7200A"
-        className="promo-input flex-1 px-4 py-3 rounded-xl outline-none"
-        value={promoCode}
-        onChange={(e) => setPromoCode(e.target.value)}
-      />
-
-      <button
-        className="promo-apply-btn text-sm font-medium"
-        onClick={handleApplyPromo}
-      >
-        APPLY
-      </button>
-    </div>
-  </div>
-
-</div>
+              <button
+                className="w-full mt-10 bg-[#7E525C] text-white py-5 rounded-full text-[10px] font-bold tracking-[3px] hover:bg-[#6a444d] transition-all uppercase"
+                onClick={() => router.push("/cart/checkout")}
+              >
+                PROCEED TO CHECKOUT
+              </button>
+            </div>
+          </div>
         </div>
       </section>
     </main>

@@ -44,7 +44,7 @@ export default function BestSellers() {
   };
 
   return (
-    <section className="best-sellers">
+    <section className="best-sellers pb-10!">
       <div className="best-sellers-top">
         <div>
           <h2>The Best Sellers</h2>
