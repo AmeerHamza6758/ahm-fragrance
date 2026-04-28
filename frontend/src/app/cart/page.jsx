@@ -41,12 +41,18 @@ export default function CartPage() {
         <div className="cart-container">
           {/* Cart Items */}
           <div className="cart-items-section">
-            <div className="flex flex-col gap-2">
-            <h1 className="cart-title">Your Shopping Bag</h1>
-            <p className="cart-subtitle">
-              A COLLECTION OF YOUR MEMORY SELECTIONS
-            </p>
-            </div>
+          <div className="flex flex-col items-center text-center px-4 mb-12 md:mb-16">
+  <h1 
+    className="text-[#7e525c] font-noto leading-tight mb-4"
+    style={{ fontSize: "clamp(40px, 7vw, 50px)" }}
+  >
+    Your Shopping Bag
+  </h1>
+  <div className="w-12 h-[1px] bg-[#7e525c]/30 mb-4"></div> {/* Decorative Line */}
+  <p className="max-w-xl text-[13px] md:text-[15px] tracking-[0.2em] text-[#7e525c]/70 uppercase font-light leading-relaxed">
+    A curated collection of your memory selections and timeless elixirs
+  </p>
+</div>
             <div className="cart-items-list">
               {cartLoading ? (
                 <div className="flex justify-center py-10">
@@ -74,7 +80,10 @@ export default function CartPage() {
                     imageSrc = buildProductImageUrl(imageRaw);
                   }
                   return (
-                    <div key={`${cartId}-${productId}-${idx}`} className="cart-item">
+                    <div
+                      key={`${cartId}-${productId}-${idx}`}
+                      className="cart-item"
+                    >
                       <div className="item-image">
                         <Image
                           src={imageSrc}
@@ -116,7 +125,7 @@ export default function CartPage() {
             </div>
 
             {/* Trust Badges */}
-            <div className="cart-badges">
+            <div className="cart-badges m-8">
               <div className="badge">
                 <span className="badge-icon">
                   <Image
@@ -163,64 +172,77 @@ export default function CartPage() {
           </div>
 
           {/* Order Summary */}
-          <div className="order-summary">
-            <h2 className="summary-title">Order Summary</h2>
+          <div className="order-summary m-6 max-w-md mx-auto rounded-[32px] p-8">
 
-            <div className="summary-content">
-              <div className="summary-row">
-                <span className="summary-label">Subtotal</span>
-                <span className="summary-value">
-                  PKR {subtotal.toLocaleString()}
-                </span>
-              </div>
+  <h2 className="  text-[#7e525c] md:mb-12 font-noto text-2xl md:text-4xl lg:text-4xl">Order Summary</h2>
 
-              <div className="summary-row">
-                <span className="summary-label">Shipping</span>
-                <span className="summary-value shipping-free">Free</span>
-              </div>
+  <div className="summary-content  space-x-5">
 
-              {discount > 0 && (
-                <div className="summary-row discount">
-                  <span className="summary-label">Discount</span>
-                  <span className="summary-value">
-                    -PKR {discount.toLocaleString()}
-                  </span>
-                </div>
-              )}
+    <div className="summary-row flex justify-between items-center">
+      <span className="summary-label">Subtotal</span>
+      <span className="summary-value">
+        PKR {subtotal.toLocaleString()}
+      </span>
+    </div>
 
-              <div className="summary-divider"></div>
+    <div className="summary-row flex justify-between items-center">
+      <span className="summary-label">Shipping</span>
+      <span className="summary-value shipping-free">Free</span>
+    </div>
 
-              <div className="summary-row total">
-                <span className="summary-label">Total</span>
-                <span className="summary-value">
-                  PKR {total.toLocaleString()}
-                </span>
-              </div>
-            </div>
+    {discount > 0 && (
+      <div className="summary-row flex justify-between items-center discount">
+        <span className="summary-label">Discount</span>
+        <span className="summary-value">
+          -PKR {discount.toLocaleString()}
+        </span>
+      </div>
+    )}
 
-            <button
-              className="checkout-btn"
-              onClick={() => router.push("/cart/checkout")}
-            >
-              PROCEED TO CHECKOUT
-            </button>
+    {/* Divider */}
+    <div className="summary-divider  my-4"></div>
 
-            <div className="promo-section">
-              <label className="promo-label">Apply Promo Code</label>
-              <div className="promo-input-group">
-                <input
-                  type="text"
-                  placeholder="OFF7200A"
-                  className="promo-input"
-                  value={promoCode}
-                  onChange={(e) => setPromoCode(e.target.value)}
-                />
-                <button className="promo-apply-btn" onClick={handleApplyPromo}>
-                  APPLY
-                </button>
-              </div>
-            </div>
-          </div>
+    <div className=" total flex justify-between items-center mt-2">
+      <span className="summary-label text-lg">Total</span>
+      <span className="summary-value text-lg">
+        PKR {total.toLocaleString()}
+      </span>
+    </div>
+  </div>
+
+  {/* Button */}
+  <button
+    className="checkout-btn w-full mt-8 py-4 rounded-full text-sm tracking-widest"
+    onClick={() => router.push("/cart/checkout")}
+  >
+    PROCEED TO CHECKOUT
+  </button>
+
+  {/* Promo Section */}
+  <div className="promo-section mt-8">
+    <label className="promo-label block text-center mb-4">
+      Apply Promo Code
+    </label>
+
+    <div className="promo-input-group flex items-center gap-3">
+      <input
+        type="text"
+        placeholder="OFF7200A"
+        className="promo-input flex-1 px-4 py-3 rounded-xl outline-none"
+        value={promoCode}
+        onChange={(e) => setPromoCode(e.target.value)}
+      />
+
+      <button
+        className="promo-apply-btn text-sm font-medium"
+        onClick={handleApplyPromo}
+      >
+        APPLY
+      </button>
+    </div>
+  </div>
+
+</div>
         </div>
       </section>
     </main>

@@ -93,18 +93,18 @@ export default function WishlistPage() {
       </div>
 
       {/* Page Title */}
-      <div className="mx-auto max-w-7xl px-10 pt-5 pb-16 lg:px-8 md:px-6 sm:px-5">
+      <div className="flex flex-col items-center text-center px-6 pt-10 pb-16">
         <h1
-          className="mb-5 font-bold leading-[1.05] text-primary md:mb-4 font-noto"
-          style={{
-            fontSize: "clamp(44px, 6vw, 56px)",
-          }}
+          className="text-[#7e525c] font-noto leading-[1.05] mb-4"
+          style={{ fontSize: "clamp(40px, 7vw, 60px)" }}
         >
           My Wishlist
         </h1>
-        <p className="max-w-md text-[15px] leading-[1.7] text-secondary sm:text-[14px]">
-          A curated collection of your most desired botanical essences and
-          timeless elixirs.
+        <div className="w-16 h-[1px] bg-[#7e525c]/40 mb-6"></div>{" "}
+        {/* Decorative Line */}
+        <p className="max-w-md text-[14px] md:text-[16px] leading-[1.8] text-gray-500 font-light italic">
+          A curated space for your most desired botanical essences, waiting to
+          become part of your signature collection.
         </p>
       </div>
 
@@ -161,9 +161,7 @@ export default function WishlistPage() {
 
                   {/* Name + ADD TO BAG inline */}
                   <div className="mb-2 flex items-start justify-between gap-3 sm:flex-col sm:items-start">
-                    <h3
-                      className="min-w-0 flex-1 text-[18px] font-bold leading-[1.05] text-foreground xl:text-[17px] font-noto"
-                    >
+                    <h3 className="min-w-0 flex-1 text-[18px] font-bold leading-[1.05] text-foreground xl:text-[17px] font-noto">
                       {product.name}
                     </h3>
                     <Link
@@ -195,12 +193,7 @@ export default function WishlistPage() {
         {/* Header row */}
         <div className="mb-12 flex flex-row items-end justify-between gap-6 w-full">
           <div className="flex flex-col">
-            <h2
-              className="font-bold text-foreground mb-2 font-noto"
-              style={{
-                fontSize: "32px",
-              }}
-            >
+            <h2 className="font-noto font-bold text-foreground mb-4 text-[24px] sm:text-[28px] md:text-[32px] lg:text-[36px] leading-tight">
               You May Also Like
             </h2>
             <p className="text-sm text-muted">
