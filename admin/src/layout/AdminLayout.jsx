@@ -8,7 +8,7 @@ function AdminLayout() {
     <div className="admin-shell">
       <Sidebar />
       <div className="admin-content-wrapper">
-        <Topbar />
+        {/* <Topbar /> */}
         <main className="admin-main">
           <Outlet />
         </main>

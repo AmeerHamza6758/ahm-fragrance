@@ -78,7 +78,7 @@ function OrdersPage() {
             <h3>Order Composition</h3>
 
             <div className="composition-item">
-              <div>
+              <div style={{marginTop:"10px", height:"70px"}}>
                 <h4>Oud Royale</h4>
                 <p>100ML Selection</p>
               </div>
@@ -86,7 +86,7 @@ function OrdersPage() {
             </div>
 
             <div className="composition-item">
-              <div>
+              <div style={{paddingBottom:"10px", height:"70px"}}>
                 <h4 style={{}}>Velvet Peony</h4>
                 <p>50ML Selection</p>
               </div>
@@ -144,7 +144,7 @@ function OrdersPage() {
          <span>•••</span>
         </div>
       </div>
-        <div className="pagination">
+      <div className="pagination">
            <div className="pagination-124">
               <p>SHOWING 1 TO 6 OF 48 ENTRIES</p>
             </div>
@@ -160,4 +160,3 @@ function OrdersPage() {
   );
 }
 export default OrdersPage;
-
