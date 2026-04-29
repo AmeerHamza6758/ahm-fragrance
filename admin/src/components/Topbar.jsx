@@ -1,13 +1,11 @@
 function Topbar() {
   return (
     <header className="admin-topbar">
-      <div>
-        <h1>Admin Panel</h1>
-        <p>Manage products, catalog, stock and orders</p>
+      <h3>AHM Fragrances</h3>
+      <div className="ahm-admin">
+        <h4>AHM Admin </h4>
+        <button className="ahm-btn"></button>
       </div>
-      <button className="action-btn" type="button">
-        Add Product
-      </button>
     </header>
   );
 }
