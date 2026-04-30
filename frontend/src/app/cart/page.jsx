@@ -13,8 +13,10 @@ import { buildProductImageUrl } from "@/lib/utils/imageUrl";
 export default function CartPage() {
   const { data: cartData, isLoading: cartLoading } = useGetCart();
   const { mutate: removeItem } = useRemoveFromCart();
+
   const [discount] = useState(0);
   const router = useRouter();
+  const [quantity, setQuantity] = useState(1);
 
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
@@ -85,7 +87,6 @@ export default function CartPage() {
                   : "/Images/best-1.svg";
 
                 return (
-                
                   <div
                     key={cartId}
                     className="relative flex bg-[#F9F6F2] rounded-[32px] p-6 items-center gap-6 group"
@@ -122,18 +123,15 @@ export default function CartPage() {
 
                       <div className="flex justify-between items-end">
                         {/* Quantity Selector  */}
-                        <div className="flex items-center bg-white rounded-full px-5 py-2.5 w-fit gap-8 shadow-sm">
-                          <button className="text-[#D1C3C1] hover:text-[#7E525C]">
-                            <Minus size={14}  className="text-[#7E525C] cursor"  />
-                          </button>
-                          <span className="text-sm font-medium text-[#4E4543]">
-                            {item.quantity ?? 1}
-                          </span>
-                          <button className="text-[#D1C3C1] hover:text-[#7E525C]">
-                            <Plus size={14} className="text-[#7E525C] cursor-pointer"/>
-                          </button>
+                        <div
+                          className="flex items-center w-fit px-8 py-2"
+                          style={{
+                            border: "1px solid rgb(var(--color-border))",
+                            borderRadius: "6px",
+                          }}
+                        >
+                          <span>{item.quantity ?? 1}</span>
                         </div>
-
                         {/* Price */}
                         <p className="text-[#7E525C] font-serif text-lg md:text-xl whitespace-nowrap mb-2">
                           PKR {price.toLocaleString()}
@@ -198,8 +196,10 @@ export default function CartPage() {
                 <div className="h-px bg-[#D1C3C1]/40 my-6" />
 
                 <div className="flex justify-between items-center text-[#7E525C]">
-                  <span className="text-xl font-serif">Total</span>
-                  <span className="text-2xl font-serif font-bold">
+                  <span className="text-xl font-serif font-semibold">
+                    Total
+                  </span>
+                  <span className="text-xl font-serif font-semibold">
                     PKR {total.toLocaleString()}
                   </span>
                 </div>

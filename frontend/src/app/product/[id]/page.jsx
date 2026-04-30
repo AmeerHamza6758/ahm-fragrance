@@ -151,7 +151,7 @@ export default function ProductDetails() {
                   Rs. {displayPrice?.toLocaleString()}
                   {displayDiscount > 0 && (
                     <span className="product-discount">
-                      {" "}
+                      
                       -{displayDiscount}%
                     </span>
                   )}
