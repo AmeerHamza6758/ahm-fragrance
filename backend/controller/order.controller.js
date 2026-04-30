@@ -134,7 +134,7 @@ const createOrder = async (req, res) => {
     if (duplicateCheck.isDuplicate) {
       return res.status(409).json({
         success: false,
-        message: `You have already ordered these product(s) within the last 24 hours: ${duplicateCheck.duplicateProducts.join(', ')}. Please wait before ordering again or contact us through email or phonenumber.`,
+        message: `You have already ordered these product(s) within the last 1 hour: ${duplicateCheck.duplicateProducts.join(', ')}. Please wait before ordering again or contact us through email or phonenumber.`,
         duplicateProducts: duplicateCheck.duplicateProducts
       });
     }
@@ -158,13 +158,6 @@ const createOrder = async (req, res) => {
         });
       }
       
-
-      // if (item.quantity > product.maxPerOrder) {
-      //   return res.status(400).json({
-      //     success: false,
-      //     message: `You can only order max ${product.maxPerOrder} bottles of ${product.name}.`
-      //   });
-      // }
       
       if (item.quantity < 1) {
         return res.status(400).json({
