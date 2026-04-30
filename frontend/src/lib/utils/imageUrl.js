@@ -4,7 +4,7 @@ const normalizePath = (value) =>
   String(value).replace(/\\/g, "/").replace(/^publics?\//, "");
 
 const getApiBaseUrl = () => {
-  const raw = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+  const raw = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
   return raw.replace(/\/+$/, "");
 };
 
