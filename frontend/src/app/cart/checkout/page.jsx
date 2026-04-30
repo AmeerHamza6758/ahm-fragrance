@@ -103,6 +103,14 @@ export default function CheckoutPage() {
   const displayOrderNumber = orderData?.orderNumber ?? orderNumber;
 
   if (orderPlaced) {
+    // Use API response values for financial summary
+    const orderSubtotal = orderData?.subtotal ?? subtotal;
+    const orderDeliveryCharges = orderData?.deliveryCharges ?? 0;
+    const orderTotal = orderData?.totalAmount ?? total;
+
+    // Use API response products if available, otherwise fall back to cart items
+    const orderProducts = orderData?.products ?? null;
+
     return (
       <main className="min-h-screen bg-[#FDF9F5] pt-10 pb-16 px-4 md:px-8">
         <div className="max-w-4xl mx-auto flex flex-col items-center">
@@ -141,7 +149,7 @@ export default function CheckoutPage() {
                     Recipient
                   </p>
                   <p className="text-sm text-[#1c1c19] font-medium">
-                    {form.name}
+                    {orderData?.customerInfo?.name ?? form.name}
                   </p>
                 </div>
                 <div>
@@ -149,19 +157,19 @@ export default function CheckoutPage() {
                     Shipping Address
                   </p>
                   <p className="text-sm text-[#1c1c19] leading-relaxed">
-                    {form.address}
+                    {orderData?.customerInfo?.address ?? form.address}
                     <br />
-                    {form.city}
-                    {form.postal ? `, ${form.postal}` : ""}
+                    {orderData?.customerInfo?.city ?? form.city}
+                    {(orderData?.customerInfo?.postalCode ?? form.postal) ? `, ${orderData?.customerInfo?.postalCode ?? form.postal}` : ""}
                     <br />
-                    {form.province}
+                    {orderData?.customerInfo?.province ?? form.province}
                   </p>
                 </div>
                 <div>
                   <p className="text-[9px] tracking-[0.18em] font-bold text-[#9a8c87] uppercase mb-1">
                     Contact
                   </p>
-                  <p className="text-sm text-[#1c1c19]">{form.phone}</p>
+                  <p className="text-sm text-[#1c1c19]">{orderData?.customerInfo?.phone ?? form.phone}</p>
                 </div>
               </div>
             </div>
@@ -172,67 +180,83 @@ export default function CheckoutPage() {
                 Order Summary
               </h2>
 
-              {/* Items */}
+              {/* Items - use API response products when available */}
               <div className="flex flex-col divide-y divide-[#e8e2dc]">
-                {cartItems.map((item, idx) => {
-                  const name = item.productId?.name ?? item.name ?? "Product";
-                  const price = item.price ?? item.productId?.price ?? 0;
-                  const qty = item.quantity ?? 1;
-                  const imageRaw =
-                    item.productId?.image_id?.path ??
-                    item.image_id?.path ??
-                    item.productId?.image ??
-                    item.image ??
-                    null;
-                  let imageSrc = "/Images/best-1.svg";
-                  if (imageRaw) {
-                    imageSrc = buildProductImageUrl(imageRaw);
-                  }
-                  return (
-                    <div key={idx} className="flex items-center gap-4 py-4">
-                      <div className="relative w-16 h-16 rounded-xl overflow-hidden shrink-0 bg-[#ede9e3]">
-                        <Image
-                          src={imageSrc}
-                          alt={name}
-                          fill
-                          className="object-cover"
-                          onError={(e) => {
-                            e.target.src = "/Images/best-1.svg";
-                          }}
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="font-serif text-sm font-normal text-[#1c1c19]">
-                          {name} — {item.size ?? "50ml"}
+                {orderProducts
+                  ? orderProducts.map((product, idx) => (
+                      <div key={idx} className="flex items-center gap-4 py-4">
+                        <div className="flex-1 min-w-0">
+                          <div className="font-serif text-sm font-normal text-[#1c1c19]">
+                            {product.name}
+                          </div>
+                          <div className="text-xs text-[#9a8c87] mt-0.5">
+                            Qty: {product.quantity}
+                          </div>
                         </div>
-                        <div className="text-xs text-[#9a8c87] mt-0.5">
-                          Eau de Parfum
+                        <div className="text-sm font-semibold text-[#1c1c19] shrink-0">
+                          PKR {(product.total ?? product.price * product.quantity).toLocaleString()}
                         </div>
                       </div>
-                      <div className="text-sm font-semibold text-[#1c1c19] shrink-0">
-                        PKR {(price * qty).toLocaleString()}
-                      </div>
-                    </div>
-                  );
-                })}
+                    ))
+                  : cartItems.map((item, idx) => {
+                      const name = item.productId?.name ?? item.name ?? "Product";
+                      const price = item.price ?? item.productId?.price ?? 0;
+                      const qty = item.quantity ?? 1;
+                      const imageRaw =
+                        item.productId?.image_id?.path ??
+                        item.image_id?.path ??
+                        item.productId?.image ??
+                        item.image ??
+                        null;
+                      let imageSrc = "/Images/best-1.svg";
+                      if (imageRaw) {
+                        imageSrc = buildProductImageUrl(imageRaw);
+                      }
+                      return (
+                        <div key={idx} className="flex items-center gap-4 py-4">
+                          <div className="relative w-16 h-16 rounded-xl overflow-hidden shrink-0 bg-[#ede9e3]">
+                            <Image
+                              src={imageSrc}
+                              alt={name}
+                              fill
+                              className="object-cover"
+                              onError={(e) => {
+                                e.target.src = "/Images/best-1.svg";
+                              }}
+                            />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="font-serif text-sm font-normal text-[#1c1c19]">
+                              {name} — {item.size ?? "50ml"}
+                            </div>
+                            <div className="text-xs text-[#9a8c87] mt-0.5">
+                              Eau de Parfum
+                            </div>
+                          </div>
+                          <div className="text-sm font-semibold text-[#1c1c19] shrink-0">
+                            PKR {(price * qty).toLocaleString()}
+                          </div>
+                        </div>
+                      );
+                    })}
               </div>
 
-              {/* Totals */}
+              {/* Totals - from API response */}
               <div className="flex flex-col gap-2 pt-4 border-t border-[#e8e2dc] mt-2">
                 <div className="flex justify-between text-sm text-[#6b6460]">
                   <span>Subtotal</span>
-                  <span>PKR {subtotal.toLocaleString()}</span>
+                  <span>PKR {orderSubtotal.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-sm text-[#6b6460]">
-                  <span>Complimentary Shipping</span>
-                  <span>PKR 0.00</span>
+                  <span>Delivery Charges</span>
+                  <span>{orderDeliveryCharges > 0 ? `PKR ${orderDeliveryCharges.toLocaleString()}` : "Free"}</span>
                 </div>
                 <div className="flex justify-between pt-2 border-t border-[#e8e2dc] mt-1">
                   <span className="font-serif text-base text-[#7e525c]">
                     Total
                   </span>
                   <span className="font-serif text-base text-[#7e525c] font-semibold">
-                    PKR {total.toLocaleString()}
+                    PKR {orderTotal.toLocaleString()}
                   </span>
                 </div>
               </div>
