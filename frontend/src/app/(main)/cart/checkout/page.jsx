@@ -5,6 +5,10 @@ import { useState } from "react";
 import Link from "next/link";
 import { useGetCart, useCreateOrder } from "@/lib/api";
 import { buildProductImageUrl } from "@/lib/utils/imageUrl";
+import {
+  getStoredCheckoutProfile,
+  saveCheckoutProfile,
+} from "@/lib/store/userProfileStore";
 
 export default function CheckoutPage() {
   const { data: cartData } = useGetCart();
@@ -14,17 +18,11 @@ export default function CheckoutPage() {
     ? cartData
     : (cartData?.items ?? cartData?.data?.items ?? []);
 
-  const [promoCode, setPromoCode] = useState("");
-  const [form, setForm] = useState({
-    name: "",
-    phone: "",
-    email: "",
-    address: "",
-    city: "",
-    postal: "",
-    province: "",
+  // const [promoCode, setPromoCode] = useState("");
+  const [form, setForm] = useState(() => ({
+    ...getStoredCheckoutProfile(),
     agreed: false,
-  });
+  }));
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [orderData, setOrderData] = useState(null);
   const [orderError, setOrderError] = useState("");
@@ -42,6 +40,10 @@ export default function CheckoutPage() {
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
+
+    if (name !== "agreed") {
+      saveCheckoutProfile({ [name]: value });
+    }
   };
 
   const handleOrder = (e) => {
@@ -77,6 +79,16 @@ export default function CheckoutPage() {
       },
       agreedToTerms: true,
     };
+
+    saveCheckoutProfile({
+      name: form.name,
+      phone: form.phone,
+      email: form.email,
+      address: form.address,
+      city: form.city,
+      postal: form.postal,
+      province: form.province,
+    });
 
     console.log("[Order Payload]", JSON.stringify(payload, null, 2));
 
@@ -672,7 +684,7 @@ export default function CheckoutPage() {
           </div>
 
           {/* Promo Code */}
-          <div className="flex items-center gap-2 py-4 border-t border-[#ede9e4] mt-1">
+          {/* <div className="flex items-center gap-2 py-4 border-t border-[#ede9e4] mt-1">
             <input
               type="text"
               value={promoCode}
@@ -686,7 +698,7 @@ export default function CheckoutPage() {
             >
               APPLY
             </button>
-          </div>
+          </div> */}
 
           {/* Totals */}
           <div className="flex flex-col gap-3 pt-4 border-t border-[#ede9e4]">

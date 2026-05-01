@@ -16,6 +16,13 @@ export interface SignUpPayload {
   userName: string;
   email: string;
   password: string;
+  phone?: string;
+  address?: {
+    street?: string;
+    city?: string;
+    province?: string;
+    postalCode?: string;
+  };
 }
 
 export interface AuthUser {
