@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import AdminLayout from "./layout/AdminLayout";
+import DashboardPage from "./features/DashboardPage";
 import ProductsPage from "./features/ProductsPage";
 import CategoriesPage from "./features/CategoriesPage";
 import BrandsPage from "./features/BrandsPage";
@@ -8,8 +9,6 @@ import StockPage from "./features/StockPage";
 import FaqPage from "./features/FaqPage";
 import CustomersPage from "./features/CustomersPage";
 import SettingsPage from "./features/SettingsPage";
-import DashboardPage from "./features/DashboardPage";
-import AddProducts from "./features/products/AddProducts";
 
 function App() {
   return (
