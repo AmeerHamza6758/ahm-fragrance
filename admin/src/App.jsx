@@ -9,7 +9,10 @@ import StockPage from "./features/StockPage";
 import FaqPage from "./features/FaqPage";
 import CustomersPage from "./features/CustomersPage";
 import SettingsPage from "./features/SettingsPage";
+<<<<<<< amna
+=======
 import AnalyticPage from "./features/AnalyticPage";
+>>>>>>> development
 import AddProducts from "./features/products/AddProducts"
 function App() {
   return (
