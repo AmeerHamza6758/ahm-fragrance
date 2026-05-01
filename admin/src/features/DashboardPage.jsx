@@ -4,7 +4,7 @@ const stats = [
   { title: "Total Products", value: "0", hint: "Source: /api/product/getProducts" },
   { title: "Pending Orders", value: "0", hint: "Source: /api/order/checkout" },
   { title: "Low Stock Alerts", value: "0", hint: "Source: /api/stock/get?alerts=true" },
-  { title: "FAQs", value: "0", hint: "Source: /api/faq/getAllFaq" },
+  { title: "Total Annual Revenue", value: "PKR 8,245,000", hint: "Maintained 92% profit margin" },
 ];
 
 function DashboardPage() {

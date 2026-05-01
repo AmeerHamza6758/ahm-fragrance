@@ -249,7 +249,7 @@ color: #1C1C19;
 .catalog-table-header,
 .catalog-row {
   display: grid;
-  grid-template-columns: 2fr repeat(5, 1fr) 0.5fr;
+  grid-template-columns:repeat(7, 1fr);
   gap: 10px;
   align-items: center;
   padding: 12px 0;
@@ -260,6 +260,7 @@ color: #1C1C19;
 }
 .catalog-row {
   border-bottom: 1px solid #f0f0f0;
+  /* padding-left: 5px; */
 }
 .product-cell {
   display: flex;
@@ -272,7 +273,7 @@ color: #1C1C19;
   border-radius: 50%;
   object-fit: cover;
 }
-.tag {
+.tag-center {
   font-weight: 700;
   font-style: bold;
   line-height: 100%;
@@ -281,6 +282,9 @@ color: #1C1C19;
   padding: 5px 10px;
   border-radius: 12px;
   font-size: 12px;
+  text-align: center;
+  margin-right: 10px;
+  align-items: center;
 }
 .actions {
   position: relative;
@@ -302,6 +306,7 @@ color: #1C1C19;
   width: 200px;
   height: 179px;
   box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+  z-index: 1000;
 }
 .dropdown p {
   padding: 5px;
@@ -736,7 +741,7 @@ box-shadow: 0px 10px 40px -10px #7E525C26;
   top: 25px;
   background: white;
   border: 1px solid #ddd;
-  /* padding: 10px; */
+  z-index: 1000;
 }
 .drop-btn{
   width: 150px;
@@ -857,4 +862,182 @@ box-shadow: 0px 10px 40px -10px #7E525C26;
   border-radius: 20px;
   width: fit-content;
   font-size: 12px;
+}
+
+/* /////////////////////////////  DashBoardPage CSS  ////////////////////////////////////////////////////////// */
+
+.dashboard-container {
+  padding: 20px;
+  background: #f8f8fb;
+}
+
+.dashboard-top {
+  display: flex;
+  gap: 20px;
+}
+
+.dashboard-bottom {
+  margin-top: 20px;
+}
+
+.card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.export-btn {
+  border: none;
+  background: none;
+  color: gray;
+  cursor: pointer;
+}
+
+.legend p {
+  font-size: 14px;
+  margin: 5px 0;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  display: inline-block;
+  border-radius: 50%;
+  margin-right: 5px;
+}
+
+.shipped { background: #7c3aed; }
+.delivered { background: #c4b5fd; }
+.pending { background: #e5e7eb; }
+
+@media (max-width: 768px) {
+  .dashboard-top {
+    flex-direction: column;
+  }
+}
+
+/* /////////////////////////////////  FaqPage CSS  ///////////////////////////////////////////////////////////////// */
+
+.faq-admin-page {
+  padding: 20px;
+  background: #faf8f6;
+  min-height: 100vh;
+}
+
+.faq-header-section {
+  margin-bottom: 30px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.faq-main-title {
+  font-size: 38px;
+  color: #4d3a3a;
+  margin-bottom: 10px;
+}
+
+.faq-sub-title {
+  color: #8f8f8f;
+  font-size: 15px;
+}
+
+.faq-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.faq-card-item {
+  background: white;
+  padding: 22px;
+  border-radius: 16px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+  position: relative;
+}
+
+.faq-question-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.faq-question-text {
+  font-size: 18px;
+  color: #4b3a3a;
+  cursor: pointer;
+}
+
+.faq-answer-text {
+  margin-top: 16px;
+  color: #777;
+  line-height: 1.7;
+}
+
+.faq-menu-button {
+  border: none;
+  background: transparent;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.faq-actions-wrapper {
+  position: relative;
+}
+
+.faq-dropdown-menu {
+  position: absolute;
+  right: 0;
+  top: 35px;
+  background: white;
+  width: 120px;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.faq-dropdown-menu p {
+  padding: 12px 16px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.faq-dropdown-menu p:hover {
+  background: #f7f2f2;
+}
+.add-faq-btn{
+  background: #8d5b5b;
+  color: white;
+  border: none;
+  padding-top: 8px;
+  border-radius: 30px;
+  cursor: pointer;
+  text-align: center;
+  height: 40px;
+  align-items: center;
+  width: 100px;
+  margin-top: 50px;
+}
+.edit-form input,
+.edit-form textarea {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.edit-form button {
+  background: #8d5b5b;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
 }

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState , useEffect} from "react";
 import PageSection from "../components/PageSection";
 import "../styles/admin.css"
 
@@ -70,7 +70,23 @@ const stockData = [
 ];
 function StockPage() {
     const [openMenu, setOpenMenu] = useState(null);
-
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+          if (!e.target.closest(".actions")) {
+            setOpenMenu(null);
+          }
+        };
+    
+        document.addEventListener("click", handleClickOutside);
+        return () => document.removeEventListener("click", handleClickOutside);
+      }, []);
+    
+      const handleEdit = (id) => {
+        console.log("Edit:", id);
+      };
+      const handleDelete = (id) => {
+    console.log("Delete:", id);
+  };
   return (
     <div className="stock-registry">
 
@@ -120,11 +136,11 @@ function StockPage() {
             <span>{item.restock}</span>
             <div className="actions">
               <button
-                onClick={() =>
+                onClick={(e) => {
+                  e.stopPropagation();
                   setOpenMenu(openMenu === item.id ? null : item.id)
-                }
+                }}
               > ⋮ </button>
-
               {openMenu === item.id && (
                 <div className="drop">
                   <h4 style={{color:'brown', paddingTop:"0px", paddingLeft:"20px"}}>ADD QUANTITY</h4>
