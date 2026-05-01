@@ -9,7 +9,7 @@ import StockPage from "./features/StockPage";
 import FaqPage from "./features/FaqPage";
 import CustomersPage from "./features/CustomersPage";
 import SettingsPage from "./features/SettingsPage";
-
+import AddProducts from "./features/products/AddProducts"
 function App() {
   return (
     <Routes>
