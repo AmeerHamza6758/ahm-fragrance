@@ -32,7 +32,8 @@ export default function CartPage() {
       sum + (item.price ?? item.productId?.price ?? 0) * (item.quantity ?? 1),
     0,
   );
-  const total = subtotal - discount;
+ const deliveryCharges = 15; 
+const total = subtotal + deliveryCharges - discount;
 
   if (!mounted) return <div className="min-h-screen bg-[#FDF9F5]" />;
 
@@ -191,7 +192,7 @@ export default function CartPage() {
                     Shipping
                   </span>
                   <span className="text-[#7E525C] font-medium uppercase tracking-widest text-[11px]">
-                    Free
+                    150
                   </span>
                 </div>
 
