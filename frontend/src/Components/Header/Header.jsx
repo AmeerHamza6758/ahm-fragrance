@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { ArrowLeft, Heart, House, Menu, User, X } from "lucide-react";
+import { ArrowLeft, Heart, House, Menu, ShoppingBag, ShoppingCart, User, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useFavorites, useGetCart } from "@/lib/api";
@@ -14,7 +14,7 @@ export default function Header() {
   const { data: wishlistProducts = [] } = useFavorites();
   const [menuOpen, setMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const isAuthPage = pathname?.startsWith("/auth/");
+  // const isAuthPage = pathname?.startsWith("/auth/");
 
   const isActive = (href) => {
     return pathname === href ? "active" : "";
@@ -61,31 +61,31 @@ export default function Header() {
     // { href: "/contact-us", label: "Contact Us" },
   ];
 
-  if (isAuthPage) {
-    return (
-      <header className="header">
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => {
-              if (typeof window !== "undefined" && window.history.length > 1) {
-                router.back();
-              } else {
-                router.push("/");
-              }
-            }}
-            aria-label="Go back"
-            className="inline-flex items-center justify-center"
-          >
-            <ArrowLeft size={24} color="#7e525c" />
-          </button>
-          <Link href="/" className="logo">
-            AHM Fragrances
-          </Link>
-        </div>
-      </header>
-    );
-  }
+  // if (isAuthPage) {
+  //   return (
+  //     <header className="header">
+  //       <div className="flex items-center gap-3">
+  //         <button
+  //           type="button"
+  //           onClick={() => {
+  //             if (typeof window !== "undefined" && window.history.length > 1) {
+  //               router.back();
+  //             } else {
+  //               router.push("/");
+  //             }
+  //           }}
+  //           aria-label="Go back"
+  //           className="inline-flex items-center justify-center"
+  //         >
+  //           <ArrowLeft size={24} color="#7e525c" />
+  //         </button>
+  //         <Link href="/" className="logo">
+  //           AHM Fragrances
+  //         </Link>
+  //       </div>
+  //     </header>
+  //   );
+  // }
 
   return (
     <>
@@ -160,11 +160,17 @@ export default function Header() {
             )}
           </div>
           <Link href="/cart" className="cart-icon-wrapper">
-            <Image
+            {/* <Image
               src="/Icons/cart_icon.svg"
               alt="Shopping Bag"
               width={20}
               height={20}
+            /> */}
+            <ShoppingCart
+             size={30}
+                  fill={pathname === "/cart" ? "#7e525c" : "none"}
+                  stroke="#7e525c"
+                  strokeWidth={2}
             />
             {cartCount > 0 && <span className="cart-count">{cartCount}</span>}
           </Link>
