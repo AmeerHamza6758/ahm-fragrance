@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PageSection from "../components/PageSection";
 import "../styles/admin.css"
 import { NavLink } from "react-router-dom";
@@ -87,7 +87,24 @@ const products = [
 ];
 function ProductsPage() {
   const [openMenu, setOpenMenu] = useState(null);
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (!e.target.closest(".actions")) {
+        setOpenMenu(null);
+      }
+    };
 
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, []);
+
+  const handleEdit = (id) => {
+    console.log("Edit:", id);
+  };
+
+  const handleDelete = (id) => {
+    console.log("Delete:", id);
+  };
   return (
     <div className="catalog">
 
@@ -99,7 +116,7 @@ function ProductsPage() {
             Manage your fragrance inventory and collection details.
           </p>
         </div>
-        <NavLink to="add" className="add-btn">+ Add New Fragrance</NavLink>
+        <NavLink to="/products/add" className="add-btn">+ Add New Fragrance</NavLink>
         
       </div>
 
@@ -130,23 +147,24 @@ function ProductsPage() {
             <span>{item.volume}</span>
             <span>{item.category}</span>
 
-            <span className="tag">{item.tag}</span>
+            <span className="tag-center">{item.tag}</span>
 
             {/* Actions */}
             <div className="actions">
               <button
-                onClick={() =>
-                  setOpenMenu(openMenu === item.id ? null : item.id)
-                }
+                onClick={(e) =>{
+                  e.stopPropagation();
+                  setOpenMenu(openMenu === item.id ? null : item.id);
+                }}
               >
                 ⋮
               </button>
 
               {openMenu === item.id && (
                 <div className="dropdown">
-                  <p>Edit Product</p>
-                  <p>Delete Product</p>
-                  <p>Mark Inactive</p>
+                 <p onClick={() => handleEdit(item.id)}>Edit Product</p>
+                 <p onClick={() => handleDelete(item.id)}>Delete Product</p>
+                 <p>Mark Inactive</p>
                 </div>
               )}
             </div>
