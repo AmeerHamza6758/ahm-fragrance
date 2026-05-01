@@ -55,6 +55,7 @@
 .admin-topbar {
   width: 1000px;
 height: 60px;
+/* position:fixed; */
 display: flex;
 justify-content: space-between;
 padding-right: 48px;
@@ -561,7 +562,7 @@ color: #B91C1C;
   /* padding: 30px; */
   /* background: #f8f5f2; */
   width: 902px;
-height: 900.5px;
+height: 900px;
 max-width: 1600px;
 top: 81px;
 left: 9px;
@@ -583,7 +584,6 @@ font-family: Noto Serif;
 font-weight: 400;
 font-style: Regular;
 font-size: 36px;
-leading-trim: NONE;
 line-height: 40px;
 letter-spacing: -0.9px;
 color: #7E525C;
@@ -608,7 +608,10 @@ color: #4E4543;
   display: flex;
   justify-content: space-between;
   gap: 20px;
-  margin: 25px;
+  margin-top: 35px;
+  width: 896px;
+  height: 130px;
+  margin-bottom: 25px;
 }
 
 .summary-card {
@@ -639,7 +642,6 @@ text-transform: uppercase;
 font-weight: 400;
 font-style: Regular;
 font-size: 36px;
-leading-trim: NONE;
 line-height: 20px;
 letter-spacing: 0px;
 text-align: center;
@@ -654,9 +656,6 @@ color: #7E525C;
 
 /* Table */
 .stock-table {
-  /* background: white;
-  border-radius: 16px;
-  padding: 20px; */
   width: 896px;
 /* height: 976px; */
 border-radius: 24px;
@@ -669,10 +668,10 @@ border: 1px solid #EBE7E499
 .stock-row {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  padding: 14px 0;
+  gap: 20px;
+  padding: 14px 0px;
   align-items: center;
   padding-left: 30px;
-  padding-right: 10px;
 }
 
 .stock-table-header {
@@ -746,4 +745,116 @@ box-shadow: 0px 10px 40px -10px #7E525C26;
   margin-left: 15px;
 }
 
+/* ////////////////////////////// Analytic Page CSS ////////////////////////////////////////////////////////////////// */
 
+.revenue-analytic {
+  padding: 5px;
+  background: white;
+  min-height: 100vh;
+
+}
+
+.revenue-header {
+  margin: 30px;
+    padding-left: 25px;
+}
+
+.overview-text {
+  font-size: 12px;
+  letter-spacing: 1.2px;
+  width: 243px;
+  color: #7E525C;
+
+}
+
+.revenue-heading {
+  width: 381px;
+  font-size: 32px;
+  color: #1C1C19;
+  margin: 8px 0;
+  font-weight: 400;
+}
+
+.revenue-subheading {
+  width: 502px;
+  font-size: 16px;
+  color: #4E4543;
+}
+.analytic-summary-card {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 40px;
+  padding-left: 25px;
+  padding-right: 25px;
+}
+
+.analytic-card {
+  background: #F2F2ED;
+  padding-left: 20px;
+  border-radius: 16px;
+  width: 280px;
+  height: 130px;
+  border-radius: 20px;
+  line-height: 15px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+}
+
+.analytic-card p {
+  color: #4E4543;
+  font-size: 14px;
+}
+
+.analytic-card h2 {
+  margin-top: 10px;
+  color: #7E525C;
+  font-size: 30px;
+}
+
+.refund-color {
+  color: #b96d6d;
+}
+.revenue-ledger {
+  background: white;
+  padding: 25px;
+  border-radius: 18px;
+}
+
+.ledger-title {
+  margin-bottom: 20px;
+  color: #7E525C;
+  font-size: 24px;
+}
+
+.ledger-table-header,
+.ledger-table-row {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  padding: 18px;
+  align-items: center;
+  border-bottom: 1px solid #f0eeee;
+}
+
+.ledger-table-header {
+  font-weight: 600;
+  color: #7b7b7b;
+  font-size: 14px;
+  background: #F7F3EF;
+  height: 69px;
+  border-radius: 10px;
+  border-bottom: 1px solid #D1C3C11A
+}
+
+.ledger-table-row {
+  font-size: 14px;
+  color: #444;
+}
+
+.paid-status {
+  background: #FFE0E5;
+  color: #7E525C;;
+  padding: 6px 14px;
+  border-radius: 20px;
+  width: fit-content;
+  font-size: 12px;
+}

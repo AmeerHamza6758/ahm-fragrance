@@ -1,4 +1,4 @@
-const mongoose = require('mongoose'); 
+const mongoose = require('mongoose');
 const Cart = require('../models/cart.model');
 const Product = require('../models/product.model');
 const Stock = require('../models/stock.model');
@@ -16,7 +16,7 @@ const getVariantForSize = (product, size) => {
 
 const addToCart = async (req, res) => {
   try {
-        console.log('Full req.user:', req.user);
+    console.log('Full req.user:', req.user);
     console.log('req.user._id:', req.user?._id);
     console.log('req.user.id:', req.user?.id);
     const userId = req.user.userId;
@@ -38,9 +38,9 @@ const addToCart = async (req, res) => {
       });
     }
 
-    const product = await Product.findOne({ 
-      _id: productId, 
-      isActive: true 
+    const product = await Product.findOne({
+      _id: productId,
+      isActive: true
     });
 
     if (!product) {
@@ -226,7 +226,7 @@ const getCart = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: hasOutOfStock 
+      message: hasOutOfStock
         ? `Warning: ${outOfStockProducts.join(', ')} ${outOfStockProducts.length > 1 ? 'have' : 'has'} low/no stock. Please reduce quantity or remove.`
         : 'Cart retrieved successfully',
       data: {
@@ -265,7 +265,7 @@ const updateCartItem = async (req, res) => {
     console.log('5. productId type:', typeof productId);
     console.log('6. quantity:', quantity);
     console.log('7. quantity type:', typeof quantity);
-    
+
     const allUserCartItems = await Cart.find({ customerId: userId });
     console.log('8. Total cart items for user:', allUserCartItems.length);
     console.log('9. All cart items details:', allUserCartItems.map(item => ({
@@ -274,7 +274,7 @@ const updateCartItem = async (req, res) => {
       productId: item.productId.toString(),
       quantity: item.quantity
     })));
-    
+
 
 
     const cartItemWithString = await Cart.findOne({
@@ -282,7 +282,7 @@ const updateCartItem = async (req, res) => {
       productId: productId
     });
     console.log('10. Search with string productId result:', cartItemWithString ? 'Found' : 'Not found');
-    
+
     // Try with ObjectId conversion
     let productObjectId;
     try {
@@ -291,7 +291,7 @@ const updateCartItem = async (req, res) => {
     } catch (err) {
       console.log('11. Failed to convert to ObjectId:', err.message);
     }
-    
+
 
     const cartItemWithObjectId = await Cart.findOne({
       customerId: userId,
@@ -299,7 +299,7 @@ const updateCartItem = async (req, res) => {
     });
     console.log('12. Search with ObjectId productId result:', cartItemWithObjectId ? 'Found' : 'Not found');
 
-    
+
 
     if (!quantity || quantity < 1) {
       return res.status(400).json({
@@ -425,7 +425,7 @@ const updateCartItem = async (req, res) => {
     console.error('========== UPDATE CART ITEM ERROR ==========');
     console.error('Error message:', error.message);
     console.error('Error stack:', error.stack);
-    
+
     return res.status(500).json({
       success: false,
       message: 'Failed to update cart',

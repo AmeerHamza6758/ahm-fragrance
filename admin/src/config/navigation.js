@@ -8,4 +8,5 @@ export const navItems = [
   { path: "/faq", label: "FAQ" },
   { path: "/customers", label: "Customers" },
   { path: "/settings", label: "Settings" },
+  { path: "/revenueanalytics", label: "Revenue Analytics" },
 ];

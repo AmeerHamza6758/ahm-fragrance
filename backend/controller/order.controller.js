@@ -159,12 +159,12 @@ const createOrder = async (req, res) => {
       }
       
 
-      if (item.quantity > product.maxPerOrder) {
-        return res.status(400).json({
-          success: false,
-          message: `You can only order max ${product.maxPerOrder} bottles of ${product.name}.`
-        });
-      }
+      // if (item.quantity > product.maxPerOrder) {
+      //   return res.status(400).json({
+      //     success: false,
+      //     message: `You can only order max ${product.maxPerOrder} bottles of ${product.name}.`
+      //   });
+      // }
       
       if (item.quantity < 1) {
         return res.status(400).json({
