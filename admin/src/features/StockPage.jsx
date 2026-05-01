@@ -160,7 +160,7 @@ function StockPage() {
          <p>Showing 8 of 124 products</p>
       </div>
       <div>
-        <button>{"<"}</button>
+        <button>{"<"}</button>  
         <button className="active-page">1</button>
         <button>2</button>
         <button>3</button>

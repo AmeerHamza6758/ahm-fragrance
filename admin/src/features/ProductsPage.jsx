@@ -1,10 +1,7 @@
-<<<<<<< amna
-import { useState, useEffect, useRef } from "react";
-=======
+
 import { useState, useEffect } from "react";
 import PageSection from "../components/PageSection";
-import "../styles/admin.css"
->>>>>>> development
+import "../styles/admin.css";
 import { NavLink } from "react-router-dom";
 import "../styles/admin.css";
 
