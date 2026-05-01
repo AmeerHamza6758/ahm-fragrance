@@ -2,7 +2,7 @@ import { Mail } from "lucide-react";
 
 export default function NewsletterSection() {
   return (
-    <section className="newsletter-section">
+    <section className="newsletter-section my-5">
       <div className="newsletter-box">
         <div className="newsletter-icon">
           <Mail size={32} strokeWidth={1.8} />

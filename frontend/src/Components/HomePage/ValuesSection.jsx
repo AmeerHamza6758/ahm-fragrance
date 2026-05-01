@@ -2,7 +2,7 @@ import { Hourglass, Package, ShoppingBag } from "lucide-react";
 
 export default function ValuesSection() {
   return (
-    <section className="values-section">
+ <section className="values-section mb-16">
       <div className="values-container">
 
         <div className="value-card">

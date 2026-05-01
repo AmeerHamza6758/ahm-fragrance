@@ -9,7 +9,7 @@ import { buildProductImageUrl } from "@/lib/utils/imageUrl";
 
 export default function BestSellers() {
   // Fetch top-rated products
-  const { data: products = [], isLoading } = useProducts({ rating: "desc" });
+  const { data: products = [], isLoading,isError } = useProducts({ rating: "desc" });
   const { data: wishlistProducts = [] } = useFavorites();
   const { mutate: toggleFavorite, isPending: isTogglingFavorite } =
     useToggleFavorite();
@@ -44,7 +44,7 @@ export default function BestSellers() {
   };
 
   return (
-    <section className="best-sellers">
+    <section className="best-sellers pb-10!">
       <div className="best-sellers-top">
         <div>
           <h2>The Best Sellers</h2>
@@ -56,7 +56,14 @@ export default function BestSellers() {
         <div className="w-full max-w-[1184px] mx-auto flex justify-center items-center py-12">
           <div className="w-9 h-9 border-4 border-[#7e525c] border-t-transparent rounded-full animate-spin" />
         </div>
-      ) : (
+      ) :isError ? (
+      /*  ERROR MESSAGE  */
+      <div className="w-full text-center py-10">
+        <p className="text-[#7e525c] font-noto italic text-lg">
+          Unable to load our collection at the moment. Please try again later.
+        </p>
+      </div>
+    ): (
         <div className="grid grid-cols-2 md:grid-cols-[repeat(auto-fit,minmax(220px,260px))] justify-start gap-x-4 sm:gap-x-5 md:gap-x-10 gap-y-10">
           {visibleProducts.map((product) => (
             <div
