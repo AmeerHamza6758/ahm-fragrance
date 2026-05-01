@@ -3,7 +3,7 @@ import ProductCard from "@/Components/ProductCard";
 
 import { useState } from "react";
 import Image from "next/image";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { useInfiniteProducts } from "@/lib/api";
 
 
@@ -140,23 +140,23 @@ export default function CollectionsPage() {
               </button>
             ))}
           </div>
-
-          <div className="sort-container w-full lg:w-auto justify-center lg:justify-center  text-nowrap rounded-xs">
-            <span className="sort-label">SORT :</span>
+           <div className="sort-container w-full lg:w-auto justify-between lg:justify-start">
+            <span className="sort-label">SORT:</span>
             <div className="sort-dropdown w-full sm:w-auto">
               <button
-                className="sort-button w-full sm:w-auto justify-between border border-[#7E525C33] rounded-xs"
+                className="sort-button whitespace-nowrap w-full sm:w-auto justify-between border
+                 border-[#7E525C33] rounded-full"
                 onClick={() => setSortOpen(!sortOpen)}
               >
                 {sortOptions.find((opt) => opt.id === sortBy)?.label}
-                <ChevronDown size={18} />
+               {sortOpen? <ChevronUp size={18} /> : <ChevronDown size={18} />} 
               </button>
               {sortOpen && (
                 <div className="sort-menu left-0 right-0 sm:left-auto sm:right-0">
                   {sortOptions.map((opt) => (
                     <button
                       key={opt.id}
-                      className={`sort-option ${sortBy === opt.id ? "active" : ""}`}
+                      className={`sort-option  ${sortBy === opt.id ? "active" : ""}`}
                       onClick={() => {
                         setSortBy(opt.id);
                         setSortOpen(false);
