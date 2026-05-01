@@ -1,6 +1,7 @@
 import { useState } from "react";
 import PageSection from "../components/PageSection";
 import "../styles/admin.css"
+import { NavLink } from "react-router-dom";
 
 const products = [
   {
@@ -98,8 +99,8 @@ function ProductsPage() {
             Manage your fragrance inventory and collection details.
           </p>
         </div>
-
-        <button className="add-btn">+ Add New Fragrance</button>
+        <NavLink to="add" className="add-btn">+ Add New Fragrance</NavLink>
+        
       </div>
 
       {/* Table */}

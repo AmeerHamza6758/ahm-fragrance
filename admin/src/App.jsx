@@ -9,14 +9,13 @@ import StockPage from "./features/StockPage";
 import FaqPage from "./features/FaqPage";
 import CustomersPage from "./features/CustomersPage";
 import SettingsPage from "./features/SettingsPage";
-import AnalyticPage from "./features/AnalyticPage";
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<AdminLayout />}>
         <Route index element={<Navigate to="/dashboard" replace />} />
-        <Route path="dashboard" element={<DashboardPage />} />
+        <Route path="dashboard" element={<DashboardPage/>} />
         <Route path="products" element={<ProductsPage />} />
         <Route path="categories" element={<CategoriesPage />} />
         <Route path="brands" element={<BrandsPage />} />
