@@ -64,22 +64,24 @@ export default function ProductCard({ product }) {
   return (
     <div className="group flex flex-col bg-[#fdf9f5] rounded-none overflow-hidden">
       {/* Image */}
-      <Link href={`/product/${productId}`} className="block relative">
-        <div className="relative w-full h-85 overflow-hidden rounded-tl-[48px] rounded-br-[48px] rounded-tr-none rounded-bl-none bg-[#e8e0d8]">
-          <Image
-            src={imageUrl}
-            alt={name}
-            fill
-            unoptimized
-            className="object-cover transition-transform duration-500"
-            onError={(e) => {
-              e.target.src = "/Images/best-1.svg";
-            }}
-          />
-        </div>
+      <div className="relative">
+        <Link href={`/product/${productId}`} className="block relative">
+          <div className="relative w-full h-85 overflow-hidden rounded-tl-[48px] rounded-br-[48px] rounded-tr-none rounded-bl-none bg-[#e8e0d8]">
+            <Image
+              src={imageUrl}
+              alt={name}
+              fill
+              unoptimized
+              className="object-cover transition-transform duration-500"
+              onError={(e) => {
+                e.target.src = "/Images/best-1.svg";
+              }}
+            />
+          </div>
+        </Link>
         <button
           type="button"
-          className="absolute top-3 right-3 w-10 h-10 rounded-full bg-white/95 text-primary flex items-center justify-center shadow-md transition-opacity duration-200 opacity-0 group-hover:opacity-100 hover:scale-105 disabled:cursor-not-allowed"
+          className="absolute top-3 right-3 z-10 w-10 h-10 rounded-full bg-white/95 text-primary flex items-center justify-center shadow-md transition-opacity duration-200 opacity-0 group-hover:opacity-100 hover:scale-105 disabled:cursor-not-allowed"
           onClick={handleWishlistToggle}
           disabled={isTogglingFavorite}
           aria-label="Toggle wishlist"
@@ -91,7 +93,7 @@ export default function ProductCard({ product }) {
             strokeWidth={2}
           />
         </button>
-      </Link>
+      </div>
 
       {/* Info */}
       <div className="pt-3 pb-1 px-1">
