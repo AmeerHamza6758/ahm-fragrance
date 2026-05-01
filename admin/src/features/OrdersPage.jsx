@@ -144,7 +144,18 @@ function OrdersPage() {
          <span>•••</span>
         </div>
       </div>
-      
+      <div className="pagination">
+           <div className="pagination-124">
+              <p>SHOWING 1 TO 6 OF 48 ENTRIES</p>
+            </div>
+        <div>
+             <button>{"<"}</button>
+              <button className="active-page">1</button>
+              <button>2</button>
+              <button>3</button>
+              <button>{">"}</button>
+        </div>
+      </div>
     </div>
   );
 }
