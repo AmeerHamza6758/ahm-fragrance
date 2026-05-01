@@ -3,7 +3,7 @@
 import { usePathname, useRouter } from "next/navigation";
 import { Heart, Menu, ShoppingCart, User, X } from "lucide-react";
 import Link from "next/link";
-import { useFavorites, useGetCart } from "@/lib/api";
+import { queryClient, useFavorites, useGetCart } from "@/lib/api";
 import { useEffect, useState } from "react";
 
 export default function Header() {
@@ -45,10 +45,14 @@ export default function Header() {
   const handleLogout = () => {
     if (typeof window !== "undefined") {
       localStorage.removeItem("token");
-      localStorage.removeItem("user");
+      localStorage.removeItem("ahm_checkout_profile");
     }
+    queryClient.setQueryData(["cart"], []);
+    queryClient.setQueryData(["favorites"], []);
+    queryClient.removeQueries({ queryKey: ["cart"] });
+    queryClient.removeQueries({ queryKey: ["favorites"] });
     setIsLoggedIn(false);
-    router.push("/");
+    router.replace("/");
   };
 
   const navLinks = [

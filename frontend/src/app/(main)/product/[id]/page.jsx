@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Heart, Star, Minus, Plus , Package } from "lucide-react";
 import {
+  useFavorites,
   useProduct,
   useProducts,
   useToggleFavorite,
@@ -21,20 +22,29 @@ export default function ProductDetails() {
   const { mutate: submitReview, isPending: isSubmittingReview } =
     useAddRatingReview();
   const params = useParams();
-  const productId = params?.id || "";
+  const productId = Array.isArray(params?.id) ? params.id[0] : (params?.id || "");
   const { data: product, isLoading, isError } = useProduct(productId);
 
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState("50ml");
   const [activeTab, setActiveTab] = useState("description");
-  const [isWishlisted, setIsWishlisted] = useState(false);
   const [reviewRating, setReviewRating] = useState(4);
   const [reviewHover, setReviewHover] = useState(0);
   const [reviewText, setReviewText] = useState("");
   const [reviewSuccess, setReviewSuccess] = useState(false);
   const [reviewError, setReviewError] = useState("");
+  const { data: wishlistProducts = [] } = useFavorites();
   const { mutate: toggleFavorite, isPending: isTogglingFavorite } =
     useToggleFavorite();
+  const isWishlisted = useMemo(
+    () =>
+      Array.isArray(wishlistProducts) &&
+      wishlistProducts.some((item) => {
+        const wishId = item?._id || item?.id;
+        return String(wishId) === String(productId);
+      }),
+    [wishlistProducts, productId],
+  );
 
   const handleWishlistToggle = () => {
     const token =
@@ -44,17 +54,10 @@ export default function ProductDetails() {
       return;
     }
     toggleFavorite(productId, {
-      onSuccess: (res) => {
+      onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["favorites"] });
-        setIsWishlisted(res.isFavorited ?? !isWishlisted);
-      },
-      onError: () => {
-        // Optimistically toggle back on failure
-        setIsWishlisted((prev) => !prev);
       },
     });
-    // Optimistic update
-    setIsWishlisted((prev) => !prev);
   };
 
   const { data: allProducts = [], isLoading: recLoading } = useProducts();
