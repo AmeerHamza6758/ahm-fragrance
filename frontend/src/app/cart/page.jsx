@@ -10,13 +10,13 @@ import auth_icon from "/public/Icons/product-details-authentic-icon.svg";
 import { useGetCart, useRemoveFromCart } from "@/lib/api";
 import { buildProductImageUrl } from "@/lib/utils/imageUrl";
 
+
 export default function CartPage() {
   const { data: cartData, isLoading: cartLoading } = useGetCart();
   const { mutate: removeItem } = useRemoveFromCart();
 
   const [discount] = useState(0);
   const router = useRouter();
-  const [quantity, setQuantity] = useState(1);
 
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
@@ -75,6 +75,8 @@ export default function CartPage() {
               </div>
             ) : (
               cartItems.map((item, idx) => {
+               
+                
                 const cartId = item.cartId ?? item._id ?? idx;
                 const name = item.productId?.name ?? item.name ?? "Product";
                 const price = item.price ?? item.productId?.price ?? 0;
@@ -146,12 +148,12 @@ export default function CartPage() {
             {/* Trust Badges */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-8">
               {[
-                { src: truck_icon, text: "Free Delivery All Over Pakistan" },
+                { src: truck_icon, text: "Quick Dispatch" },
                 { src: cash_icon, text: "Cash on Delivery Available" },
                 { src: auth_icon, text: "100% Authentic Products" },
               ].map((badge, i) => (
                 <div key={i} className="flex items-center gap-4 py-2 px-4!">
-                  <div className="w-12 h-12 flex items-center justify-center shrink-0 bg-[#faedd9]  badge rounded">
+                  <div className="w-12 h-12 flex items-center justify-center shrink-0 bg-[#faead2]   rounded-full">
                     <Image
                       src={badge.src}
                       alt="icon"

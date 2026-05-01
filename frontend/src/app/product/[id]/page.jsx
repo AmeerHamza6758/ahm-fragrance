@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { Heart, Star, Minus, Plus } from "lucide-react";
+import { Heart, Star, Minus, Plus , Package } from "lucide-react";
 import {
   useProduct,
   useProducts,
@@ -195,6 +195,7 @@ export default function ProductDetails() {
 
               {/* Action Buttons */}
               <div className="action-buttons">
+             
                 <button
                   className="order-btn"
                   onClick={handleAddToCart}
@@ -203,7 +204,7 @@ export default function ProductDetails() {
                   {isAddingToCart ? "Adding..." : "Order Now (COD)"}
                 </button>
                 <button
-                  className={`wishlist-btn ${isWishlisted ? "active" : ""}`}
+                  className={`wishlist-btn ${isWishlisted ? "active" : ""} fit`}
                   onClick={handleWishlistToggle}
                   disabled={isTogglingFavorite}
                 >
@@ -217,7 +218,7 @@ export default function ProductDetails() {
 
               {/* Info Badges (static for now) */}
               <div className="info-badges">
-                <div className="badge">
+                <div className="badge  bg-[#FDF9F5]!">
                   <span className="badge-icon">
                     <Image
                       src="/Icons/product-details-truck-icon.svg"
@@ -227,10 +228,10 @@ export default function ProductDetails() {
                     />
                   </span>
                   <div className="badge-content">
-                    <p>FREE DELIVERY</p>
+                    <p>Quick Dispatch</p>
                   </div>
                 </div>
-                <div className="badge">
+                <div className="badge  bg-[#FDF9F5]!">
                   <span className="badge-icon">
                     <Image
                       src="/Icons/product-details-cash-icon.svg"
@@ -243,7 +244,7 @@ export default function ProductDetails() {
                     <p>CASH ON DELIVERY</p>
                   </div>
                 </div>
-                <div className="badge">
+                <div className="badge  bg-[#FDF9F5]!">
                   <span className="badge-icon">
                     <Image
                       src="/Icons/product-details-time-icon.svg"
@@ -256,7 +257,7 @@ export default function ProductDetails() {
                     <p>7-DAY RETURN</p>
                   </div>
                 </div>
-                <div className="badge">
+                <div className="badge bg-[#FDF9F5]!">
                   <span className="badge-icon">
                     <Image
                       src="/Icons/product-details-authentic-icon.svg"
@@ -271,8 +272,8 @@ export default function ProductDetails() {
                 </div>
               </div>
 
-              <p className="delivery-estimate">
-                Delivery estimate: 3-5 Working Days
+              <p className="delivery-estimate badge rounded-full! w-fit px-4!">
+                <Package /> Delivery estimate: 3-5 Working Days
               </p>
             </div>
           </div>
