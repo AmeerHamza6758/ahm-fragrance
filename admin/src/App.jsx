@@ -1,14 +1,14 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import AdminLayout from "./layout/AdminLayout";
-import DashboardPage from "./pages/DashboardPage";
-import ProductsPage from "./pages/ProductsPage";
-import CategoriesPage from "./pages/CategoriesPage";
-import BrandsPage from "./pages/BrandsPage";
-import OrdersPage from "./pages/OrdersPage";
-import StockPage from "./pages/StockPage";
-import FaqPage from "./pages/FaqPage";
-import CustomersPage from "./pages/CustomersPage";
-import SettingsPage from "./pages/SettingsPage";
+import DashboardPage from "./features/DashboardPage";
+import ProductsPage from "./features/ProductsPage";
+import CategoriesPage from "./features/CategoriesPage";
+import BrandsPage from "./features/BrandsPage";
+import OrdersPage from "./features/OrdersPage";
+import StockPage from "./features/StockPage";
+import FaqPage from "./features/FaqPage";
+import CustomersPage from "./features/CustomersPage";
+import SettingsPage from "./features/SettingsPage";
 
 function App() {
   return (
