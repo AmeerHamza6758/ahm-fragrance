@@ -43,14 +43,7 @@ function ProductsPage() {
 
   return (
     <div className="catalog-container">
-      {/* Top Breadcrumb  */}
-      <div className="top-nav-bar">
-        <span className="brand-label">AHM Fragrances</span>
-        <div className="admin-profile">
-          <span className="admin-name">AHM Admin</span>
-          <div className="avatar-circle">A</div>
-        </div>
-      </div>
+    
 
       <div className="catalog-card">
         <div className="catalog-card-header">

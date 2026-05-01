@@ -119,8 +119,10 @@ color: #1C1C19;
 }
 
 .admin-main {
-  padding: 24px;
+  padding: 30px;
+ background: #f8f5f2;
 }
+
 
 .stats-grid {
   display: grid;
@@ -208,7 +210,7 @@ color: #1C1C19;
 }
 /* //////////////////////////////////////// Product Management page ////////////////////////////////////////////////////////////////// */
 .catalog-container {
-  padding: 30px 50px;
+ 
   background: #f8f5f2; 
   min-height: 100vh;
   font-family: 'Inter', sans-serif;
@@ -256,7 +258,6 @@ color: #1C1C19;
 .catalog-card {
   background:#f8f5f2;
   border-radius: 20px;
-  padding: 40px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.02);
 }
 
@@ -264,7 +265,7 @@ color: #1C1C19;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 40px;
+  margin-bottom: 25px;
   background-color:#f8f5f2;
 }
 
@@ -482,7 +483,6 @@ color: #1C1C19;
 }
 /* ////////////////////////////addproduct/////////////////////// */
 .add-product-container {
-  padding: 2rem 5%;
   background-color: #FDF9F5;
   min-height: 100vh;
   font-family: 'Montserrat', sans-serif;
