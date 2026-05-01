@@ -93,20 +93,19 @@ export default function WishlistPage() {
       </div>
 
       {/* Page Title */}
-      <div className="mx-auto max-w-7xl px-10 pt-5 pb-16 lg:px-8 md:px-6 sm:px-5">
-        <h1
-          className="mb-5 font-bold leading-[1.05] text-primary md:mb-4 font-noto"
-          style={{
-            fontSize: "clamp(44px, 6vw, 56px)",
-          }}
-        >
+      <section className="text-center pb-14 px-4 ">
+        <h1 className="text-[#7E525C] text-5xl sm:text-6xl md:text-7xl font-noto font-normal">
           My Wishlist
         </h1>
-        <p className="max-w-md text-[15px] leading-[1.7] text-secondary sm:text-[14px]">
-          A curated collection of your most desired botanical essences and
-          timeless elixirs.
-        </p>
-      </div>
+        <div className="flex items-center justify-center gap-3 mt-4">
+          <span className="block h-px w-12 bg-[#D1C3C1]" />
+          <p className="text-[#4E4543] text-xs uppercase tracking-[2px] font-normal">
+            A curated space for your most desired botanical essences, waiting to
+            become part of your signature collection.
+          </p>
+          <span className="block h-px w-12 bg-[#D1C3C1]" />
+        </div>
+      </section>
 
       {/* Products Grid */}
       <div className="mx-auto max-w-7xl px-10 pb-24 lg:px-8 md:px-6 sm:px-5">
@@ -160,20 +159,20 @@ export default function WishlistPage() {
                   </div>
 
                   {/* Name + ADD TO BAG inline */}
-                  <div className="mb-2 flex items-start justify-between gap-3 sm:flex-col sm:items-start">
-                    <h3
-                      className="min-w-0 flex-1 text-[18px] font-bold leading-[1.05] text-foreground xl:text-[17px] font-noto"
-                    >
-                      {product.name}
-                    </h3>
-                    <Link
-                      href={`/product/${productId}`}
-                      className="inline-flex shrink-0 items-center rounded-full bg-primary px-5 py-2.5 text-[10px] font-semibold uppercase tracking-[1.1px] text-primary-foreground transition-colors hover:bg-primary/90 sm:px-6"
-                    >
-                      ADD TO BAG
-                    </Link>
-                  </div>
-
+                  {/* Info Section */}
+                  <div className="space-y-1 px-2">
+                    <div className="flex justify-between items-start">
+                      <h3 className="text-[22px] font-medium text-[#1A1A1A] font-serif">
+                        {product.name}
+                      </h3>
+                      <Link
+                        href={`/product/${productId}`}
+                        className="bg-[#7E525C] text-white text-[10px] font-bold tracking-[1px] px-6 py-2.5 rounded-full hover:bg-[#6a444d] transition-colors"
+                      >
+                        ADD TO BAG
+                      </Link>
+                    </div>
+                  
                   {/* Category */}
                   <p className="mb-3 text-xs font-normal uppercase tracking-[0.9px] text-muted">
                     {category}
@@ -183,6 +182,7 @@ export default function WishlistPage() {
                   <p className="text-[16px] font-semibold text-primary font-noto">
                     Rs. {price.toLocaleString()}
                   </p>
+                </div>
                 </div>
               );
             })}
@@ -195,12 +195,7 @@ export default function WishlistPage() {
         {/* Header row */}
         <div className="mb-12 flex flex-row items-end justify-between gap-6 w-full">
           <div className="flex flex-col">
-            <h2
-              className="font-bold text-foreground mb-2 font-noto"
-              style={{
-                fontSize: "32px",
-              }}
-            >
+            <h2 className="font-noto font-bold text-foreground mb-4 text-[24px] sm:text-[28px] md:text-[32px] lg:text-[36px] leading-tight">
               You May Also Like
             </h2>
             <p className="text-sm text-muted">

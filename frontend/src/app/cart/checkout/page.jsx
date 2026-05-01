@@ -816,7 +816,7 @@ export default function CheckoutPage() {
             </div>
             <div>
               <div className="text-[10px] tracking-[0.2em] font-bold text-[#7e525c] uppercase mb-1">
-                FREE DELIVERY
+                Quick Dispatch
               </div>
               <div className="text-xs text-[#6b6460]">
                 On all domestic orders over £50.
