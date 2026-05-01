@@ -1,4 +1,10 @@
+<<<<<<< amna
 import { useState, useEffect, useRef } from "react";
+=======
+import { useState, useEffect } from "react";
+import PageSection from "../components/PageSection";
+import "../styles/admin.css"
+>>>>>>> development
 import { NavLink } from "react-router-dom";
 import "../styles/admin.css";
 
@@ -21,6 +27,7 @@ const products = [
 
 function ProductsPage() {
   const [openMenu, setOpenMenu] = useState(null);
+<<<<<<< amna
   const dropdownRef = useRef(null);
 
   useEffect(() => {
@@ -32,6 +39,28 @@ function ProductsPage() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+=======
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (!e.target.closest(".actions")) {
+        setOpenMenu(null);
+      }
+    };
+
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, []);
+
+  const handleEdit = (id) => {
+    console.log("Edit:", id);
+  };
+
+  const handleDelete = (id) => {
+    console.log("Delete:", id);
+  };
+  return (
+    <div className="catalog">
+>>>>>>> development
 
   const getTagClass = (tag) => {
     const t = tag.trim().toUpperCase();
@@ -50,6 +79,11 @@ function ProductsPage() {
           <span className="admin-name">AHM Admin</span>
           <div className="avatar-circle">A</div>
         </div>
+<<<<<<< amna
+=======
+        <NavLink to="/products/add" className="add-btn">+ Add New Fragrance</NavLink>
+        
+>>>>>>> development
       </div>
 
       <div className="catalog-card">
@@ -72,6 +106,7 @@ function ProductsPage() {
             <span className="col-act">Actions</span>
           </div>
 
+<<<<<<< amna
           {products.map((item) => (
             <div className="catalog-row" key={item.id}>
               <div className="product-cell col-prod">
@@ -112,6 +147,28 @@ function ProductsPage() {
                   </div>
                 )}
               </div>
+=======
+            <span className="tag-center">{item.tag}</span>
+
+            {/* Actions */}
+            <div className="actions">
+              <button
+                onClick={(e) =>{
+                  e.stopPropagation();
+                  setOpenMenu(openMenu === item.id ? null : item.id);
+                }}
+              >
+                ⋮
+              </button>
+
+              {openMenu === item.id && (
+                <div className="dropdown">
+                 <p onClick={() => handleEdit(item.id)}>Edit Product</p>
+                 <p onClick={() => handleDelete(item.id)}>Delete Product</p>
+                 <p>Mark Inactive</p>
+                </div>
+              )}
+>>>>>>> development
             </div>
           ))}
         </div>
@@ -128,6 +185,18 @@ function ProductsPage() {
           </div>
         </div>
         {/* --- PAGINATION SECTION END --- */}
+      </div>
+      <div className="pagination">
+           <div className="pagination-124">
+              <p>SHOWING 1 TO 6 OF 48 ENTRIES</p>
+            </div>
+        <div>
+             <button>{"<"}</button>
+              <button className="active-page">1</button>
+              <button>2</button>
+              <button>3</button>
+              <button>{">"}</button>
+        </div>
       </div>
     </div>
   );
