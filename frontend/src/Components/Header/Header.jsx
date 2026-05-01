@@ -1,8 +1,7 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { ArrowLeft, Heart, House, Menu, ShoppingBag, ShoppingCart, User, X } from "lucide-react";
-import Image from "next/image";
+import { Heart, Menu, ShoppingCart, User, X } from "lucide-react";
 import Link from "next/link";
 import { useFavorites, useGetCart } from "@/lib/api";
 import { useEffect, useState } from "react";

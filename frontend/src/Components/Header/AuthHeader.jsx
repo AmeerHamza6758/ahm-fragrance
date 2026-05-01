@@ -1,9 +1,15 @@
-import React from 'react'
+"use client";
+
+import { ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 function AuthHeader() {
+  const router = useRouter();
+
    return (
       <header className="header">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 cursor-pointer">
           <button
             type="button"
             onClick={() => {
