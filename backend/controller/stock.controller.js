@@ -323,6 +323,36 @@ const getStock = async (req, res) => {
 };
 
 
+
+
+const getLowStockCount = async (req, res) => {
+  try {
+    const lowStockCount = await Stock.countDocuments({
+      $expr: {
+        $and: [
+          { $lte: ['$quantity', '$lowStockThreshold'] }, // quantity <= threshold
+          { $gt: ['$quantity', 0] } // exclude out of stock (optional but recommended)
+        ]
+      }
+    });
+
+    res.status(200).json({
+      success: true,
+      lowStockCount
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to get low stock count',
+      error: error.message
+    });
+  }
+};
+
+module.exports = { getLowStockCount };
+
+
 // const deleteStock = async (req, res) => {
 //   try {
 //     const { productId } = req.params;
@@ -368,6 +398,7 @@ const getStock = async (req, res) => {
 module.exports = {
   manageStock,
   getStock,
+  getLowStockCount
   // deleteStock
 };
 
