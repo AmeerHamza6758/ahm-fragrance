@@ -16,7 +16,7 @@ export const navItems = [
   { path: "/customers", label: "Customers" },
   { path: "/products", label: "Products" },
   { path: "/categories", label: "Categories" },
-  { path: "/brands", label: "Brands" },
+  // { path: "/brands", label: "Brands" },
   { path: "/stock", label: "Stock" },
   { path: "/orders", label: "Orders" },
   { path: "/settings", label: "Settings" },

@@ -1,7 +1,18 @@
+import { useState } from "react";
 import PageSection from "../../components/PageSection";
 import "../../styles/admin.css"
+import Pagination from "../../components/Pagination";
 
 function OrdersPage() {
+  const [currentPage, setCurrentPage] = useState(1);
+        const entriesPerPage = 6;
+        const totalEntries = 48; // Mock total entries
+        const totalPages = Math.ceil(totalEntries / entriesPerPage);
+  
+        const handlePageChange = (page) => {
+      setCurrentPage(page);
+      console.log("Page changed to:", page);
+    };
   return (
     <div className="orders">
 
@@ -143,19 +154,18 @@ function OrdersPage() {
          <span className="payment-refund">Refunded</span>
          <span>•••</span>
         </div>
+
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+          totalEntries={totalEntries}
+          startEntry={(currentPage - 1) * entriesPerPage + 1}
+          endEntry={Math.min(currentPage * entriesPerPage, totalEntries)}
+        />
       </div>
-      <div className="pagination">
-           <div className="pagination-124">
-              <p>SHOWING 1 TO 6 OF 48 ENTRIES</p>
-            </div>
-        <div>
-             <button>{"<"}</button>
-              <button className="active-page">1</button>
-              <button>2</button>
-              <button>3</button>
-              <button>{">"}</button>
-        </div>
-      </div>
+      
+      
     </div>
   );
 }
