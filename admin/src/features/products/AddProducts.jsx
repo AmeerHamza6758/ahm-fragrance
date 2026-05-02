@@ -1,7 +1,7 @@
 import React from 'react';
 import { LuImagePlus } from "react-icons/lu";
 import { MdOutlineFileUpload } from "react-icons/md";
-import '../../styles/admin.css';
+import "../../styles/admin.css";
 
 function AddProducts() {
 
@@ -28,7 +28,7 @@ function AddProducts() {
     <section className="add-product-container">
        <div className="title-section">
             <h1 className="catalog-title">Add New Fragrance</h1>
-            <p className="catalogs-subtitle">Compose a new entry for the botanical collection</p>
+            <p className="catalog-subtitle">Compose a new entry for the botanical collection</p>
           </div>
      
 

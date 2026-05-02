@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 // import PageSection from "../components/PageSection";
 import "../../styles/admin.css";
 import { NavLink } from "react-router-dom";
+import { IoMdAdd } from "react-icons/io";
 
 const products = [
   {
@@ -106,23 +107,20 @@ function ProductsPage() {
     console.log("Delete:", id);
   };
   return (
-    <div className="catalog">
-
+    <div>
       {/* Header */}
-      <div className="catalog-header">
+      <div className="catalog-header"> 
         <div>
           <h1 className="catalog-title">Product Catalog</h1>
           <p className="catalog-subtitle">
             Manage your fragrance inventory and collection details.
           </p>
         </div>
-        <NavLink to="/products/add" className="add-btn">+ Add New Fragrance</NavLink>
-        
+        <NavLink to="/products/add" className="add-btn"><IoMdAdd/> Add New Fragrance</NavLink>
       </div>
 
       {/* Table */}
       <div className="catalog-table">
-
         <div className="catalog-table-header">
           <span>Product</span>
           <span>Quantity</span>

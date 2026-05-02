@@ -189,8 +189,6 @@ color: white;
 .dropdown-item.logout:hover {
   background: #BA1A1A1A;
 }
-
-
 .action-btn {
   border: none;
   background: #2563eb;
@@ -294,22 +292,17 @@ color: white;
 }
 /* /////////////////////////////////// Product Management ///////////////////////////////////////////////////////// */
 
-.catalog {
-  padding: 20px;
-  max-width: 1200px;
-  margin: auto;
-  background: #f8f5f2;
-}
 .catalog-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: start;
   flex-wrap: wrap;
 }
 
 .catalog-title {
   font-size: 28px;
   color: #6b4c4c;
+  margin : 0px;
 }
 
 .catalog-subtitle {
@@ -324,12 +317,13 @@ color: white;
   border-radius: 20px;
   border: none;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap:4px;
 }
 .catalog-table {
   background: white;
   margin-top: 20px;
-  border-radius: 15px;
-  padding: 15px;
   overflow-x: auto;
 }
 .catalog-table-header,
@@ -338,11 +332,16 @@ color: white;
   grid-template-columns:repeat(7, 1fr);
   gap: 10px;
   align-items: center;
-  padding: 12px 0;
+  padding: 15px;
+  background-color: #FDF9F5;
 }
 .catalog-table-header {
   font-weight: bold;
+  color: #7E525C;
   border-bottom: 1px solid #eee;
+  background-color: #FDF9F5;
+  border-radius: 15px 15px 0px 0px;
+
 }
 .catalog-row {
   border-bottom: 1px solid #f0f0f0;
@@ -1273,3 +1272,199 @@ box-shadow: 0px 10px 40px -10px #7E525C26;
   cursor: not-allowed;
 }
 
+/* ////////////////////////////// AddProducts Page CSS //////////////////////////////////////////////////////////// */
+
+.add-product-container {
+  padding: 30px;
+  max-width: 1200px;
+  margin: auto;
+}
+
+.title-section {
+  margin-bottom: 40px;
+}
+
+.product-form-layout {
+  display: flex;
+  gap: 40px;
+}
+
+.left-column {
+  flex: 1;
+}
+
+.right-column {
+  flex: 1.5;
+}
+
+.image-uploads-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.main-image-upload {
+  width: 100%;
+  height: 350px;
+  border: 2px dashed #D1C3C1;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.secondary-images-row {
+  display: flex;
+  gap: 20px;
+}
+
+.secondary-image-upload {
+  flex: 1;
+  height: 150px;
+  border: 2px dashed #D1C3C1;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.image-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #f9f9f9;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.image-placeholder:hover {
+  background: #f0f0f0;
+}
+
+.placeholder-text {
+  font-size: 14px;
+  color: #7E525C;
+  margin-top: 10px;
+}
+
+.hidden-input {
+  display: none;
+}
+
+.aesthetic-tip-box {
+  margin-top: 30px;
+  padding: 20px;
+  background: #7E525C1A;
+  border-radius: 12px;
+}
+
+.tip-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #7E525C;
+  margin-bottom: 10px;
+}
+
+.tip-content {
+  font-size: 14px;
+  color: #4E4543;
+  line-height: 1.6;
+}
+
+.form-fields-container {
+  background: white;
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+
+.form-group {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #7E525C;
+}
+
+.styled-input, .styled-textarea, .styled-select {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #EBE7E4;
+  border-radius: 8px;
+  font-size: 15px;
+  color: #4E4543;
+  background: #FDF9F5;
+  transition: border-color 0.3s;
+}
+
+.styled-input:focus, .styled-textarea:focus, .styled-select:focus {
+  outline: none;
+  border-color: #7E525C;
+}
+
+.dropdowns-row, .input-fields-row {
+  display: flex;
+  gap: 20px;
+}
+
+.dropdowns-row .form-group, .input-fields-row .form-group {
+  flex: 1;
+}
+
+.input-with-unit {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.unit-tag {
+  position: absolute;
+  right: 16px;
+  font-size: 12px;
+  font-weight: bold;
+  color: #7E525C;
+}
+
+.form-actions-section {
+  margin-top: 30px;
+}
+
+.publish-btn {
+  width: 100%;
+  padding: 14px;
+  background: #7E525C;
+  color: white;
+  border: none;
+  border-radius: 30px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: background 0.3s;
+}
+
+.publish-btn:hover {
+  background: #6A444D;
+}
+
+.admin-footer-text {
+  margin-top: 50px;
+  padding: 20px 0;
+  border-top: 1px solid #EBE7E4;
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #999;
+}
+
+.footer-links {
+  display: flex;
+  gap: 20px;
+}
