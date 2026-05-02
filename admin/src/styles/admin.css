@@ -485,8 +485,30 @@
   }
 }
 
+/* Footer  */
+.admin-footer-text {
+  margin-top: auto;
+  padding-top: 4rem;
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: #7E525C66;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.action-icon-btn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-size: 1.2rem; /* Icon ka size manage karne ke liye */
+  color: #7e7e7e; /* Default grey color jo image mein tha */
+  transition: color 0.2s ease;
+}
 
-
+.action-icon-btn:hover {
+  color: #e74c3c; /* Delete par hover karne se red color ho jaye */
+}
 /* ///////////////////////////////////////// Order Page CSS /////////////////////////////////////////////////////////////////////////////////////////////////////////////////// */
 .orders {
   padding: 30px;

@@ -33,6 +33,8 @@ export default function Reviews() {
   const { data, isLoading } = useGetAllReviews();
 const reviews = (() => {
   const raw = Array.isArray(data) ? data : (data?.data ?? data?.reviews ?? []);
+  console.log(raw,"raw");
+  
   const source = raw.length > 0 ? STATIC_FALLBACK : raw;
 
   return source.slice(0, 3); 

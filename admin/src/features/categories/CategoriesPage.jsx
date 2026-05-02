@@ -208,4 +208,4 @@ function CategoriesPage() {
   );
 }
 
-export default CategoriesPage;
+// export default CategoriesPage;

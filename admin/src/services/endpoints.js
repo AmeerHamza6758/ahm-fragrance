@@ -13,9 +13,10 @@ export const productsApi = {
   list: () => http.get("/api/product/getProducts"),
   getById: (id) => http.get(`/api/product/getProductById?id=${id}`),
   create: (payload) => http.post("/api/product/addProduct", payload),
-  update: (payload) => http.put("/api/product/updateProduct", payload),
+update: (id, payload) => http.put(`/api/product/updateProduct?id=${id}`, payload),
   remove: (id) => http.delete(`/api/product/deleteProduct/${id}`),
 };
+
 
 export const categoryApi = {
   list: () => http.get("/api/category/getCategory"),
