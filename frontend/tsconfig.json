@@ -27,7 +27,9 @@
       "@/Components/*": ["./src/Components/*"],
       "@/app/*": ["./src/app/*"],
       "@/context/*": ["./src/context/*"],
-      "@/api/*": ["./src/lib/api/*"]
+      "@/api/*": ["./src/lib/api/*"],
+      "@/hooks/*": ["./src/hooks/*"],
+      "@/utils/*": ["./src/utils/*"]
     }
   },
   "include": [

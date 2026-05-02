@@ -6,10 +6,14 @@ import { useRouter } from "next/navigation";
 import { useSignUp } from "@/lib/api/hooks/useAuth";
 import Image from "next/image";
 import { saveCheckoutProfile } from "@/lib/store/userProfileStore";
+import { errorToaster } from "@/utils/alert-service";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function SignupPage() {
   const router = useRouter();
-  const { mutate: signUp, isPending, isError, error } = useSignUp();
+  const { mutate: signUp, isPending } = useSignUp();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [form, setForm] = useState({
     userName: "",
     email: "",
@@ -22,18 +26,101 @@ export default function SignupPage() {
     confirmPassword: "",
   });
   const [touched, setTouched] = useState({});
+  const [errors, setErrors] = useState({});
+
+  const validate = (name, value, currentForm = form) => {
+    let error = "";
+    switch (name) {
+      case "userName":
+        if (!value) error = "Full name is required";
+        break;
+      case "email":
+        if (!value) {
+          error = "Email address is required";
+        } else if (!/\S+@\S+\.\S+/.test(value)) {
+          error = "Please enter a valid email address";
+        }
+        break;
+      case "phone":
+        if (!value) {
+          error = "Phone number is required";
+        } else if (!/^\d{10,11}$/.test(value)) {
+          error = "Please enter a valid 10-11 digit phone number";
+        }
+        break;
+      case "address":
+        if (!value) error = "Address is required";
+        break;
+      case "city":
+        if (!value) error = "City is required";
+        break;
+      case "postal":
+        if (!value) error = "Postal code is required";
+        break;
+      case "province":
+        if (!value) error = "Please select a province";
+        break;
+      case "password":
+        if (!value) {
+          error = "Password is required";
+        } else if (value.length < 6) {
+          error = "Password must be at least 6 characters";
+        }
+        break;
+      case "confirmPassword":
+        if (!value) {
+          error = "Please confirm your password";
+        } else if (value !== currentForm.password) {
+          error = "Passwords do not match";
+        }
+        break;
+      default:
+        break;
+    }
+    return error;
+  };
 
   const handleChange = (e) => {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, value } = e.target;
+    const nextForm = { ...form, [name]: value };
+    setForm(nextForm);
+    if (touched[name]) {
+      setErrors((prev) => ({ ...prev, [name]: validate(name, value, nextForm) }));
+    }
+    // Cross-validate confirmPassword when password changes
+    if (name === "password" && touched.confirmPassword) {
+      setErrors((prev) => ({
+        ...prev,
+        confirmPassword: validate("confirmPassword", nextForm.confirmPassword, nextForm),
+      }));
+    }
   };
 
   const handleBlur = (e) => {
-    setTouched((prev) => ({ ...prev, [e.target.name]: true }));
+    const { name, value } = e.target;
+    setTouched((prev) => ({ ...prev, [name]: true }));
+    setErrors((prev) => ({ ...prev, [name]: validate(name, value) }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (form.password !== form.confirmPassword) return;
+
+    // Validate all fields
+    const newErrors = {};
+    Object.keys(form).forEach((key) => {
+      const error = validate(key, form[key]);
+      if (error) newErrors[key] = error;
+    });
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      setTouched(
+        Object.keys(form).reduce((acc, key) => ({ ...acc, [key]: true }), {}),
+      );
+      errorToaster("Please fix the errors in the form before submitting");
+      return;
+    }
+
     saveCheckoutProfile({
       name: form.userName,
       email: form.email,
@@ -58,20 +145,22 @@ export default function SignupPage() {
         },
       },
       {
-      onSuccess: () => {
-        router.push(`/auth/verify?email=${encodeURIComponent(form.email)}`);
-      },
+        onSuccess: () => {
+          router.push(`/auth/verify?email=${encodeURIComponent(form.email)}`);
+        },
+        onError: (err) => {
+          errorToaster(
+            err?.response?.data?.message ||
+              err?.message ||
+              "Signup failed. Please try again.",
+          );
+        },
       },
     );
   };
 
-  const passwordMismatch =
-    form.password &&
-    form.confirmPassword &&
-    form.password !== form.confirmPassword;
-
   return (
-    <main className="min-h-screen flex items-center justify-center bg-[#f5ede8] px-4 py-10">
+    <main className="min-h-screen flex items-start justify-center bg-[#f5ede8] px-4 pt-6 pb-10 sm:pt-10 sm:pb-16">
       <div
         className="flex w-full max-w-6xl rounded-[48px] overflow-hidden"
         style={{ boxShadow: "0 8px 48px 0 rgba(80,30,40,0.13)" }}
@@ -95,7 +184,7 @@ export default function SignupPage() {
               &ldquo;The scent of a memory, captured in a bottle.&rdquo;
             </p>
             <span
-              className="text-[#e8c9c0] text-[11px] tracking-[0.18em] uppercase font-sans"
+              className="text-[#e8c9c0] text-xs tracking-[0.18em] uppercase font-sans"
               style={{ letterSpacing: "0.18em" }}
             >
               COLLECTION AHM
@@ -120,7 +209,7 @@ export default function SignupPage() {
             <div className="flex flex-col gap-1.25">
               <label
                 htmlFor="userName"
-                className="text-[11px] font-semibold uppercase tracking-[0.13em] text-[#7e525c] font-sans"
+                className="text-xs font-semibold uppercase tracking-[0.13em] text-[#7e525c] font-sans"
               >
                 Full Name
               </label>
@@ -129,42 +218,48 @@ export default function SignupPage() {
                 name="userName"
                 type="text"
                 autoComplete="name"
-                required
+                
                 placeholder="Julianne Moore"
                 value={form.userName}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 className="px-4 py-2.75 rounded-xl border border-[#ede4df] bg-[#faf7f5] text-[14px] text-[#5a3540] font-sans focus:border-[#7e525c] focus:bg-white outline-none transition placeholder:text-[#cdb8b0]"
               />
+              {touched.userName && errors.userName && (
+                <span className="text-xs text-red-500 mt-1 ml-1">{errors.userName}</span>
+              )}
             </div>
 
             {/* Email */}
             <div className="flex flex-col gap-1.25">
               <label
                 htmlFor="email"
-                className="text-[11px] font-semibold uppercase tracking-[0.13em] text-[#7e525c] font-sans"
+                className="text-xs font-semibold uppercase tracking-[0.13em] text-[#7e525c] font-sans"
               >
                 Email Address
               </label>
               <input
                 id="email"
                 name="email"
-                type="email"
+                type="text"
                 autoComplete="email"
-                required
+                
                 placeholder="j.moore@botanique.com"
                 value={form.email}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 className="px-4 py-2.75 rounded-xl border border-[#ede4df] bg-[#faf7f5] text-[14px] text-[#5a3540] font-sans focus:border-[#7e525c] focus:bg-white outline-none transition placeholder:text-[#cdb8b0]"
               />
+              {touched.email && errors.email && (
+                <span className="text-xs text-red-500 mt-1 ml-1">{errors.email}</span>
+              )}
             </div>
 
             {/* Phone */}
             <div className="flex flex-col gap-1.25">
               <label
                 htmlFor="phone"
-                className="text-[11px] font-semibold uppercase tracking-[0.13em] text-[#7e525c] font-sans"
+                className="text-xs font-semibold uppercase tracking-[0.13em] text-[#7e525c] font-sans"
               >
                 Phone
               </label>
@@ -173,20 +268,23 @@ export default function SignupPage() {
                 name="phone"
                 type="tel"
                 autoComplete="tel"
-                required
+                
                 placeholder="03001234567"
                 value={form.phone}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 className="px-4 py-2.75 rounded-xl border border-[#ede4df] bg-[#faf7f5] text-[14px] text-[#5a3540] font-sans focus:border-[#7e525c] focus:bg-white outline-none transition placeholder:text-[#cdb8b0]"
               />
+              {touched.phone && errors.phone && (
+                <span className="text-xs text-red-500 mt-1 ml-1">{errors.phone}</span>
+              )}
             </div>
 
             {/* Address */}
             <div className="flex flex-col gap-1.25">
               <label
                 htmlFor="address"
-                className="text-[11px] font-semibold uppercase tracking-[0.13em] text-[#7e525c] font-sans"
+                className="text-xs font-semibold uppercase tracking-[0.13em] text-[#7e525c] font-sans"
               >
                 Address
               </label>
@@ -195,13 +293,16 @@ export default function SignupPage() {
                 name="address"
                 type="text"
                 autoComplete="street-address"
-                required
+                
                 placeholder="House 24, Street 8, DHA"
                 value={form.address}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 className="px-4 py-2.75 rounded-xl border border-[#ede4df] bg-[#faf7f5] text-[14px] text-[#5a3540] font-sans focus:border-[#7e525c] focus:bg-white outline-none transition placeholder:text-[#cdb8b0]"
               />
+              {touched.address && errors.address && (
+                <span className="text-xs text-red-500 mt-1 ml-1">{errors.address}</span>
+              )}
             </div>
 
             {/* City + Postal */}
@@ -209,7 +310,7 @@ export default function SignupPage() {
               <div className="flex flex-col gap-1.25">
                 <label
                   htmlFor="city"
-                  className="text-[11px] font-semibold uppercase tracking-[0.13em] text-[#7e525c] font-sans"
+                  className="text-xs font-semibold uppercase tracking-[0.13em] text-[#7e525c] font-sans"
                 >
                   City
                 </label>
@@ -218,18 +319,21 @@ export default function SignupPage() {
                   name="city"
                   type="text"
                   autoComplete="address-level2"
-                  required
+                  
                   placeholder="Lahore"
                   value={form.city}
                   onChange={handleChange}
                   onBlur={handleBlur}
                   className="px-4 py-2.75 rounded-xl border border-[#ede4df] bg-[#faf7f5] text-[14px] text-[#5a3540] font-sans focus:border-[#7e525c] focus:bg-white outline-none transition placeholder:text-[#cdb8b0]"
                 />
+                {touched.city && errors.city && (
+                  <span className="text-xs text-red-500 mt-1 ml-1">{errors.city}</span>
+                )}
               </div>
               <div className="flex flex-col gap-1.25">
                 <label
                   htmlFor="postal"
-                  className="text-[11px] font-semibold uppercase tracking-[0.13em] text-[#7e525c] font-sans"
+                  className="text-xs font-semibold uppercase tracking-[0.13em] text-[#7e525c] font-sans"
                 >
                   Postal Code
                 </label>
@@ -238,13 +342,16 @@ export default function SignupPage() {
                   name="postal"
                   type="text"
                   autoComplete="postal-code"
-                  required
+                  
                   placeholder="54000"
                   value={form.postal}
                   onChange={handleChange}
                   onBlur={handleBlur}
                   className="px-4 py-2.75 rounded-xl border border-[#ede4df] bg-[#faf7f5] text-[14px] text-[#5a3540] font-sans focus:border-[#7e525c] focus:bg-white outline-none transition placeholder:text-[#cdb8b0]"
                 />
+                {touched.postal && errors.postal && (
+                  <span className="text-xs text-red-500 mt-1 ml-1">{errors.postal}</span>
+                )}
               </div>
             </div>
 
@@ -252,7 +359,7 @@ export default function SignupPage() {
             <div className="flex flex-col gap-1.25">
               <label
                 htmlFor="province"
-                className="text-[11px] font-semibold uppercase tracking-[0.13em] text-[#7e525c] font-sans"
+                className="text-xs font-semibold uppercase tracking-[0.13em] text-[#7e525c] font-sans"
               >
                 Province
               </label>
@@ -262,7 +369,7 @@ export default function SignupPage() {
                 value={form.province}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                required
+                
                 className="px-4 py-2.75 rounded-xl border border-[#ede4df] bg-[#faf7f5] text-[14px] text-[#5a3540] font-sans focus:border-[#7e525c] focus:bg-white outline-none transition"
               >
                 <option value="" disabled>
@@ -280,6 +387,9 @@ export default function SignupPage() {
                   Azad Jammu & Kashmir
                 </option>
               </select>
+              {touched.province && errors.province && (
+                <span className="text-xs text-red-500 mt-1 ml-1">{errors.province}</span>
+              )}
             </div>
 
             {/* Password row */}
@@ -287,59 +397,70 @@ export default function SignupPage() {
               <div className="flex flex-col gap-1.25">
                 <label
                   htmlFor="password"
-                  className="text-[11px] font-semibold uppercase tracking-[0.13em] text-[#7e525c] font-sans"
+                  className="text-xs font-semibold uppercase tracking-[0.13em] text-[#7e525c] font-sans"
                 >
                   Password
                 </label>
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  autoComplete="new-password"
-                  required
-                  placeholder="••••••••"
-                  value={form.password}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  className="px-4 py-2.75 rounded-xl border border-[#ede4df] bg-[#faf7f5] text-[14px] text-[#5a3540] font-sans focus:border-[#7e525c] focus:bg-white outline-none transition placeholder:text-[#cdb8b0]"
-                />
+                <div className="relative">
+                  <input
+                    id="password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    autoComplete="new-password"
+                    placeholder="••••••••"
+                    value={form.password}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    className="w-full px-4 py-2.75 rounded-xl border border-[#ede4df] bg-[#faf7f5] text-[14px] text-[#5a3540] font-sans focus:border-[#7e525c] focus:bg-white outline-none transition placeholder:text-[#cdb8b0] pr-12"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-[#cdb8b0] hover:text-[#7e525c] transition-colors"
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+                {touched.password && errors.password && (
+                  <span className="text-xs text-red-500 mt-1 ml-1">{errors.password}</span>
+                )}
               </div>
               <div className="flex flex-col gap-1.25">
                 <label
                   htmlFor="confirmPassword"
-                  className="text-[11px] font-semibold uppercase tracking-[0.13em] text-[#7e525c] font-sans"
+                  className="text-xs font-semibold uppercase tracking-[0.13em] text-[#7e525c] font-sans"
                 >
                   Confirm Password
                 </label>
-                <input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type="password"
-                  autoComplete="new-password"
-                  required
-                  placeholder="••••••••"
-                  value={form.confirmPassword}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  className="px-4 py-2.75 rounded-xl border border-[#ede4df] bg-[#faf7f5] text-[14px] text-[#5a3540] font-sans focus:border-[#7e525c] focus:bg-white outline-none transition placeholder:text-[#cdb8b0]"
-                />
+                <div className="relative">
+                  <input
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type={showConfirmPassword ? "text" : "password"}
+                    autoComplete="new-password"
+                    placeholder="••••••••"
+                    value={form.confirmPassword}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    className="w-full px-4 py-2.75 rounded-xl border border-[#ede4df] bg-[#faf7f5] text-[14px] text-[#5a3540] font-sans focus:border-[#7e525c] focus:bg-white outline-none transition placeholder:text-[#cdb8b0] pr-12"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-[#cdb8b0] hover:text-[#7e525c] transition-colors"
+                  >
+                    {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+                {touched.confirmPassword && errors.confirmPassword && (
+                  <span className="text-xs text-red-500 mt-1 ml-1">{errors.confirmPassword}</span>
+                )}
               </div>
             </div>
 
-            {passwordMismatch && touched.confirmPassword && (
-              <p className="text-[12px] text-[#c0392b] bg-[#fdf0ef] border border-[#f5c6c3] rounded-lg px-3 py-2 font-sans">
-                Passwords do not match.
-              </p>
-            )}
-            {isError && (
-              <p className="text-[12px] text-[#c0392b] bg-[#fdf0ef] border border-[#f5c6c3] rounded-lg px-3 py-2 font-sans">
-                {error?.message || "Something went wrong. Please try again."}
-              </p>
-            )}
-
             <button
               type="submit"
-              disabled={isPending || !!passwordMismatch}
+              disabled={isPending}
               className="w-full mt-1 py-3 rounded-full text-[15px] font-semibold tracking-wide font-sans text-white transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
               style={{
                 background: "linear-gradient(90deg, #7e525c 0%, #9b6370 100%)",

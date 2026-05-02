@@ -1,8 +1,3 @@
-/**
- * Auth API Endpoints
- * Handles signIn, signUp, OTP verification, and password reset API calls
- */
-
 import apiClient from "../client";
 
 // ─── Types ────────────────────────────────────────────────────────────────────

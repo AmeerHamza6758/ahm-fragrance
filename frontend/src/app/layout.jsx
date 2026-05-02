@@ -1,7 +1,7 @@
 import { Manrope, Noto_Serif } from "next/font/google";
 import "./globals.css";
-import RouteLoader from "@/Components/RouteLoader";
 import { Providers } from "./providers";
+import ScrollHandler from "@/Components/ScrollHandler";
 
 const manrope = Manrope({
   variable: "--font-manrope",
@@ -29,7 +29,7 @@ export default function RootLayout({ children }) {
     >
       <body className="min-h-full flex flex-col bg-background text-foreground font-sans">
         <Providers>
-          <RouteLoader />
+          <ScrollHandler />
           {children}
         </Providers>
       </body>

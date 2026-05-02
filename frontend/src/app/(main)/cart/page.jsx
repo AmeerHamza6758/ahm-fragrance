@@ -9,6 +9,7 @@ import cash_icon from "/public/Icons/product-details-cash-icon.svg";
 import auth_icon from "/public/Icons/product-details-authentic-icon.svg";
 import { useGetCart, useRemoveFromCart } from "@/lib/api";
 import { buildProductImageUrl } from "@/lib/utils/imageUrl";
+import { Handbag } from 'lucide-react';
 
 
 export default function CartPage() {
@@ -63,17 +64,18 @@ const total = subtotal + deliveryCharges - discount;
                 <div className="w-8 h-8 border-4 border-[#7e525c] border-t-transparent rounded-full animate-spin" />
               </div>
             ) : cartItems.length === 0 ? (
-              <div className="bg-[#F9F6F2] rounded-[32px] p-20 text-center">
-                <p className="text-[#7E525C] font-serif text-xl mb-4">
-                  Your bag is empty
-                </p>
-                <button
-                  onClick={() => router.push("/collections")}
-                  className="text-[#4E4543] text-xs underline tracking-widest"
-                >
-                  CONTINUE SHOPPING
-                </button>
-              </div>
+             <div className="bg-[#F9F6F2] rounded-[32px] p-20 flex flex-col items-center justify-center text-center">
+  <p className="text-[#7E525C] font-serif text-xl mb-10">
+    Your bag is empty
+  </p>
+  
+  <button
+    onClick={() => router.push("/collections")}
+    className="text-[#4E4543] text-xs  tracking-widest flex items-center gap-2 transition-opacity hover:opacity-70"
+  >
+   EXPLORE COLLECTIONS <Handbag className="w-4 h-4" />
+  </button>
+</div>
             ) : (
               cartItems.map((item, idx) => {
                
