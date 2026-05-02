@@ -2670,13 +2670,16 @@ p.product-price {
 
 .product-details-main {
   width: 95%;
- 
-}
 
+}
+.detail-img{
+ border-radius: 40px
+}
 /* Product Details Section */
 .product-details-section {
   width: 100%;
   background: rgb(var(--color-bg-canvas));
+  
 }
 
 .product-details-container {
@@ -2684,7 +2687,7 @@ p.product-price {
   margin: 0 auto;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 60px;
+  gap: 20px;
   align-items: flex-start;
 }
 
@@ -2693,6 +2696,7 @@ p.product-price {
   display: flex;
   flex-direction: column;
   gap: 20px;
+ 
 }
 
 .main-image {
@@ -2705,16 +2709,19 @@ p.product-price {
 }
 
 .main-product-image {
-  width: 90%;
-  height: 90%;
+  /* width: 90%;
+  height: 90%; */
   object-fit: cover;
   padding-left: 80px;
+  
+
 }
 
 .thumbnail-images {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 12px;
+  
 }
 
 .thumbnail {

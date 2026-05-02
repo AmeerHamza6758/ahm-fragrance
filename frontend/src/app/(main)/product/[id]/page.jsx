@@ -128,19 +128,43 @@ console.log(product,"pro");
         <section className="product-details-section">
           <div className="product-details-container">
             {/* Product Images */}
-            <div className="product-images">
-              <div className="main-image  bg-[#faf8f5]!">
-                <Image
-                  src={imageUrl}
-                  alt={product.name}
-                  fill
-                  className="main-product-image w-[90%]! "
-                />
-              </div>
-            </div>
+           {/* Product Images Section */}
+
+<div className="flex flex-col gap-4 items-end">
+  {/* Main Large Image */}
+  <div 
+  className="relative aspect-square w-[90%] bg-[#faf8f5] rounded-xl! overflow-hidden ">
+  <Image
+  src={imageUrl}
+  alt={product.name}
+  fill
+  className="object-contain p-4 rounded-lg! detail-img"
+  priority
+/>
+  </div>
+
+  {/* Thumbnails Row */}
+  <div className="flex flex-row justify-center gap-3 relative w-[90%] rounded-lg!">
+  {[1, 2].map((_, index) => (
+  <div 
+    key={index} 
+    className="relative aspect-square bg-[#faf8f5] !rounded-xl overflow-hidden transition-colors h-[30%] w-[30%]"
+  >
+    <Image
+      src={imageUrl}
+      alt={`${product.name} thumb ${index}`}
+      fill
+      className="object-contain p-2 detail-img"
+    />
+  </div>
+))}
+  
+  
+</div>
+</div>
 
             {/* Product Details */}
-            <div className="product-info">
+            <div className="product-info mt-10">
               <h1 className="product-title capitalize">{product.name}</h1>
 
               <p className="product-notes-detail capitalize!">{product.description}</p>
@@ -223,7 +247,7 @@ console.log(product,"pro");
               </div>
 
               {/* Info Badges (static for now) */}
-              <div className="info-badges">
+              <div className="info-badges p-0! gap-0!">
                 <div className="badge  bg-[#FDF9F5]!">
                   <span className="badge-icon">
                     <Image
