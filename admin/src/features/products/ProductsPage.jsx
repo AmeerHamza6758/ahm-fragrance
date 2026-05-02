@@ -1,8 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import PageSection from "../components/PageSection";
-import "../styles/admin.css";
+import "../../styles/admin.css";
 import { NavLink } from "react-router-dom";
-// Standard icons to match Figma
 import { MdOutlineEditNote } from "react-icons/md";
 import { AiFillDelete } from "react-icons/ai";
 import { FiXCircle } from "react-icons/fi";

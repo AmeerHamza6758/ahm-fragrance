@@ -1,7 +1,7 @@
 import React from 'react';
 import { LuImagePlus } from "react-icons/lu";
 import { MdOutlineFileUpload } from "react-icons/md";
-import "/src/styles/admin.css";
+import '../../styles/admin.css';
 
 function AddProducts() {
 
@@ -14,7 +14,7 @@ function AddProducts() {
     
     const data = Object.fromEntries(formData.entries());
     
-    // 2. Images ko check karne ka tareeqa (Kyunki wo object mein nazar nahi aati)
+    // 2. Images 
     const primaryImg = formData.get('primaryImage');
     
     console.log("Form Data Object:", data);
@@ -26,12 +26,11 @@ function AddProducts() {
 
   return (
     <section className="add-product-container">
-      <div className="add-header-section">
-        <h1 className="catalog-title">Add New Fragrance</h1>
-        <p className="catalog-subtitle">
-          Compose a new entry for the botanical collection.
-        </p>
-      </div>
+       <div className="title-section">
+            <h1 className="catalog-title">Add New Fragrance</h1>
+            <p className="catalogs-subtitle">Compose a new entry for the botanical collection</p>
+          </div>
+     
 
       <form className="product-form-layout" onSubmit={handleSubmit}>
         {/* Left Column */}
