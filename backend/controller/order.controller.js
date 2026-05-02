@@ -134,7 +134,7 @@ const createOrder = async (req, res) => {
     if (duplicateCheck.isDuplicate) {
       return res.status(409).json({
         success: false,
-        message: `You have already ordered these product(s) within the last 24 hours: ${duplicateCheck.duplicateProducts.join(', ')}. Please wait before ordering again or contact us through email or phonenumber.`,
+        message: `You have already ordered these product(s) within the last 1 hour: ${duplicateCheck.duplicateProducts.join(', ')}. Please wait before ordering again or contact us through email or phonenumber.`,
         duplicateProducts: duplicateCheck.duplicateProducts
       });
     }

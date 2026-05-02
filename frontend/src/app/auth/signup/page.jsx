@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSignUp } from "@/lib/api/hooks/useAuth";
 import Image from "next/image";
+import { saveCheckoutProfile } from "@/lib/store/userProfileStore";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -12,6 +13,11 @@ export default function SignupPage() {
   const [form, setForm] = useState({
     userName: "",
     email: "",
+    phone: "",
+    address: "",
+    city: "",
+    postal: "",
+    province: "",
     password: "",
     confirmPassword: "",
   });
@@ -28,11 +34,35 @@ export default function SignupPage() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (form.password !== form.confirmPassword) return;
-    signUp(form, {
+    saveCheckoutProfile({
+      name: form.userName,
+      email: form.email,
+      phone: form.phone,
+      address: form.address,
+      city: form.city,
+      postal: form.postal,
+      province: form.province,
+    });
+
+    signUp(
+      {
+        userName: form.userName,
+        email: form.email,
+        password: form.password,
+        phone: form.phone,
+        address: {
+          street: form.address,
+          city: form.city,
+          province: form.province,
+          postalCode: form.postal,
+        },
+      },
+      {
       onSuccess: () => {
         router.push(`/auth/verify?email=${encodeURIComponent(form.email)}`);
       },
-    });
+      },
+    );
   };
 
   const passwordMismatch =
@@ -128,6 +158,128 @@ export default function SignupPage() {
                 onBlur={handleBlur}
                 className="px-4 py-2.75 rounded-xl border border-[#ede4df] bg-[#faf7f5] text-[14px] text-[#5a3540] font-sans focus:border-[#7e525c] focus:bg-white outline-none transition placeholder:text-[#cdb8b0]"
               />
+            </div>
+
+            {/* Phone */}
+            <div className="flex flex-col gap-1.25">
+              <label
+                htmlFor="phone"
+                className="text-[11px] font-semibold uppercase tracking-[0.13em] text-[#7e525c] font-sans"
+              >
+                Phone
+              </label>
+              <input
+                id="phone"
+                name="phone"
+                type="tel"
+                autoComplete="tel"
+                required
+                placeholder="03001234567"
+                value={form.phone}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                className="px-4 py-2.75 rounded-xl border border-[#ede4df] bg-[#faf7f5] text-[14px] text-[#5a3540] font-sans focus:border-[#7e525c] focus:bg-white outline-none transition placeholder:text-[#cdb8b0]"
+              />
+            </div>
+
+            {/* Address */}
+            <div className="flex flex-col gap-1.25">
+              <label
+                htmlFor="address"
+                className="text-[11px] font-semibold uppercase tracking-[0.13em] text-[#7e525c] font-sans"
+              >
+                Address
+              </label>
+              <input
+                id="address"
+                name="address"
+                type="text"
+                autoComplete="street-address"
+                required
+                placeholder="House 24, Street 8, DHA"
+                value={form.address}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                className="px-4 py-2.75 rounded-xl border border-[#ede4df] bg-[#faf7f5] text-[14px] text-[#5a3540] font-sans focus:border-[#7e525c] focus:bg-white outline-none transition placeholder:text-[#cdb8b0]"
+              />
+            </div>
+
+            {/* City + Postal */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="flex flex-col gap-1.25">
+                <label
+                  htmlFor="city"
+                  className="text-[11px] font-semibold uppercase tracking-[0.13em] text-[#7e525c] font-sans"
+                >
+                  City
+                </label>
+                <input
+                  id="city"
+                  name="city"
+                  type="text"
+                  autoComplete="address-level2"
+                  required
+                  placeholder="Lahore"
+                  value={form.city}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  className="px-4 py-2.75 rounded-xl border border-[#ede4df] bg-[#faf7f5] text-[14px] text-[#5a3540] font-sans focus:border-[#7e525c] focus:bg-white outline-none transition placeholder:text-[#cdb8b0]"
+                />
+              </div>
+              <div className="flex flex-col gap-1.25">
+                <label
+                  htmlFor="postal"
+                  className="text-[11px] font-semibold uppercase tracking-[0.13em] text-[#7e525c] font-sans"
+                >
+                  Postal Code
+                </label>
+                <input
+                  id="postal"
+                  name="postal"
+                  type="text"
+                  autoComplete="postal-code"
+                  required
+                  placeholder="54000"
+                  value={form.postal}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  className="px-4 py-2.75 rounded-xl border border-[#ede4df] bg-[#faf7f5] text-[14px] text-[#5a3540] font-sans focus:border-[#7e525c] focus:bg-white outline-none transition placeholder:text-[#cdb8b0]"
+                />
+              </div>
+            </div>
+
+            {/* Province */}
+            <div className="flex flex-col gap-1.25">
+              <label
+                htmlFor="province"
+                className="text-[11px] font-semibold uppercase tracking-[0.13em] text-[#7e525c] font-sans"
+              >
+                Province
+              </label>
+              <select
+                id="province"
+                name="province"
+                value={form.province}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                required
+                className="px-4 py-2.75 rounded-xl border border-[#ede4df] bg-[#faf7f5] text-[14px] text-[#5a3540] font-sans focus:border-[#7e525c] focus:bg-white outline-none transition"
+              >
+                <option value="" disabled>
+                  Select Province
+                </option>
+                <option value="Punjab">Punjab</option>
+                <option value="Sindh">Sindh</option>
+                <option value="Khyber Pakhtunkhwa">Khyber Pakhtunkhwa</option>
+                <option value="Balochistan">Balochistan</option>
+                <option value="Islamabad Capital Territory">
+                  Islamabad Capital Territory
+                </option>
+                <option value="Gilgit-Baltistan">Gilgit-Baltistan</option>
+                <option value="Azad Jammu & Kashmir">
+                  Azad Jammu & Kashmir
+                </option>
+              </select>
             </div>
 
             {/* Password row */}

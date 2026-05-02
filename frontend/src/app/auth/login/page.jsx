@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSignIn } from "@/lib/api/hooks/useAuth";
+import { persistAuthSession } from "@/lib/store/userProfileStore";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -18,17 +19,14 @@ export default function LoginPage() {
     e.preventDefault();
     signIn(form, {
       onSuccess: (data) => {
-        if (data?.token) {
-          localStorage.setItem("token", data.token);
-          localStorage.setItem("user", JSON.stringify(data.user));
-        }
+        persistAuthSession({ token: data?.token, user: data?.user });
         router.push("/");
       },
     });
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-[#f8f4f1] px-2 pb-16pt-10">
+    <main className="flex items-center justify-center px-2 pb-16 pt-10">
       <div
         className="w-full max-w-lg bg-white rounded-3xl shadow-xl p-16 flex flex-col items-center"
         style={{ boxShadow: "0 8px 48px 0 rgba(80,30,40,0.10)" }}

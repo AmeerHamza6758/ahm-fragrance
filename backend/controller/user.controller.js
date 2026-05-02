@@ -36,7 +36,7 @@ const authController = {
     // ========== SIGN UP WITH AUTO OTP ==========
      signUp: async (req, res) => {
     try {
-        const { userName, email, password, phone, gender, dateOfBirth } = req.body;
+        const { userName, email, password, phone, gender, dateOfBirth, address } = req.body;
 
         // Check if user already exists
         const existingUser = await userModel.findOne({ email });
@@ -62,6 +62,12 @@ const authController = {
             phone, 
             gender, 
             dateOfBirth,
+            address: {
+                street: address?.street || "",
+                city: address?.city || "",
+                province: address?.province || "",
+                postalCode: address?.postalCode || ""
+            },
             otpCode: newOtp,
             otpType: 'email_verification',
             otpExpiresAt: new Date(Date.now() + 60 * 1000), // 60 seconds

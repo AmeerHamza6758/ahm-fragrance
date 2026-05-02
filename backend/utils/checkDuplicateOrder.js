@@ -1,15 +1,15 @@
 const Order = require('../models/order.model');
 
 const checkDuplicateOrder = async (customerId, products) => {
-  const twentyFourHoursAgo = new Date();
-  twentyFourHoursAgo.setHours(twentyFourHoursAgo.getHours() - 24);
+  const oneHourAgo  = new Date();
+  oneHourAgo .setHours(oneHourAgo .getHours() - 1);
   
   const productIds = products.map(p => p.productId);
   
   const existingOrder = await Order.findOne({
     customerId: customerId,
     orderStatus: { $in: ['pending', 'confirmed', 'processing'] },
-    placedAt: { $gte: twentyFourHoursAgo },
+    placedAt: { $gte: oneHourAgo  },
     'products.productId': { $in: productIds }
   });
   

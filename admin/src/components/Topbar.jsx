@@ -1,15 +1,13 @@
-// function Topbar() {
-//   return (
-//     <header className="admin-topbar">
-//       <div>
-//         <h1>Admin Panel</h1>
-//         <p>Manage products, catalog, stock and orders</p>
-//       </div>
-//       <button className="action-btn" type="button">
-//         Add Product
-//       </button>
-//     </header>
-//   );
-// }
+function Topbar() {
+  return (
+    <header className="admin-topbar">
+      <h3>AHM Fragrances</h3>
+      <div className="ahm-admin">
+        <h4>AHM Admin </h4>
+        <button className="ahm-btn"></button>
+      </div>
+    </header>
+  );
+}
 
-// export default Topbar;
+export default Topbar;
