@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react";
-// import PageSection from "../components/PageSection";
 import "../../styles/admin.css";
 import { NavLink } from "react-router-dom";
 import { IoMdAdd } from "react-icons/io";
+import { FiEdit } from "react-icons/fi";
+import { GrView } from "react-icons/gr";
+import { RiDeleteBin6Line } from "react-icons/ri";
+import Pagination from "../../components/Pagination";
 
 const products = [
   {
@@ -14,6 +17,7 @@ const products = [
     volume: "100ml",
     category: "Unisex",
     tag: "SIGNATURE",
+    status: "active",
   },
   {
     id: 2,
@@ -24,16 +28,18 @@ const products = [
     volume: "50ml",
     category: "Female",
     tag: "BEST SELLER",
+    status: "active",
   },
   {
     id: 3,
     name: "Midnight Leather",
     image: "/image/image3.png",
-    qty: 89,
+    qty: 0,
     date: "Nov 02, 2023",
     volume: "100ml",
     category: "Male",
     tag: "NEW",
+    status: "inactive",
   },
   {
     id: 4,
@@ -44,6 +50,7 @@ const products = [
     volume: "100ml",
     category: "Unisex",
     tag: "SEASONAL",
+    status: "active",
   },
   {
     id: 5,
@@ -54,6 +61,7 @@ const products = [
     volume: "50ml",
     category: "Female",
     tag: "SIGNATURE",
+    status: "active",
   },
   {
     id: 6,
@@ -63,7 +71,8 @@ const products = [
     date: "Oct 20, 2023",
     volume: "100ml",
     category: "Male",
-    tag: "  BEST SELLER",
+    tag: "BEST SELLER",
+    status: "inactive",
   },
   {
     id: 7,
@@ -74,6 +83,7 @@ const products = [
     volume: "100ml",
     category: "Unisex",
     tag: "NEW",
+    status: "active",
   },
   {
     id: 8,
@@ -84,10 +94,22 @@ const products = [
     volume: "50ml",
     category: "Unisex",
     tag: "SIGNATURE",
+    status: "active",
   },
 ];
+
 function ProductsPage() {
   const [openMenu, setOpenMenu] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const entriesPerPage = 6;
+  const totalEntries = 48; // Mock total entries
+  const totalPages = Math.ceil(totalEntries / entriesPerPage);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    console.log("Page changed to:", page);
+  };
+
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (!e.target.closest(".actions")) {
@@ -106,26 +128,38 @@ function ProductsPage() {
   const handleDelete = (id) => {
     console.log("Delete:", id);
   };
+
+  const getTagClass = (tag) => {
+    const t = tag.trim().toUpperCase();
+    if (t === "SIGNATURE") return "tag-signature";
+    if (t === "BEST SELLER") return "tag-best-seller";
+    if (t === "NEW") return "tag-new";
+    if (t === "SEASONAL") return "tag-seasonal";
+    return "tag-default";
+  };
+
   return (
     <div>
       {/* Header */}
-      <div className="catalog-header"> 
+      <div className="catalog-header">
         <div>
           <h1 className="catalog-title">Product Catalog</h1>
           <p className="catalog-subtitle">
             Manage your fragrance inventory and collection details.
           </p>
         </div>
-        <NavLink to="/products/add" className="add-btn"><IoMdAdd/> Add New Fragrance</NavLink>
+        <NavLink to="/products/add" className="add-btn">
+          <IoMdAdd /> Add New Fragrance
+        </NavLink>
       </div>
 
       {/* Table */}
       <div className="catalog-table">
         <div className="catalog-table-header">
           <span>Product</span>
-          <span>Quantity</span>
+          <span>Status</span>
           <span>Restock Date</span>
-          <span>Volume</span>
+          {/* <span>Volume</span> */}
           <span>Category</span>
           <span>Tags</span>
           <span>Actions</span>
@@ -133,58 +167,71 @@ function ProductsPage() {
 
         {products.map((item) => (
           <div className="catalog-row" key={item.id}>
-
             {/* Product */}
             <div className="product-cell">
-              <img src={item.image} />
+              <img src={item.image} alt={item.name} />
               <span>{item.name}</span>
             </div>
 
-            <span>{item.qty}</span>
+            <div className="status-cell">
+              <span
+                className={`status-badge ${
+                  item.status === "active" ? "status-active" : "status-inactive"
+                }`}
+              >
+                {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
+              </span>
+            </div>
             <span>{item.date}</span>
-            <span>{item.volume}</span>
+            {/* <span>{item.volume}</span> */}
             <span>{item.category}</span>
 
-            <span className="tag-center">{item.tag}</span>
-
-            {/* Actions */}
-            <div className="actions">
-              <button
-                onClick={(e) =>{
-                  e.stopPropagation();
-                  setOpenMenu(openMenu === item.id ? null : item.id);
-                }}
-              >
-                ⋮
-              </button>
-
-              {openMenu === item.id && (
-                <div className="dropdown">
-                 <p onClick={() => handleEdit(item.id)}>Edit Product</p>
-                 <p onClick={() => handleDelete(item.id)}>Delete Product</p>
-                 <p>Mark Inactive</p>
-                </div>
-              )}
+            <div>
+              <span className={`tag-center ${getTagClass(item.tag)}`}>
+                {item.tag.trim()}
+              </span>
             </div>
 
+            {/* Actions */}
+            <div
+              className="actions"
+              onClick={(e) => {
+                e.stopPropagation();
+                setOpenMenu(openMenu === item.id ? null : item.id);
+              }}
+            >
+              <GrView
+                className="action-icon view-icon"
+                size={18}
+                style={{ color: "#10b981", cursor: "pointer" }}
+              />
+              <FiEdit
+                className="action-icon edit-icon"
+                size={18}
+                onClick={() => handleEdit(item.id)}
+                style={{ color: "#3b82f6", cursor: "pointer" }}
+              />
+              <RiDeleteBin6Line
+                className="action-icon delete-icon"
+                size={18}
+                onClick={() => handleDelete(item.id)}
+                style={{ color: "#ef4444", cursor: "pointer" }}
+              />
+            </div>
           </div>
         ))}
 
-      </div>
-      <div className="pagination">
-           <div className="pagination-124">
-              <p>SHOWING 1 TO 6 OF 48 ENTRIES</p>
-            </div>
-        <div>
-             <button>{"<"}</button>
-              <button className="active-page">1</button>
-              <button>2</button>
-              <button>3</button>
-              <button>{">"}</button>
-        </div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+          totalEntries={totalEntries}
+          startEntry={(currentPage - 1) * entriesPerPage + 1}
+          endEntry={Math.min(currentPage * entriesPerPage, totalEntries)}
+        />
       </div>
     </div>
   );
 }
-    
- export default ProductsPage;
+
+export default ProductsPage;
