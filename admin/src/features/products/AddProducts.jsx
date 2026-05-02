@@ -4,6 +4,26 @@ import { MdOutlineFileUpload } from "react-icons/md";
 import "/src/styles/admin.css";
 
 function AddProducts() {
+
+  const handleSubmit = (e) => {
+    e.preventDefault(); 
+    
+    // FormData object 
+    const formData = new FormData(e.target);
+
+    
+    const data = Object.fromEntries(formData.entries());
+    
+    // 2. Images ko check karne ka tareeqa (Kyunki wo object mein nazar nahi aati)
+    const primaryImg = formData.get('primaryImage');
+    
+    console.log("Form Data Object:", data);
+    console.log("Primary Image File:", primaryImg);
+    
+   
+    alert("Product data captured! Check console.");
+  };
+
   return (
     <section className="add-product-container">
       <div className="add-header-section">
@@ -13,15 +33,16 @@ function AddProducts() {
         </p>
       </div>
 
-      <form className="product-form-layout">
+      <form className="product-form-layout" onSubmit={handleSubmit}>
         {/* Left Column */}
         <div className="left-column">
           <div className="image-uploads-container">
             <div className="main-image-upload">
               <label htmlFor="primary-image" className="image-placeholder main-placeholder">
-               <LuImagePlus size={30} color="#7E525C"/>
+                <LuImagePlus size={30} color="#7E525C"/>
                 <span className="placeholder-text">Primary Vision</span>
-                <input type="file" className="hidden-input" id="primary-image" accept="image/*"  />
+                {/* Name Added: primaryImage */}
+                <input type="file" name="primaryImage" className="hidden-input" id="primary-image" accept="image/*" />
               </label>
             </div>
             
@@ -29,8 +50,9 @@ function AddProducts() {
               {[1, 2].map((num) => (
                 <div key={num} className="secondary-image-upload">
                   <label htmlFor={`secondary-image-${num}`} className="image-placeholder secondary-placeholder">
-                   <LuImagePlus size={30} color="#7E525C" />
-                    <input type="file" className="hidden-input" id={`secondary-image-${num}`} accept="image/* " />
+                    <LuImagePlus size={30} color="#7E525C" />
+                    {/* Name Added: secondaryImage_1, secondaryImage_2 */}
+                    <input type="file" name={`secondaryImage_${num}`} className="hidden-input" id={`secondary-image-${num}`} accept="image/* " />
                   </label>
                 </div>
               ))}
@@ -50,30 +72,34 @@ function AddProducts() {
           <div className="form-fields-container">
             <div className="form-group">
               <label>Product Identity</label>
-              <input type="text" placeholder="e.g. Midnight Jasmine & Sandalwood" className="styled-input" />
+              {/* Name Added: productName */}
+              <input name="productName" type="text" placeholder="e.g. Midnight Jasmine & Sandalwood" className="styled-input" required />
             </div>
 
             <div className="form-group">
               <label>Fragrance Story</label>
-              <textarea placeholder="Describe the olfactory journey..." className="styled-input styled-textarea" rows="4"></textarea>
+              {/* Name Added: story */}
+              <textarea name="story" placeholder="Describe the olfactory journey..." className="styled-input styled-textarea" rows="4"></textarea>
             </div>
 
             <div className="dropdowns-row">
               <div className="form-group">
                 <label>Essence Category</label>
-                <select className="styled-input styled-select">
+                {/* Name Added: category */}
+                <select name="category" className="styled-input styled-select">
                   <option value="unisex">Unisex</option>
-                  <option value="floral">Male</option>
-                  <option value="floral">Female</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
                 </select>
               </div>
 
               <div className="form-group">
                 <label>Collection Tags</label>
-                <select className="styled-input styled-select">
+                {/* Name Added: tag */}
+                <select name="tag" className="styled-input styled-select">
                   <option value="signature">Signature</option>
-                  <option value="classic">New</option>
-                   <option value="classic">Best seller</option>
+                  <option value="new">New</option>
+                  <option value="best-seller">Best seller</option>
                 </select>
               </div>
             </div>
@@ -82,7 +108,8 @@ function AddProducts() {
               <div className="form-group">
                 <label>Volume (ML)</label>
                 <div className="input-with-unit">
-                    <input type="text" placeholder="100" className="styled-input" />
+                    {/* Name Added: volume */}
+                    <input name="volume" type="number" placeholder="100" className="styled-input" />
                     <span className="unit-tag">ML</span>
                 </div>
               </div>
@@ -90,14 +117,18 @@ function AddProducts() {
               <div className="form-group">
                 <label>Investment (PKR)</label>
                 <div className="input-with-unit">
-                    <input type="text" placeholder="8900" className="styled-input" />
+                    {/* Name Added: price */}
+                    <input name="price" type="number" placeholder="8900" className="styled-input" />
                     <span className="unit-tag">PKR</span>
                 </div>
               </div>
             </div>
 
             <div className="form-actions-section ">
-              <button type="submit" className="publish-btn "><MdOutlineFileUpload size={20} color="#FFFFFF"/>Publish Product</button>
+              <button type="submit" className="publish-btn ">
+                <MdOutlineFileUpload size={20} color="#FFFFFF"/>
+                Publish Product
+              </button>
             </div>
           </div>
         </div>
