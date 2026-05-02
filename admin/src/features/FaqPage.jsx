@@ -1,40 +1,100 @@
 import { useState, useEffect } from "react";
 import PageSection from "../components/PageSection";
 import "../styles/admin.css"
-import { NavLink } from "react-router-dom";
+import { faqApi } from "../services/endpoints";
 
-const faqData = [
-  {
-    id: 1,
-    question: "How can I track my fragrance order?",
-    answer: "Customers can track their order from dashboard using tracking ID.",
-  },
-  {
-    id: 2,
-    question: "Can users return opened products?",
-    answer: "Opened products are not eligible for return or exchange.",
-  },
-  {
-    id: 3,
-    question: "How to manage stock alerts?",
-    answer: "Admin can manage stock alerts from inventory settings.",
-  },
-];
 function FaqPage() {
-
+  const [faqData, setFaqData] = useState([]);
   const [openFAQ, setOpenFAQ] = useState(null);
   const [menuOpen, setMenuOpen] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [newQuestion, setNewQuestion] = useState("");
+  const [newAnswer, setNewAnswer] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [editingFaq, setEditingFaq] = useState(null);
+
+  // Fetch FAQs on mount
   useEffect(() => {
-  const closeMenu = () => {
+    const fetchFaqs = async () => {
+      try {
+        const res = await faqApi.list();
+        if (res.data && res.data.data) {
+          setFaqData(res.data.data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch FAQs:", err);
+      }
+    };
+    fetchFaqs();
+  }, []);
+
+  useEffect(() => {
+    const closeMenu = () => {
+      setMenuOpen(null);
+    };
+    document.addEventListener("click", closeMenu);
+    return () => {
+      document.removeEventListener("click", closeMenu);
+    };
+  }, []);
+
+  const handleAddFaq = async () => {
+    if (!newQuestion.trim() || !newAnswer.trim()) return;
+    setSubmitting(true);
+    try {
+      const res = await faqApi.create({
+        question: newQuestion.trim(),
+        answer: newAnswer.trim(),
+      });
+      if (res.data && res.data.data) {
+        setFaqData((prev) => [...prev, res.data.data]);
+      }
+      closeModal();
+    } catch (err) {
+      console.error("Failed to add FAQ:", err);
+      alert("Failed to add FAQ. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleEdit = (item) => {
+    setEditingFaq(item);
+    setNewQuestion(item.question);
+    setNewAnswer(item.answer);
+    setShowModal(true);
     setMenuOpen(null);
   };
 
-  document.addEventListener("click", closeMenu);
-
-  return () => {
-    document.removeEventListener("click", closeMenu);
+  const handleUpdateFaq = async () => {
+    if (!newQuestion.trim() || !newAnswer.trim()) return;
+    setSubmitting(true);
+    try {
+      const res = await faqApi.update(editingFaq._id, {
+        question: newQuestion.trim(),
+        answer: newAnswer.trim(),
+      });
+      if (res.data && res.data.data) {
+        setFaqData((prev) =>
+          prev.map((faq) => faq._id === editingFaq._id ? res.data.data : faq)
+        );
+      }
+      closeModal();
+    } catch (err) {
+      console.error("Failed to update FAQ:", err);
+      alert("Failed to update FAQ. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
-}, []);
+
+  const closeModal = () => {
+    setShowModal(false);
+    setNewQuestion("");
+    setNewAnswer("");
+    setEditingFaq(null);
+  };
+
   return (
     <div className="faq-admin-page">
       <div className="faq-header-section">
@@ -44,12 +104,12 @@ function FaqPage() {
           Manage frequently asked questions and customer help content.
           </p>
         </div>
-        <NavLink to="add" className="add-faq-btn" >+ Add FAQ</NavLink>
+        <button className="add-faq-btn" onClick={() => { setEditingFaq(null); setShowModal(true); }}>+ Add FAQ</button>
       </div>
 
       <div className="faq-list-container">
         {faqData.map((item, index) => (
-          <div className="faq-card-item" key={item.id}>
+          <div className="faq-card-item" key={item._id || index}>
             <div className="faq-question-row">
               <h3
                 className="faq-question-text"
@@ -73,8 +133,8 @@ function FaqPage() {
 
                 {menuOpen === index && (
                   <div className="faq-dropdown-menu">
-                    <p onClick={() => handleEdit(item.id)}>Edit</p>
-                    <p onClick={() => handleDelete(item.id)}>Delete</p>
+                    <p onClick={() => handleEdit(item)}>Edit</p>
+                    <p onClick={() => handleDelete(item._id)}>Delete</p>
                   </div>
                 )}
               </div>
@@ -86,8 +146,49 @@ function FaqPage() {
           </div>
         ))}
       </div>
+
+      {/* Add / Edit FAQ Modal */}
+      {showModal && (
+        <div className="faq-modal-overlay" onClick={closeModal}>
+          <div className="faq-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="faq-modal-header">
+              <h2>{editingFaq ? "Edit FAQ" : "Add New FAQ"}</h2>
+              <button className="faq-modal-close" onClick={closeModal}>×</button>
+            </div>
+            <div className="faq-modal-body">
+              <label className="faq-modal-label">Question</label>
+              <input
+                type="text"
+                className="faq-modal-input"
+                placeholder="Enter the question"
+                value={newQuestion}
+                onChange={(e) => setNewQuestion(e.target.value)}
+              />
+              <label className="faq-modal-label">Answer</label>
+              <textarea
+                className="faq-modal-textarea"
+                placeholder="Enter the answer"
+                rows={4}
+                value={newAnswer}
+                onChange={(e) => setNewAnswer(e.target.value)}
+              />
+            </div>
+            <div className="faq-modal-footer">
+              <button className="faq-modal-cancel" onClick={closeModal}>Cancel</button>
+              <button
+                className="faq-modal-submit"
+                onClick={editingFaq ? handleUpdateFaq : handleAddFaq}
+                disabled={submitting || !newQuestion.trim() || !newAnswer.trim()}
+              >
+                {submitting ? (editingFaq ? "Updating..." : "Adding...") : (editingFaq ? "Update FAQ" : "Add FAQ")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
 export default FaqPage;
+

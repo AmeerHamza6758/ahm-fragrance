@@ -452,8 +452,35 @@ const cancelOrder = async (req, res) => {
 //   }
 // };
 
+
+
+const getPendingOrdersCount = async (req, res) => {
+  try {
+    const totalPendingOrders = await Order.countDocuments({
+      orderStatus: 'pending'
+    });
+
+    res.status(200).json({
+      success: true,
+      totalPendingOrders
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to get pending orders count',
+      error: error.message
+    });
+  }
+};
+
+
+
+
+
 module.exports = {
   getCheckoutSummary,
   createOrder,
-  cancelOrder
+  cancelOrder,
+  getPendingOrdersCount
 };

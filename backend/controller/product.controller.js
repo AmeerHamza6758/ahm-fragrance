@@ -8,18 +8,17 @@ const mongoose = require('mongoose');
 const productController = {
     addProduct: async (req, res) => {
         try {
-            const { name, price, discountPrice, description, brand_id, category_id, tag_id, image_id, variants  } = req.body;
+            const { name, price, discountPrice, description, category_id, tag_id, image_id, variants } = req.body;
 
             const product = new Product({
                 name,
                 price,
                 discountPrice,
                 description,
-                brand_id,
                 category_id,
                 tag_id,
                 image_id,
-                variants 
+                variants
             });
 
             await product.save();
@@ -57,7 +56,6 @@ const productController = {
             }
 
             const product = await Product.findById(id)
-                .populate('brand_id')
                 .populate('category_id')
                 .populate('tag_id')
                 // .populate('image_id');
@@ -123,55 +121,55 @@ const productController = {
 
 
     updateProduct: async (req, res) => {
-    try {
-        const { id } = req.query;
-        const { price, discountPercentage, variants, ...rest } = req.body;
+        try {
+            const { id } = req.query;
+            const { price, discountPercentage, variants, ...rest } = req.body;
 
-        if (!id) {
-            return res.status(400).json({ message: 'Product ID is required' });
+            if (!id) {
+                return res.status(400).json({ message: 'Product ID is required' });
+            }
+
+            const product = await Product.findById(id);
+
+            if (!product) {
+                return res.status(404).json({ message: 'Product not found' });
+            }
+
+            const finalPrice = price ?? product.price;
+            const finalDiscount = discountPercentage ?? product.discountPercentage ?? 0;
+
+            let updatedVariants = product.variants;
+
+            if (variants && Array.isArray(variants)) {
+                updatedVariants = variants.map(v => {
+                    const vPrice = v.price ?? 0;
+                    const vDiscount = v.discountPercentage ?? 0;
+
+                    return {
+                        size: v.size,
+                        price: vPrice,
+                        discountPercentage: vDiscount
+                    };
+                });
+            }
+
+            const updatedProduct = await Product.findByIdAndUpdate(
+                id,
+                {
+                    ...rest,
+                    price: finalPrice,
+                    discountPercentage: finalDiscount,
+                    variants: updatedVariants
+                },
+                { new: true }
+            );
+
+            res.json(updatedProduct);
+
+        } catch (error) {
+            res.status(500).json({ error: error.message });
         }
-
-        const product = await Product.findById(id);
-
-        if (!product) {
-            return res.status(404).json({ message: 'Product not found' });
-        }
-
-        const finalPrice = price ?? product.price;
-        const finalDiscount = discountPercentage ?? product.discountPercentage ?? 0;
-
-        let updatedVariants = product.variants;
-
-        if (variants && Array.isArray(variants)) {
-            updatedVariants = variants.map(v => {
-                const vPrice = v.price ?? 0;
-                const vDiscount = v.discountPercentage ?? 0;
-
-                return {
-                    size: v.size,
-                    price: vPrice,
-                    discountPercentage: vDiscount
-                };
-            });
-        }
-
-        const updatedProduct = await Product.findByIdAndUpdate(
-            id,
-            {
-                ...rest,
-                price: finalPrice,
-                discountPercentage: finalDiscount,
-                variants: updatedVariants
-            },
-            { new: true }
-        );
-
-        res.json(updatedProduct);
-
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-},
+    },
 
     deleteProduct: async (req, res) => {
         try {
@@ -254,7 +252,6 @@ const productController = {
 
             // 🔹 FINAL QUERY
             let productsQuery = Product.find(query)
-                .populate('brand_id', 'brandName')
                 .populate('category_id', 'name')
                 .populate('tag_id', 'name')
                 // .populate('image_id', 'filename path')
@@ -292,6 +289,24 @@ const productController = {
 
         } catch (err) {
             res.status(500).json({ error: err.message });
+        }
+    },
+
+     getTotalProducts : async (req, res) => {
+        try {
+            const totalProducts = await Product.countDocuments();
+
+            res.status(200).json({
+                success: true,
+                totalProducts
+            });
+
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                message: 'Failed to get total products',
+                error: error.message
+            });
         }
     }
 

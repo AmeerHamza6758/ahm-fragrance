@@ -1,46 +1,36 @@
 import React from 'react';
 import { LuImagePlus } from "react-icons/lu";
 import { MdOutlineFileUpload } from "react-icons/md";
-import '/src/styles/admin.css';
+import "../../styles/admin.css";
 
 function AddProducts() {
 
   const handleSubmit = (e) => {
     e.preventDefault(); 
-    
     // FormData object 
     const formData = new FormData(e.target);
-
-    
     const data = Object.fromEntries(formData.entries());
-    
     // 2. Images 
     const primaryImg = formData.get('primaryImage');
-    
     console.log("Form Data Object:", data);
     console.log("Primary Image File:", primaryImg);
-    
-   
     alert("Product data captured! Check console.");
   };
 
   return (
-    <section className="add-product-container">
+    <section className="">
        <div className="title-section">
             <h1 className="catalog-title">Add New Fragrance</h1>
-            <p className="catalogs-subtitle">Compose a new entry for the botanical collection</p>
+            <p className="catalog-subtitle">Compose a new entry for the botanical collection</p>
           </div>
-     
 
       <form className="product-form-layout" onSubmit={handleSubmit}>
-        {/* Left Column */}
         <div className="left-column">
           <div className="image-uploads-container">
             <div className="main-image-upload">
-              <label htmlFor="primary-image" className="image-placeholder main-placeholder">
+              <label htmlFor="primary-image" className="image-placeholder">
                 <LuImagePlus size={30} color="#7E525C"/>
                 <span className="placeholder-text">Primary Vision</span>
-                {/* Name Added: primaryImage */}
                 <input type="file" name="primaryImage" className="hidden-input" id="primary-image" accept="image/*" />
               </label>
             </div>
@@ -50,7 +40,6 @@ function AddProducts() {
                 <div key={num} className="secondary-image-upload">
                   <label htmlFor={`secondary-image-${num}`} className="image-placeholder secondary-placeholder">
                     <LuImagePlus size={30} color="#7E525C" />
-                    {/* Name Added: secondaryImage_1, secondaryImage_2 */}
                     <input type="file" name={`secondaryImage_${num}`} className="hidden-input" id={`secondary-image-${num}`} accept="image/* " />
                   </label>
                 </div>
@@ -114,7 +103,7 @@ function AddProducts() {
               </div>
 
               <div className="form-group">
-                <label>Investment (PKR)</label>
+                <label>Price (PKR)</label>
                 <div className="input-with-unit">
                     {/* Name Added: price */}
                     <input name="price" type="number" placeholder="8900" className="styled-input" />
@@ -132,11 +121,6 @@ function AddProducts() {
           </div>
         </div>
       </form>
-
-      <footer className="admin-footer-text">
-        <div className="footer-links">Content Guidelines | Pricing Policy | Stock Alerts</div>
-        <div className="footer-copy">© 2024 AHM Fragrances Suite</div>
-      </footer>
     </section>
   );
 }

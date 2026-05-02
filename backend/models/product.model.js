@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
- const productSchema = new mongoose.Schema({
+const productSchema = new mongoose.Schema({
   name: {
     type: String,
     required: [true, 'Name is required'],
@@ -42,39 +42,35 @@ const mongoose = require('mongoose');
     }
   ],
 
-  brand_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Brand',
-    required: true
-  },
+
   category_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Category',
     required: true
   },
 
-  isActive: { 
-    type: Boolean, 
-    default: true 
-  },  
+  isActive: {
+    type: Boolean,
+    default: true
+  },
 
-  image_id: {
+  image_id: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Image',
-  },
+  }],
 
   tag_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Tag',
     required: true
   },
-    rating: { 
-    type: Number, 
-    default: 0 
+  rating: {
+    type: Number,
+    default: 0
   },
 }, { timestamps: true });
 
-productSchema.virtual('currentPrice').get(function() {
+productSchema.virtual('currentPrice').get(function () {
   return this.price - (this.price * this.discountPercentage / 100);
 });
 

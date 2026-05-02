@@ -2,6 +2,9 @@ import http from "./http";
 
 export const dashboardApi = {
   getProducts: () => http.get("/api/product/getProducts"),
+  getTotalProducts: () => http.get("/api/product/totalProducts"),
+  getPendingOrders: () => http.get("/api/order/pendingOrders"),
+  getLowStockCount: () => http.get("/api/stock/lowStockCount"),
   getOrdersSummary: () => http.get("/api/order/checkout"),
   getFaqCount: () => http.get("/api/faq/getAllFaq"),
 };
@@ -41,6 +44,6 @@ export const stockApi = {
 export const faqApi = {
   list: () => http.get("/api/faq/getAllFaq"),
   create: (payload) => http.post("/api/faq/addFaq", payload),
-  update: (payload) => http.put("/api/faq/updateFaq", payload),
+  update: (id, payload) => http.put(`/api/faq/updateFaq?id=${id}`, payload),
   remove: (id) => http.delete(`/api/faq/deleteFaq/${id}`),
 };

@@ -24,7 +24,7 @@ app.use("/api/auth", require("./router/auth.router"));
 app.use("/api/category", require("./router/category.router"));
 app.use("/api/tag", require("./router/tag.router"));
 app.use("/api/product", require("./router/product.router"));
-app.use("/api/brand", require("./router/brand.router"));
+// app.use("/api/brand", require("./router/brand.router"));
 app.use("/api/order", require("./router/order.router"));
 app.use('/api/cart', require("./router/cart.router"));
 app.use('/api/stock', require("./router/stock.router"));
