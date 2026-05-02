@@ -9,7 +9,7 @@ function AdminLayout() {
       <Sidebar />
       <div className="admin-content-wrapper">
         <Topbar />
-        <main className="admin-main">
+        <main className="admin-main bg-[#f8f5f2]!">
           <Outlet />
         </main>
       </div>
