@@ -11,7 +11,7 @@ const manageStock = async (req, res) => {
       reason = 'manual_update'
     } = req.body;
     
-    const userId = req.user._id;
+    const userId = req.user.userId;
 
     // Validation
     if (!productId) {

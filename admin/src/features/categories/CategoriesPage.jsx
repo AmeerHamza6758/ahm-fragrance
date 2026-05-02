@@ -1,211 +1,138 @@
-import PageSection from "../../components/PageSection";
-
-import { useState, useEffect } from "react";
-import "./CategoriesPage.css";
+import React, { useState } from "react";
+import "../../styles/admin.css";
 import { NavLink } from "react-router-dom";
 import { IoMdAdd } from "react-icons/io";
 import { FiEdit } from "react-icons/fi";
-import { GrView } from "react-icons/gr";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import Pagination from "../../components/Pagination";
-
-
-const categories = [
-  {
-    id: 1,
-    name: "Oud Collection",
-    image: "/images/categories/oud.jpg",
-    productsCount: 24,
-    createdAt: "Oct 24, 2023",
-    status: "active",
-    description: "Premium oud-based fragrances",
-  },
-  {
-    id: 2,
-    name: "Floral Bliss",
-    image: "/images/categories/floral.jpg",
-    productsCount: 18,
-    createdAt: "Oct 18, 2023",
-    status: "active",
-    description: "Beautiful floral notes",
-  },
-  {
-    id: 3,
-    name: "Oriental Spice",
-    image: "/images/categories/oriental.jpg",
-    productsCount: 12,
-    createdAt: "Nov 02, 2023",
-    status: "inactive",
-    description: "Warm and exotic spices",
-  },
-  {
-    id: 4,
-    name: "Citrus Fresh",
-    image: "/images/categories/citrus.jpg",
-    productsCount: 15,
-    createdAt: "Oct 30, 2023",
-    status: "active",
-    description: "Energizing citrus notes",
-  },
-  {
-    id: 5,
-    name: "Woody Essence",
-    image: "/images/categories/woody.jpg",
-    productsCount: 20,
-    createdAt: "Nov 12, 2023",
-    status: "active",
-    description: "Rich woody aromas",
-  },
-  {
-    id: 6,
-    name: "Leather & Tobacco",
-    image: "/images/categories/leather.jpg",
-    productsCount: 8,
-    createdAt: "Oct 20, 2023",
-    status: "inactive",
-    description: "Bold leather tobacco blends",
-  },
-  {
-    id: 7,
-    name: "Fresh Aquatic",
-    image: "/images/categories/aquatic.jpg",
-    productsCount: 14,
-    createdAt: "Nov 05, 2023",
-    status: "active",
-    description: "Clean ocean-inspired scents",
-  },
-  {
-    id: 8,
-    name: "Gourmand Delights",
-    image: "/images/categories/gourmand.jpg",
-    productsCount: 10,
-    createdAt: "Oct 29, 2023",
-    status: "active",
-    description: "Sweet edible-inspired fragrances",
-  },
-];
+import Loader from "../../components/Loader";
+import { useGetCategories, useDeleteCategory } from "../../services/hooks/categories";
+import { confirmationPopup } from "../../utils/alert-service";
 
 function CategoriesPage() {
-  const [openMenu, setOpenMenu] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const entriesPerPage = 6;
-  const totalEntries = 48;
+  const entriesPerPage = 10;
+  
+  const { data: categoriesRes, isLoading, isError } = useGetCategories();
+  const deleteMutation = useDeleteCategory();
+
+  const allCategories = categoriesRes?.data || [];
+  const totalEntries = allCategories.length;
   const totalPages = Math.ceil(totalEntries / entriesPerPage);
+  
+  const currentCategories = allCategories.slice(
+    (currentPage - 1) * entriesPerPage,
+    currentPage * entriesPerPage
+  );
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
-    console.log("Page changed to:", page);
   };
 
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (!e.target.closest(".actions")) {
-        setOpenMenu(null);
-      }
-    };
-
-    document.addEventListener("click", handleClickOutside);
-    return () => document.removeEventListener("click", handleClickOutside);
-  }, []);
-
-  const handleEdit = (id) => {
-    console.log("Edit category:", id);
+  const handleDelete = async (id) => {
+    const result = await confirmationPopup("Are you sure you want to delete this smell category?");
+    if (result.isConfirmed) {
+      deleteMutation.mutate(id);
+    }
   };
 
-  const handleDelete = (id) => {
-    console.log("Delete category:", id);
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+    const date = new Date(dateString);
+    return isNaN(date.getTime()) ? "N/A" : date.toLocaleDateString();
   };
 
   return (
-    <div>
+    <div className="categories-page-container">
       {/* Header */}
-      <div className="category-header">
+      <div className="catalog-header">
         <div>
-          <h1 className="category-title">Product Categories</h1>
-          <p className="category-subtitle">
-            Manage your fragrance categories and collections.
+          <h1 className="catalog-title">Fragrance Families</h1>
+          <p className="catalog-subtitle">
+            Manage olfactory categories and the unique smell profiles of your collection.
           </p>
         </div>
         <NavLink to="/categories/add" className="add-btn">
-          <IoMdAdd /> Add New Category
+          <IoMdAdd size={18} /> Add New Profile
         </NavLink>
       </div>
 
       {/* Table */}
-      <div className="category-table">
-        <div className="category-table-header">
-          <span>Category</span>
-          <span>Status</span>
-          <span>Created Date</span>
+      <div className="catalog-table">
+        <div className="catalog-table-header category-grid-layout">
+          <span>Smell Category</span>
+          <span>Description</span>
           <span>Products</span>
+          <span>Created At</span>
           <span>Actions</span>
         </div>
 
-        {categories.map((item) => (
-          <div className="category-row" key={item.id}>
-            <div className="category-name">
-              <span>{item.name}</span>
-            </div>
-            {/* Status */}
-            <div className="category-status-cell">
-              <span
-                className={`category-status-badge ${
-                  item.status === "active" ? "status-active" : "status-inactive"
-                }`}
-              >
-                {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
-              </span>
-            </div>
-
-            {/* Created Date */}
-            <span>{item.createdAt}</span>
-
-            {/* Products Count */}
-            <span style={{ fontWeight: "600", color: "#7b4b4b" }}>
-              {item.productsCount} products
-            </span>
-
-
-            {/* Actions */}
-            <div
-              className="category-actions"
-              onClick={(e) => {
-                e.stopPropagation();
-                setOpenMenu(openMenu === item.id ? null : item.id);
-              }}
-            >
-              <GrView
-                className="action-icon view-icon"
-                size={18}
-                style={{ color: "#10b981", cursor: "pointer" }}
-              />
-              <FiEdit
-                className="action-icon edit-icon"
-                size={18}
-                onClick={() => handleEdit(item.id)}
-                style={{ color: "#3b82f6", cursor: "pointer" }}
-              />
-              <RiDeleteBin6Line
-                className="action-icon delete-icon"
-                size={18}
-                onClick={() => handleDelete(item.id)}
-                style={{ color: "#ef4444", cursor: "pointer" }}
-              />
-            </div>
+        {isLoading ? (
+          <Loader text="Inhaling category data..." />
+        ) : isError ? (
+          <div className="error-state">
+             <p>Failed to retrieve the fragrance profiles.</p>
           </div>
-        ))}
+        ) : allCategories.length === 0 ? (
+          <div className="empty-state">No fragrance families defined.</div>
+        ) : (
+          currentCategories.map((item) => (
+            <div className="catalog-row category-grid-layout" key={item._id}>
+              {/* Category Name */}
+              <div className="product-cell">
+                <span className="user-name">{item.name}</span>
+              </div>
 
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={handlePageChange}
-          totalEntries={totalEntries}
-          startEntry={(currentPage - 1) * entriesPerPage + 1}
-          endEntry={Math.min(currentPage * entriesPerPage, totalEntries)}
-        />
+              {/* Description */}
+              <div className="description-cell">
+                <p className="description-text-small">
+                  {item.description || "No specific olfactory story provided."}
+                </p>
+              </div>
+
+              {/* Products Count */}
+              <div className="count-cell">
+                <span className="status-badge status-active">
+                  {item.productCount || 0} Essence{item.productCount !== 1 ? 's' : ''}
+                </span>
+              </div>
+
+              {/* Created Date */}
+              <span>{formatDate(item.createdAt)}</span>
+
+              {/* Actions */}
+              <div className="actions">
+                <NavLink to={`/categories/edit/${item._id}`}>
+                  <FiEdit
+                    className="action-icon edit-icon"
+                    size={18}
+                    style={{ color: "#7E525C", cursor: "pointer" }}
+                  />
+                </NavLink>
+                <RiDeleteBin6Line
+                  className="action-icon delete-icon"
+                  size={18}
+                  onClick={() => handleDelete(item._id)}
+                  style={{ color: "#ef4444", cursor: "pointer" }}
+                />
+              </div>
+            </div>
+          ))
+        )}
+
+        {totalEntries > 0 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+            totalEntries={totalEntries}
+            startEntry={(currentPage - 1) * entriesPerPage + 1}
+            endEntry={Math.min(currentPage * entriesPerPage, totalEntries)}
+          />
+        )}
       </div>
     </div>
   );
 }
 
-// export default CategoriesPage;
+export default CategoriesPage;

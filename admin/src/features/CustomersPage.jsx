@@ -1,13 +1,126 @@
-// import PageSection from "../components/PageSection";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import "../styles/admin.css";
+import { GrView } from "react-icons/gr";
+import { RiDeleteBin6Line } from "react-icons/ri";
+import Pagination from "../components/Pagination";
+import Loader from "../components/Loader";
+import { useGetUsers } from "../services/hooks/users";
 
-// function CustomersPage() {
-//   return (
-//     <PageSection
-//       title="Customers"
-//       description="Auth routes currently support sign-in/sign-up/OTP flow. Add a user-list endpoint in backend to fully power this page."
-//       endpoint="POST /api/auth/signUp | POST /api/auth/signIn | POST /api/auth/otp | POST /api/auth/reset-password"
-//     />
-//   );
-// }
+function CustomersPage() {
+  const navigate = useNavigate();
+  const [currentPage, setCurrentPage] = useState(1);
+  const entriesPerPage = 10;
+  
+  const { data: usersRes, isLoading, isError } = useGetUsers(currentPage, entriesPerPage);
 
-// export default CustomersPage;
+  const users = usersRes?.data?.data || [];
+  const totalEntries = usersRes?.data?.pagination?.totalItems || 0;
+  const totalPages = usersRes?.data?.pagination?.totalPages || 1;
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+    const date = new Date(dateString);
+    return isNaN(date.getTime()) ? "N/A" : date.toLocaleDateString();
+  };
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  const handleView = (id) => {
+    navigate(`/customers/view/${id}`);
+  };
+
+  return (
+    <div className="customers-page-container">
+      {/* Header */}
+      <div className="catalog-header">
+        <div>
+          <h1 className="catalog-title">Customer Directory</h1>
+          <p className="catalog-subtitle">
+            Manage your registered botanical enthusiasts and their preferences.
+          </p>
+        </div>
+      </div>
+
+      {/* Table */}
+      <div className="catalog-table">
+        <div className="catalog-table-header customer-grid-simple">
+          <span>Identity</span>
+          <span>Contact Details</span>
+          <span>Gender</span>
+          <span>Member Since</span>
+          <span>Verification</span>
+          <span>Actions</span>
+        </div>
+
+        {isLoading ? (
+          <Loader text="Gathering customer data..." />
+        ) : isError ? (
+          <div className="error-state">
+             <p>Failed to retrieve the customer list.</p>
+          </div>
+        ) : users.length === 0 ? (
+          <div className="empty-state">No customers found.</div>
+        ) : (
+          users.map((user) => (
+            <div className="catalog-row customer-grid-simple" key={user._id}>
+              {/* Customer Name */}
+              <div className="product-cell">
+                <span className="user-name">{user.userName}</span>
+              </div>
+
+              {/* Contact */}
+              <div className="contact-cell">
+                <span className="user-email">{user.email}</span>
+                <span className="user-phone">{user.phone || "No contact"}</span>
+              </div>
+
+              {/* Gender */}
+              <span className="capitalize">{user.gender || "N/A"}</span>
+
+              {/* Join Date */}
+              <span>{formatDate(user.createdAt)}</span>
+
+              {/* Status */}
+              <div className="status-cell">
+                <span className={`status-badge ${user.isEmailVerified ? "status-active" : "status-inactive"}`}>
+                  {user.isEmailVerified ? "Verified" : "Pending"}
+                </span>
+              </div>
+
+              {/* Actions */}
+              <div className="actions">
+                <GrView
+                  className="action-icon view-icon"
+                  size={18}
+                  style={{ color: "#10b981", cursor: "pointer" }}
+                  onClick={() => handleView(user._id)}
+                />
+                <RiDeleteBin6Line
+                  className="action-icon delete-icon"
+                  size={18}
+                  style={{ color: "#ef4444", cursor: "pointer" }}
+                />
+              </div>
+            </div>
+          ))
+        )}
+
+        {totalEntries > 0 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+            totalEntries={totalEntries}
+            startEntry={(currentPage - 1) * entriesPerPage + 1}
+            endEntry={Math.min(currentPage * entriesPerPage, totalEntries)}
+          />
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default CustomersPage;

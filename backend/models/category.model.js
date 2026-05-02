@@ -3,8 +3,7 @@ const mongoose = require('mongoose');
 const categorySchema = new mongoose.Schema({
     name: {
         type: String,
-        required: true,
-        enum: ['men', 'women', 'unisex']
+        required: true
     },
     description:{
         type : String,

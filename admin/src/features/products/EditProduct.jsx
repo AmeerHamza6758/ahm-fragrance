@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { LuImagePlus } from "react-icons/lu";
 import { MdOutlineFileUpload } from "react-icons/md";
+import { IoArrowBack } from "react-icons/io5";
 import "../../styles/admin.css";
 import { categoryApi, tagApi, imageApi } from "../../services/endpoints";
-import { useAddProduct } from "../../services/hooks/products";
-import { IoArrowBack } from 'react-icons/io5';
+import { useGetProductById, useUpdateProduct } from "../../services/hooks/products";
+import Loader from "../../components/Loader";
 
-function AddProducts() {
+function EditProduct() {
+  const { id } = useParams();
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
   const [tags, setTags] = useState([]);
@@ -23,16 +25,49 @@ function AddProducts() {
 
   // Image states
   const [images, setImages] = useState([
-    { file: null, preview: null }, // Primary
-    { file: null, preview: null }, // Secondary 1
-    { file: null, preview: null }, // Secondary 2
+    { file: null, preview: null, existingId: null }, // Primary
+    { file: null, preview: null, existingId: null }, // Secondary 1
+    { file: null, preview: null, existingId: null }, // Secondary 2
   ]);
 
   const primaryRef = useRef(null);
   const secondary1Ref = useRef(null);
   const secondary2Ref = useRef(null);
 
-  // Fetch categories and tags on mount
+  const { data: productRes, isLoading: isFetching } = useGetProductById(id);
+  const updateMutation = useUpdateProduct();
+  const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
+
+  // Initialize form with existing data
+  useEffect(() => {
+    if (productRes?.data) {
+      const p = productRes.data;
+      setProductName(p.name || "");
+      setDescription(p.description || "");
+      setCategoryId(p.category_id?._id || p.category_id || "");
+      setTagId(p.tag_id?._id || p.tag_id || "");
+      setPrice(p.price || "");
+      setDiscountPercentage(p.discountPercentage || "0");
+      
+      if (p.variants?.[0]?.size) {
+        setVolume(p.variants[0].size.replace("ml", ""));
+      }
+
+      // Set existing images
+      const newImages = [...images];
+      if (p.image_id?.[0]) {
+        newImages[0] = { file: null, preview: `${BASE_URL}/${p.image_id[0].path}`, existingId: p.image_id[0]._id };
+      }
+      if (p.image_id?.[1]) {
+        newImages[1] = { file: null, preview: `${BASE_URL}/${p.image_id[1].path}`, existingId: p.image_id[1]._id };
+      }
+      if (p.image_id?.[2]) {
+        newImages[2] = { file: null, preview: `${BASE_URL}/${p.image_id[2].path}`, existingId: p.image_id[2]._id };
+      }
+      setImages(newImages);
+    }
+  }, [productRes, BASE_URL]);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -43,21 +78,20 @@ function AddProducts() {
         setCategories(Array.isArray(catRes.data) ? catRes.data : catRes.data.data || []);
         setTags(Array.isArray(tagRes.data) ? tagRes.data : tagRes.data.data || []);
       } catch (err) {
-        console.error("Failed to fetch dependencies:", err);
+        console.error("Failed to fetch categories/tags:", err);
       }
     };
     fetchData();
   }, []);
 
-  const addProductMutation = useAddProduct();
-
   const handleImageChange = (e, index) => {
     const file = e.target.files[0];
     if (file) {
       const newImages = [...images];
-      newImages[index] = {
-        file: file,
-        preview: URL.createObjectURL(file)
+      newImages[index] = { 
+        ...newImages[index], 
+        file: file, 
+        preview: URL.createObjectURL(file) 
       };
       setImages(newImages);
     }
@@ -68,17 +102,18 @@ function AddProducts() {
     if (!productName.trim() || !price) return;
 
     try {
-      // 1. Upload images first
+      // 1. Upload new images first
       const imageIds = await Promise.all(
         images.map(async (img) => {
           if (img.file) {
             const res = await imageApi.upload(img.file);
-            return res.data?.data?._id;
+            return res.data?.data?._id; // New ID
           }
-          return null;
+          return img.existingId; // Keep existing ID
         })
       );
 
+      // Filter out nulls
       const finalImageIds = imageIds.filter(id => id);
 
       // 2. Prepare payload
@@ -102,28 +137,31 @@ function AddProducts() {
         ];
       }
 
-      // 3. Add product
-      addProductMutation.mutate(payload, {
+      // 3. Update product
+      updateMutation.mutate({ id, data: payload }, {
         onSuccess: () => {
           navigate("/products");
         }
       });
     } catch (err) {
-      console.error("Failed to add product:", err);
+      console.error("Failed to update product:", err);
     }
   };
 
+  if (isFetching) {
+    return <Loader text="Retrieving botanical data..." />;
+  }
+
   return (
-    <section className="">
-      <div className="title-section">
-        <div className="header-main">
-          <div className="back-arrow-btn" onClick={() => navigate('/products')}>
-            <IoArrowBack size={24} />
-          </div>
-          <h1 className="catalog-title">Add New Fragrance</h1>
+    <section className="view-product-container">
+       <div className="admin-view-header">
+            <div className="header-main">
+               <div className="back-arrow-btn" onClick={() => navigate('/products')}>
+                  <IoArrowBack size={24} />
+               </div>
+               <h1 className="catalog-title">Edit Fragrance</h1>
+            </div>
         </div>
-        <p className="catalog-subtitle">Compose a new entry for the botanical collection</p>
-      </div>
 
       <form className="product-form-layout" onSubmit={handleSubmit}>
         <div className="left-column">
@@ -134,7 +172,7 @@ function AddProducts() {
                   <img src={images[0].preview} alt="Primary" className="image-preview" />
                 ) : (
                   <>
-                    <LuImagePlus size={30} color="#7E525C" />
+                    <LuImagePlus size={30} color="#7E525C"/>
                     <span className="placeholder-text">Primary Vision</span>
                   </>
                 )}
@@ -147,7 +185,7 @@ function AddProducts() {
                 />
               </div>
             </div>
-
+            
             <div className="secondary-images-row">
               <div className="secondary-image-upload">
                 <div className="image-placeholder secondary-placeholder" onClick={() => secondary1Ref.current.click()}>
@@ -184,11 +222,11 @@ function AddProducts() {
               </div>
             </div>
           </div>
-
+          
           <div className="aesthetic-tip-box">
-            <h4 className="tip-title"> Aesthetic Tip</h4>
+            <h4 className="tip-title">Refining the Essence</h4>
             <p className="tip-content">
-              High-contrast images with soft botanical elements perform best. Use natural daylight for product photography.
+              Updating a fragrance's visual identity ensures your collection remains contemporary and alluring.
             </p>
           </div>
         </div>
@@ -256,29 +294,29 @@ function AddProducts() {
               <div className="form-group">
                 <label>Volume (ML)</label>
                 <div className="input-with-unit">
-                  <input
-                    type="number"
-                    placeholder="100"
-                    className="styled-input"
-                    value={volume}
-                    onChange={(e) => setVolume(e.target.value)}
-                  />
-                  <span className="unit-tag">ML</span>
+                    <input
+                      type="number"
+                      placeholder="100"
+                      className="styled-input"
+                      value={volume}
+                      onChange={(e) => setVolume(e.target.value)}
+                    />
+                    <span className="unit-tag">ML</span>
                 </div>
               </div>
 
               <div className="form-group">
                 <label>Price (PKR)</label>
                 <div className="input-with-unit">
-                  <input
-                    type="number"
-                    placeholder="8900"
-                    className="styled-input"
-                    required
-                    value={price}
-                    onChange={(e) => setPrice(e.target.value)}
-                  />
-                  <span className="unit-tag">PKR</span>
+                    <input
+                      type="number"
+                      placeholder="8900"
+                      className="styled-input"
+                      required
+                      value={price}
+                      onChange={(e) => setPrice(e.target.value)}
+                    />
+                    <span className="unit-tag">PKR</span>
                 </div>
               </div>
             </div>
@@ -287,28 +325,28 @@ function AddProducts() {
               <div className="form-group">
                 <label>Discount (%)</label>
                 <div className="input-with-unit">
-                  <input
-                    type="number"
-                    placeholder="0"
-                    className="styled-input"
-                    min="0"
-                    max="100"
-                    value={discountPercentage}
-                    onChange={(e) => setDiscountPercentage(e.target.value)}
-                  />
-                  <span className="unit-tag">%</span>
+                    <input
+                      type="number"
+                      placeholder="0"
+                      className="styled-input"
+                      min="0"
+                      max="100"
+                      value={discountPercentage}
+                      onChange={(e) => setDiscountPercentage(e.target.value)}
+                    />
+                    <span className="unit-tag">%</span>
                 </div>
               </div>
             </div>
 
             <div className="form-actions-section ">
-              <button
-                type="submit"
-                className="publish-btn"
-                disabled={addProductMutation.isPending}
+              <button 
+                type="submit" 
+                className="publish-btn" 
+                disabled={updateMutation.isPending}
               >
-                <MdOutlineFileUpload size={20} color="#FFFFFF" />
-                {addProductMutation.isPending ? "Publishing..." : "Publish Product"}
+                <MdOutlineFileUpload size={20} color="#FFFFFF"/>
+                {updateMutation.isPending ? "Refining Essence..." : "Save Changes"}
               </button>
             </div>
           </div>
@@ -318,4 +356,4 @@ function AddProducts() {
   );
 }
 
-export default AddProducts;
+export default EditProduct;

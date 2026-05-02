@@ -478,9 +478,77 @@ const getPendingOrdersCount = async (req, res) => {
 
 
 
+const getAllOrders = async (req, res) => {
+  try {
+    const { page = 1, limit = 10, status } = req.query;
+    const query = status ? { orderStatus: status } : {};
+    
+    const orders = await Order.find(query)
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(parseInt(limit));
+    
+    const totalOrders = await Order.countDocuments(query);
+    
+    res.status(200).json({
+      success: true,
+      data: orders,
+      pagination: {
+        totalItems: totalOrders,
+        totalPages: Math.ceil(totalOrders / limit),
+        currentPage: parseInt(page),
+        itemsPerPage: parseInt(limit)
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to get orders', error: error.message });
+  }
+};
+
+const getOrderById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const order = await Order.findById(id).populate('customerId', 'userName email phone');
+    if (!order) {
+      return res.status(404).json({ success: false, message: 'Order not found' });
+    }
+    res.status(200).json({ success: true, data: order });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to get order details', error: error.message });
+  }
+};
+
+const updateOrderStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status, paymentStatus } = req.body;
+    
+    const order = await Order.findById(id);
+    if (!order) {
+      return res.status(404).json({ success: false, message: 'Order not found' });
+    }
+    
+    if (status) order.orderStatus = status;
+    if (paymentStatus) order.paymentStatus = paymentStatus;
+    
+    if (status === 'delivered') {
+      order.deliveredAt = new Date();
+      order.paymentStatus = 'paid'; // Usually delivered means paid for COD
+    }
+    
+    await order.save();
+    res.status(200).json({ success: true, message: 'Order status updated successfully', data: order });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to update order status', error: error.message });
+  }
+};
+
 module.exports = {
   getCheckoutSummary,
   createOrder,
   cancelOrder,
-  getPendingOrdersCount
+  getPendingOrdersCount,
+  getAllOrders,
+  getOrderById,
+  updateOrderStatus
 };

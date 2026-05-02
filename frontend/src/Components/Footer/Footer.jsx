@@ -33,7 +33,6 @@ export default function Footer() {
           <h4>Connect</h4>
           <a href="tel:03044524449">03044524449</a>
           <a href="mailto:ahmfragrance@gmail.com">ahmfragrance@gmail.com</a>
-          <Link href="/contact-us">Contact Us</Link>
           <a
             href="https://instagram.com"
             target="_blank"

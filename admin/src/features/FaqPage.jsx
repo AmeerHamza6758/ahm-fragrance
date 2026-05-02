@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
-import PageSection from "../components/PageSection";
-import "../styles/admin.css"
+import React, { useState, useEffect } from "react";
+import "../styles/admin.css";
 import { faqApi } from "../services/endpoints";
+import { successToaster, errorToaster, confirmationPopup } from "../utils/alert-service";
 
 function FaqPage() {
   const [faqData, setFaqData] = useState([]);
@@ -48,22 +48,15 @@ function FaqPage() {
       });
       if (res.data && res.data.data) {
         setFaqData((prev) => [...prev, res.data.data]);
+        successToaster("FAQ added successfully.");
       }
       closeModal();
     } catch (err) {
       console.error("Failed to add FAQ:", err);
-      alert("Failed to add FAQ. Please try again.");
+      errorToaster("Failed to add FAQ. Please try again.");
     } finally {
       setSubmitting(false);
     }
-  };
-
-  const handleEdit = (item) => {
-    setEditingFaq(item);
-    setNewQuestion(item.question);
-    setNewAnswer(item.answer);
-    setShowModal(true);
-    setMenuOpen(null);
   };
 
   const handleUpdateFaq = async () => {
@@ -78,14 +71,36 @@ function FaqPage() {
         setFaqData((prev) =>
           prev.map((faq) => faq._id === editingFaq._id ? res.data.data : faq)
         );
+        successToaster("FAQ updated successfully.");
       }
       closeModal();
     } catch (err) {
       console.error("Failed to update FAQ:", err);
-      alert("Failed to update FAQ. Please try again.");
+      errorToaster("Failed to update FAQ.");
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const handleDelete = async (id) => {
+    const result = await confirmationPopup("Delete this FAQ query permanently?");
+    if (result.isConfirmed) {
+      try {
+        await faqApi.delete(id);
+        setFaqData((prev) => prev.filter((faq) => faq._id !== id));
+        successToaster("FAQ removed.");
+      } catch (err) {
+        errorToaster("Failed to remove FAQ.");
+      }
+    }
+  };
+
+  const handleEdit = (item) => {
+    setEditingFaq(item);
+    setNewQuestion(item.question);
+    setNewAnswer(item.answer);
+    setShowModal(true);
+    setMenuOpen(null);
   };
 
   const closeModal = () => {
@@ -101,7 +116,7 @@ function FaqPage() {
         <div>
           <h1 className="faq-main-title">FAQ</h1>
           <p className="faq-sub-title">
-          Manage frequently asked questions and customer help content.
+            Manage frequently asked questions and customer help content.
           </p>
         </div>
         <button className="add-faq-btn" onClick={() => { setEditingFaq(null); setShowModal(true); }}>+ Add FAQ</button>
@@ -147,7 +162,6 @@ function FaqPage() {
         ))}
       </div>
 
-      {/* Add / Edit FAQ Modal */}
       {showModal && (
         <div className="faq-modal-overlay" onClick={closeModal}>
           <div className="faq-modal" onClick={(e) => e.stopPropagation()}>
@@ -191,4 +205,3 @@ function FaqPage() {
 }
 
 export default FaqPage;
-

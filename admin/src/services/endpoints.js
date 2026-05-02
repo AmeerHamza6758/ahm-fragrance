@@ -10,10 +10,13 @@ export const dashboardApi = {
 };
 
 export const productsApi = {
-  list: () => http.get("/api/product/getProducts"),
+  list: (params) => {
+    const query = params ? "?" + new URLSearchParams(params).toString() : "";
+    return http.get(`/api/product/getProducts${query}`);
+  },
   getById: (id) => http.get(`/api/product/getProductById?id=${id}`),
   create: (payload) => http.post("/api/product/addProduct", payload),
-update: (id, payload) => http.put(`/api/product/updateProduct?id=${id}`, payload),
+  update: (id, payload) => http.put(`/api/product/updateProduct?id=${id}`, payload),
   remove: (id) => http.delete(`/api/product/deleteProduct/${id}`),
 };
 
@@ -33,12 +36,21 @@ export const brandApi = {
 };
 
 export const orderApi = {
+  list: (params) => {
+    const query = params ? "?" + new URLSearchParams(params).toString() : "";
+    return http.get(`/api/order/all${query}`);
+  },
+  getById: (id) => http.get(`/api/order/${id}`),
   create: (payload) => http.post("/api/order/create", payload),
   cancel: (orderId) => http.put(`/api/order/${orderId}/cancel`),
+  updateStatus: (id, payload) => http.put(`/api/order/${id}/status`, payload),
 };
 
 export const stockApi = {
-  get: () => http.get("/api/stock/get"),
+  get: (params) => {
+    const query = params ? "?" + new URLSearchParams(params).toString() : "";
+    return http.get(`/api/stock/get${query}`);
+  },
   manage: (payload) => http.post("/api/stock/manage", payload),
 };
 
@@ -46,9 +58,39 @@ export const faqApi = {
   list: () => http.get("/api/faq/getAllFaq"),
   create: (payload) => http.post("/api/faq/addFaq", payload),
   update: (id, payload) => http.put(`/api/faq/updateFaq?id=${id}`, payload),
-  remove: (id) => http.delete(`/api/faq/deleteFaq/${id}`),
+  remove: (id) => http.delete(`/api/faq/deleteFaq?id=${id}`),
+};
+
+export const cmsApi = {
+  get: (key) => http.get(`/api/cms/${key}`),
+  update: (payload) => http.post('/api/cms/update', payload),
+  listKeys: () => http.get('/api/cms/all/keys'),
 };
 
 export const tagApi = {
   list: () => http.get("/api/tag/getTags"),
+};
+
+export const imageApi = {
+  upload: (file) => {
+    const formData = new FormData();
+    formData.append("image", file);
+    return http.post("/single", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  },
+};
+
+export const authApi = {
+  login: (payload) => http.post("/api/auth/signIn", payload),
+  updateProfile: (payload) => http.put("/api/auth/update-profile", payload),
+  updatePassword: (payload) => http.put("/api/auth/update-password", payload),
+};
+
+export const userApi = {
+  list: (params) => {
+    const query = params ? "?" + new URLSearchParams(params).toString() : "";
+    return http.get(`/api/auth/getAllUsers${query}`);
+  },
+  getById: (id) => http.get(`/api/auth/getUserById?id=${id}`),
 };

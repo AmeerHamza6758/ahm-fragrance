@@ -5,7 +5,10 @@ const {
   getCheckoutSummary,
   createOrder,
   cancelOrder,
-  getPendingOrdersCount
+  getPendingOrdersCount,
+  getAllOrders,
+  getOrderById,
+  updateOrderStatus
 } = require('../controller/order.controller');
 
 // router.use(authMiddleware);
@@ -13,10 +16,13 @@ const {
 
 router.get('/checkout', authMiddleware,getCheckoutSummary);
 router.get('/pendingOrders', getPendingOrdersCount);
+router.get('/all', getAllOrders);
+router.get('/:id', getOrderById);
 
 router.post('/create', authMiddleware,createOrder);
 
 
 router.put('/:id/cancel', authMiddleware,cancelOrder);
+router.put('/:id/status', updateOrderStatus);
 
 module.exports = router;

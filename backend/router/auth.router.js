@@ -10,5 +10,9 @@ router.post("/signIn" , authController.signIn);
 router.get("/test" , authMiddleware, authController.test);
 router.post("/otp", otpHandler);
 router.post("/reset-password", resetPassword);
+router.get("/getAllUsers", authController.getAllUsers);
+router.get("/getUserById", authController.getUserById);
+router.put("/update-profile", authMiddleware, authController.updateProfile);
+router.put("/update-password", authMiddleware, authController.updatePassword);
 
 module.exports = router;

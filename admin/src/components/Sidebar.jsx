@@ -7,9 +7,11 @@ import {
   MdOutlineShoppingCart,
   MdOutlineSettings,
   MdOutlineBarChart,
-  MdOutlineQuestionAnswer
+  MdOutlineQuestionAnswer,
+  MdOutlinePersonOutline
 } from "react-icons/md";
-import { FiUsers } from "react-icons/fi";
+import { FiUsers, FiLogOut } from "react-icons/fi";
+import { successToaster, confirmationPopup } from "../utils/alert-service";
 
 export const navItems = [
   { path: "/dashboard", label: "Dashboard" },
@@ -20,6 +22,7 @@ export const navItems = [
   { path: "/stock", label: "Stock" },
   { path: "/orders", label: "Orders" },
   { path: "/settings", label: "Settings" },
+  { path: "/profile", label: "Profile" },
   // { path: "/faq", label: "FAQ" },
   // { path: "/revenueanalytics", label: "Revenue Analytics" },
 ];
@@ -34,9 +37,20 @@ const iconByPath = {
   "/stock": <MdOutlineBarChart />,
   "/faq": <MdOutlineQuestionAnswer />,
   "/settings": <MdOutlineSettings />,
+  "/profile": <MdOutlinePersonOutline />,
 };
 
 function Sidebar() {
+  const handleLogout = async () => {
+    const result = await confirmationPopup("Are you sure you want to exit the vault?", "Logout", "Stay");
+    if (result.isConfirmed) {
+      localStorage.removeItem("ahm_admin_token");
+      localStorage.removeItem("ahm_admin_user");
+      successToaster("Logged out successfully.");
+      window.location.href = "/login";
+    }
+  };
+
   return (
     <aside className="admin-sidebar">
       {/* <div className="brand-block">
@@ -60,6 +74,13 @@ function Sidebar() {
           </NavLink>
         ))}
       </nav>
+
+      <div className="sidebar-footer">
+        <button className="logout-nav-item" onClick={handleLogout}>
+          <span className="nav-icon"><FiLogOut /></span>
+          <strong>Sign Out</strong>
+        </button>
+      </div>
     </aside>
   );
 }

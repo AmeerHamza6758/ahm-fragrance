@@ -96,7 +96,7 @@ const faqController = {
                 return res.status(404).json({ message: 'FAQ not found' });
             }
 
-            await faq.remove();
+            await Faq.findByIdAndDelete(id);
             res.json({ status: 1, message: 'FAQ deleted successfully' });
 
         } catch (err) {

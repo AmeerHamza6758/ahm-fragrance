@@ -1,180 +1,159 @@
-import { useState } from "react";
-import PageSection from "../../components/PageSection";
-import "../../styles/admin.css"
+import React, { useState } from "react";
+import "../../styles/admin.css";
+import { useNavigate } from "react-router-dom";
+import { GrView } from "react-icons/gr";
 import Pagination from "../../components/Pagination";
+import Loader from "../../components/Loader";
+import { useGetOrders } from "../../services/hooks/order";
 
 function OrdersPage() {
+  const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
-        const entriesPerPage = 6;
-        const totalEntries = 48; // Mock total entries
-        const totalPages = Math.ceil(totalEntries / entriesPerPage);
+  const [statusFilter, setStatusFilter] = useState("");
+  const entriesPerPage = 10;
   
-        const handlePageChange = (page) => {
-      setCurrentPage(page);
-      console.log("Page changed to:", page);
-    };
+  const { data: ordersRes, isLoading, isError } = useGetOrders(currentPage, entriesPerPage, statusFilter);
+
+  const orders = ordersRes?.data?.data || [];
+  const totalEntries = ordersRes?.data?.pagination?.totalItems || 0;
+  const totalPages = ordersRes?.data?.pagination?.totalPages || 1;
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  const handleView = (id) => {
+    navigate(`/orders/view/${id}`);
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+    const date = new Date(dateString);
+    return isNaN(date.getTime()) ? "N/A" : date.toLocaleDateString();
+  };
+
+  const getStatusClass = (status) => {
+    switch (status?.toLowerCase()) {
+      case 'pending': return 'status-pending';
+      case 'confirmed': return 'status-confirmed';
+      case 'shipped': return 'status-shipped';
+      case 'delivered': return 'status-active';
+      case 'cancelled': return 'status-inactive';
+      default: return 'status-inactive';
+    }
+  };
+
   return (
-    <div className="orders">
+    <div className="orders-registry-wrapper">
       {/* Header */}
-      <div className="orders-header">
-        <h1 className="orders-title">Order Registry</h1>
-        <p className="orders-subtitle">
-          Managing the factory journey of our clients.
-        </p>
-      </div>
-
-      {/* Filters */}
-      <div className="orders-filters">
-        <input
-          type="text"
-          placeholder="Search orders, customers, or tracking IDs..."
-          className="orders-search"
-        />
-
-        <div className="filters-right">
-          <select className="filter-select">
-            <option>Status: All</option>
+      <div className="catalog-header">
+        <div>
+          <h1 className="catalog-title">Order Registry</h1>
+          <p className="catalog-subtitle">
+            Overseeing the olfactory journey from workshop to doorstep.
+          </p>
+        </div>
+        
+        {/* Subtle Inline Filter */}
+        <div className="inline-filters">
+          <select 
+            className="styled-select-small"
+            value={statusFilter}
+            onChange={(e) => {
+              setStatusFilter(e.target.value);
+              setCurrentPage(1);
+            }}
+          >
+            <option value="">All Journeys</option>
+            <option value="pending">Pending</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="shipped">Shipped</option>
+            <option value="delivered">Delivered</option>
+            <option value="cancelled">Cancelled</option>
           </select>
-
-          <select className="filter-select">
-            <option>Date: Last 30 Days</option>
-          </select>
-
-          <button className="filter-btn">⚙</button>
         </div>
       </div>
 
       {/* Table */}
-      <div className="orders-table">
-        <div className="orders-table-header">
-          <span>Order ID</span>
-          <span>Date</span>
+      <div className="catalog-table">
+        <div className="catalog-table-header order-grid-layout">
+          <span>Order Reference</span>
+          <span>Placed On</span>
           <span>Customer</span>
-          <span>Total (PKR)</span>
-          <span>Order Status</span>
-          <span>Payment</span>
-          <span>Actions</span>
+          <span>Grand Total</span>
+          <span className="text-center">Order Status</span>
+          <span className="text-center">Payment</span>
+          <span className="text-center">Actions</span>
         </div>
 
-        {/* Row 1 */}
-        <div className="orders-row">
-          <span>#AHM-9284</span>
-          <span>Oct 24, 2023</span>
-          <span>Evelyn Thorne</span>
-          <span>24,500</span>
-          <span className="status-shipped">Shipped</span>
-          <span className="payment-paid">Paid</span>
-          <span>•••</span>
-        </div>
-
-        {/* Row 2 */}
-        <div className="orders-row">
-          <span>#AHM-9285</span>
-          <span>Oct 24, 2023</span>
-          <span>Julian Vane</span>
-          <span>18,200</span>
-          <span className="status-pending">Pending</span>
-          <span className="payment-pending">Pending</span>
-          <span>•••</span>
-        </div>
-
-        {/* Expanded Detail */}
-        <div className="order-details">
-          {/* Left */}
-          <div className="order-composition">
-            <h3>Order Composition</h3>
-
-            <div className="composition-item">
-              <div style={{ marginTop: "10px", height: "70px" }}>
-                <h4>Oud Royale</h4>
-                <p>100ML Selection</p>
-              </div>
-              <span style={{ marginTop: "60px" }}>PKR 12,500</span>
-            </div>
-
-            <div className="composition-item">
-              <div style={{ paddingBottom: "10px", height: "70px" }}>
-                <h4 style={{}}>Velvet Peony</h4>
-                <p>50ML Selection</p>
-              </div>
-              <span style={{ marginTop: "60px" }}>PKR 5,700</span>
-            </div>
+        {isLoading ? (
+          <Loader text="Retrieving order history..." />
+        ) : isError ? (
+          <div className="error-state">
+             <p>Failed to retrieve the order registry.</p>
           </div>
+        ) : orders.length === 0 ? (
+          <div className="empty-state">No orders found matching your criteria.</div>
+        ) : (
+          orders.map((order) => (
+            <div className="catalog-row order-grid-layout" key={order._id}>
+              {/* Order ID */}
+              <div className="order-id-cell">
+                <span className="user-name">#{order.orderNumber}</span>
+              </div>
 
-          {/* Right */}
-          <div className="customer-info">
-            <h3 style={{ paddingTop: "20px" }}>Customer Information</h3>
+              {/* Date */}
+              <span>{formatDate(order.placedAt)}</span>
 
-            <p>
-              <strong>Full Name:</strong> Julian Vane
-            </p>
-            <p>
-              <strong>Phone:</strong> 0304-XXXXXXX
-            </p>
-            <p>
-              <strong>Email:</strong> j.vane@editorial.com
-            </p>
-            <p>
-              <strong>Address:</strong>Suite 402, Sterling heights, Phase 6,
-              DHA, Karachi, Pakistan
-            </p>
-            <p>
-              <strong>Postal Code:</strong> 75500
-            </p>
-            <p>
-              <strong>Delivery Charges:</strong> PKR 500
-            </p>
-          </div>
-        </div>
-        <div className="orders-row">
-          <span>#AHM-9286</span>
-          <span>Oct 23, 2023</span>
-          <span>Clara Beaumont</span>
-          <span>36,800</span>
-          <span className="status-confirmed">Confirmed</span>
-          <span className="payment-paid">Paid</span>
-          <span>•••</span>
-        </div>
-        <div className="orders-row">
-          <span>#AHM 9287</span>
-          <span>Oct 23, 2023</span>
-          <span>Marcus Chen</span>
-          <span>12,250</span>
-          <span className="status-deliver">Delivered</span>
-          <span className="payment">Paid</span>
-          <span>•••</span>
-        </div>
-        <div className="orders-row">
-          <span>#AHM-9288</span>
-          <span>Oct 22, 2023</span>
-          <span>Aria Sterling</span>
-          <span>9,500</span>
-          <span className="status-can">Cancelled</span>
-          <span className="payment-fail">Failed</span>
-          <span>•••</span>
-        </div>
-        <div className="orders-row">
-          <span>#AHM-9289</span>
-          <span>Oct 21, 2023</span>
-          <span>Zephyr Khan</span>
-          <span>15,000</span>
-          <span className="status-refund">Refunded</span>
-          <span className="payment-refund">Refunded</span>
-          <span>•••</span>
-        </div>
+              {/* Customer */}
+              <div className="customer-cell-order">
+                <span className="user-name">{order.customerInfo?.name || "Guest"}</span>
+                <span className="user-email">{order.customerInfo?.email}</span>
+              </div>
 
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={handlePageChange}
-          totalEntries={totalEntries}
-          startEntry={(currentPage - 1) * entriesPerPage + 1}
-          endEntry={Math.min(currentPage * entriesPerPage, totalEntries)}
-        />
+              {/* Total */}
+              <span className="order-total-price">PKR {order.totalAmount?.toLocaleString()}</span>
+
+              {/* Order Status */}
+              <div className="status-cell justify-center">
+                <span className={`status-badge ${getStatusClass(order.orderStatus)}`}>
+                  {order.orderStatus}
+                </span>
+              </div>
+
+              {/* Payment Status */}
+              <div className="status-cell justify-center">
+                <span className={`status-badge ${order.paymentStatus === 'paid' ? 'status-active' : 'status-pending'}`}>
+                  {order.paymentStatus}
+                </span>
+              </div>
+
+              {/* Actions */}
+              <div className="actions justify-center">
+                <GrView
+                  className="action-icon view-icon"
+                  size={18}
+                  style={{ color: "#7E525C", cursor: "pointer" }}
+                  onClick={() => handleView(order._id)}
+                />
+              </div>
+            </div>
+          ))
+        )}
+
+        {totalEntries > 0 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+            totalEntries={totalEntries}
+            startEntry={(currentPage - 1) * entriesPerPage + 1}
+            endEntry={Math.min(currentPage * entriesPerPage, totalEntries)}
+          />
+        )}
       </div>
-      
-      
     </div>
   );
 }
+
 export default OrdersPage;

@@ -13,7 +13,25 @@ createCategory : async (req, res) => {
 
 getCategories : async (req, res) => {
   try {
-    const categories = await Category.find();
+    const categories = await Category.aggregate([
+      {
+        $lookup: {
+          from: 'products',
+          localField: '_id',
+          foreignField: 'category_id',
+          as: 'products'
+        }
+      },
+      {
+        $project: {
+          name: 1,
+          description: 1,
+          createdAt: 1,
+          productCount: { $size: '$products' }
+        }
+      },
+      { $sort: { name: 1 } }
+    ]);
     res.json(categories);
   } catch (err) {
     res.status(500).json({ error: err.message });

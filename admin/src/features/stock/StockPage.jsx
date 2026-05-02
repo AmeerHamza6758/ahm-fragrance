@@ -1,206 +1,231 @@
-import { useState , useEffect} from "react";
-import PageSection from "../../components/PageSection";
-import "../../styles/admin.css"
+import React, { useState } from "react";
+import "../../styles/admin.css";
 import Pagination from "../../components/Pagination";
+import Loader from "../../components/Loader";
+import { useGetStock, useManageStock } from "../../services/hooks/stock";
+import { FiEdit } from "react-icons/fi";
+import { IoClose } from "react-icons/io5";
 
-const stockData = [
-  {
-    id: "AHM-FRG-001",
-    name: "Oud Royale",
-    size: "100ML",
-    current: 45,
-    previous: 52,
-    restock: "Oct 12, 2023",
-  },
-  {
-    id: "#AHM-FRG-008",
-    name: "Velvet Peony",
-    size: "50ML",
-    current: 8,
-    previous: 54,
-    restock: "Sep 28, 2023",
-  },
-  {
-    id: "#AHM-FRG-059",
-    name: "Midnight Oud",
-    size: "100ML",
-    current: 0,
-    previous: 12,
-    restock: "Aug 01, 2023",
-  },
-  {
-    id: "#AHM-FRG-031",
-    name: "Ambar Night",
-    size: "100ML",
-    current: 60,
-    previous: 55,
-    restock: "Act 24, 2023",
-  },
-  {
-    id: "#AHM-FRG-022",
-    name: "Citrus Bloom",
-    size: "50ML",
-    current: 2,
-    previous: 40,
-    restock: "Aug 19, 2023",
-  },
-  {
-    id: "#AHM-FRG-015",
-    name: "Signature Rose",
-    size: "100ML",
-    current: 12,
-    previous: 18,
-    restock: "Act 05, 2023",
-  },
-  {
-    id: "#AHM-FRG-044",
-    name: "Jasmine Silk",
-    size: "50ML",
-    current: 25,
-    previous: 28,
-    restock: "Act 18, 2023",
-  },
-  {
-    id: "#AHM-FRG-062",
-    name: "Sandalwood Aura",
-    size: "50ML",
-    current: 15,
-    previous: 20,
-    restock: "Nov 02, 2023",
-  },
-];
 function StockPage() {
-    const [openMenu, setOpenMenu] = useState(null);
-    const [stocks , setStocks] = useState(null);
-    const [loading , setLoading] = useState(true);
-    const [currentPage, setCurrentPage] = useState(1);
-      const entriesPerPage = 6;
-      const totalEntries = 48; // Mock total entries
-      const totalPages = Math.ceil(totalEntries / entriesPerPage);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [statusFilter, setStatusFilter] = useState("");
+  const [editingStock, setEditingStock] = useState(null); // {productId, name, currentQuantity}
+  const [updateAmount, setUpdateAmount] = useState("");
+  const [operation, setOperation] = useState("add");
+  const entriesPerPage = 10;
 
-      const handlePageChange = (page) => {
+  const { data: stockRes, isLoading, isError } = useGetStock(currentPage, entriesPerPage, statusFilter);
+  const manageStockMutation = useManageStock();
+
+  const stocks = stockRes?.data?.data || [];
+  const summary = stockRes?.data?.summary || { total: 0, lowStock: 0, outOfStock: 0 };
+  const totalEntries = stockRes?.data?.pagination?.totalItems || 0;
+  const totalPages = stockRes?.data?.pagination?.totalPages || 1;
+
+  const handlePageChange = (page) => {
     setCurrentPage(page);
-    console.log("Page changed to:", page);
   };
-    useEffect(() => {
-        const handleClickOutside = (e) => {
-          if (!e.target.closest(".actions")) {
-            setOpenMenu(null);
-          }
-        };
+
+  const handleUpdateStock = () => {
+    if (!updateAmount || isNaN(updateAmount)) return;
     
-        document.addEventListener("click", handleClickOutside);
-        // return () => document.removeEventListener("click", handleClickOutside);
-    
-      fetch("http://localhost:4000/api/stock/get", {
-        method:"GET",
-        headers: { 
-          "Content-Type": "application/json",
-          Authorization:`Bearer ${localStorage.getItem("token")}`, 
-         },
-      })
-      .then((res) => res.json())
-      .then((data) => {
-        setStocks(data.data || data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.log(err);
-        setLoading(false);
-      });
-      return () => {
-        document.removeEventListener("click", handleClickOutside);
-      };
-      }, []);
-         
-      if(loading) {
-        return<h2>Loading...</h2>
+    manageStockMutation.mutate({
+      productId: editingStock.productId,
+      quantity: parseInt(updateAmount),
+      operation: operation,
+      reason: "manual_admin_update"
+    }, {
+      onSuccess: () => {
+        setEditingStock(null);
+        setUpdateAmount("");
       }
+    });
+  };
 
-    //   const handleEdit = (id) => {
-    //     console.log("Edit:", id);
-    //   };
-    //   const handleDelete = (id) => {
-    // console.log("Delete:", id);
-    
+  const formatDate = (dateString) => {
+    if (!dateString) return "Never";
+    const date = new Date(dateString);
+    return isNaN(date.getTime()) ? "Never" : date.toLocaleDateString();
+  };
+
   return (
-    <div className="stock-registry">
-
+    <div className="stock-page-container">
       {/* Header */}
-      <div className="stock-header">
-        <h1 className="stock-title">Stock Registry</h1>
-        <p className="stock-subtitle">
-           Refine your artisanal fragrance inventory. Monitor real-time stock levels and update quantities with botanical precision. 
-        </p>
+      <div className="catalog-header">
+        <div>
+          <h1 className="catalog-title">Stock Registry</h1>
+          <p className="catalog-subtitle">
+            Maintain your artisanal fragrance inventory with botanical precision.
+          </p>
+        </div>
       </div>
 
-      {/* Summary cards */}
-      <div className="stock-summary">
+      {/* Summary Cards */}
+      <div className="stock-summary-grid">
         <div className="summary-card">
-          <p>Total Stock</p>
-          <h3>124 Items</h3>
+          <label>Total Essences</label>
+          <div className="summary-value">{summary.total}</div>
         </div>
+        <div className="summary-card warning">
+          <label>Low Stock Alerts</label>
+          <div className="summary-value">{summary.lowStock}</div>
+        </div>
+        <div className="summary-card critical">
+          <label>Depleted Stock</label>
+          <div className="summary-value">{summary.outOfStock}</div>
+        </div>
+      </div>
 
-        <div className="summary-card">
-          <p>Out Of Stock</p>
-          <h3 style={{color:"#BA1A1A"}}>03</h3>
-        </div>
+      {/* Filters */}
+      <div className="inline-filters-container">
+         <div className="filter-group">
+            <select 
+              className="styled-select-small"
+              value={statusFilter}
+              onChange={(e) => {
+                setStatusFilter(e.target.value);
+                setCurrentPage(1);
+              }}
+            >
+              <option value="">All Inventory</option>
+              <option value="inStock">Healthy Stock</option>
+              <option value="lowStock">Low Stock</option>
+              <option value="outOfStock">Depleted</option>
+            </select>
+         </div>
       </div>
 
       {/* Table */}
-      <div className="stock-table">
-
-        <div className="stock-table-header">
-          <span>Product ID</span>
-          <span>Product Name</span>
-          <span>Size</span>
-          <span>Current Stock</span>
+      <div className="catalog-table">
+        <div className="catalog-table-header stock-grid-layout">
+          <span>Product Details</span>
+          <span>Current Level</span>
           <span>Previous</span>
-          <span>Last Restock</span> 
-          <span>Actions</span>
+          <span>Last Restock</span>
+          <span className="text-center">Status</span>
+          <span className="text-center">Actions</span>
         </div>
 
-        {stockData.map((item, index) => (
-          <div className="stock-row" key={index}>
-            <span>{item.id}</span>
-            <span>{item.name}</span>
-            <span>{item.size}</span>
-            <span className={item.current <= 8 ? "low-stock" : ""}>
-              {item.current}
-            </span>
-            <span>{item.previous}</span>
-            <span>{item.restock}</span>
-
-            <div className="actions">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setOpenMenu(openMenu === item.id ? null : item.id)
-                }}
-              > ⋮ </button>
-              {openMenu === item.id && (
-                <div className="drop">
-                  <h4 style={{color:'brown', paddingTop:"0px", paddingLeft:"20px"}}>ADD QUANTITY</h4>
-                  <input 
-                     type="text"
-                     placeholder="Enter amount"
-                     className="drop-btn"/>
-                  <button style={{width:"150px", height:"40px", background:"#ecedef", marginTop:"10px", borderRadius:"32px", marginLeft:"15px" }}>Update Stock</button>
+        {isLoading ? (
+          <Loader text="Analyzing inventory levels..." />
+        ) : isError ? (
+          <div className="error-state">
+             <p>Failed to retrieve the stock registry.</p>
+          </div>
+        ) : stocks.length === 0 ? (
+          <div className="empty-state">No inventory found matching your filters.</div>
+        ) : (
+          stocks.map((stock) => {
+            const isLow = stock.quantity <= stock.lowStockThreshold && stock.quantity > 0;
+            const isOut = stock.quantity === 0;
+            
+            return (
+              <div className="catalog-row stock-grid-layout" key={stock._id}>
+                <div className="product-cell">
+                  <span className="user-name">{stock.productId?.name}</span>
+                  <span className="user-email">ID: {stock.productId?._id}</span>
                 </div>
-              )}
-            </div>
-          </div>        
-        ))}
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={handlePageChange}
-          totalEntries={totalEntries}
-          startEntry={(currentPage - 1) * entriesPerPage + 1}
-          endEntry={Math.min(currentPage * entriesPerPage, totalEntries)}
-        />
+
+                <div className="stock-level-cell">
+                   <span className={`stock-count ${isOut ? 'critical' : isLow ? 'warning' : ''}`}>
+                     {stock.quantity} Units
+                   </span>
+                </div>
+
+                <span>{stock.stockHistory?.[stock.stockHistory.length - 2]?.newQuantity || 0}</span>
+
+                <span>{formatDate(stock.lastRestockedAt)}</span>
+
+                <div className="status-cell justify-center">
+                  <span className={`status-badge ${isOut ? 'status-inactive' : isLow ? 'status-pending' : 'status-active'}`}>
+                    {isOut ? 'Out of Stock' : isLow ? 'Low Stock' : 'In Stock'}
+                  </span>
+                </div>
+
+                <div className="actions justify-center">
+                  <FiEdit
+                    className="action-icon edit-icon"
+                    size={18}
+                    style={{ color: "#7E525C", cursor: "pointer" }}
+                    onClick={() => setEditingStock({
+                      productId: stock.productId?._id,
+                      name: stock.productId?.name,
+                      currentQuantity: stock.quantity
+                    })}
+                  />
+                </div>
+              </div>
+            );
+          })
+        )}
+
+        {totalEntries > 0 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+            totalEntries={totalEntries}
+            startEntry={(currentPage - 1) * entriesPerPage + 1}
+            endEntry={Math.min(currentPage * entriesPerPage, totalEntries)}
+          />
+        )}
       </div>
-    
+
+      {/* Stock Management Modal */}
+      {editingStock && (
+        <div className="stock-modal-overlay">
+          <div className="stock-modal">
+            <div className="modal-header">
+              <h3>Manage Inventory</h3>
+              <IoClose 
+                size={24} 
+                className="close-icon" 
+                onClick={() => setEditingStock(null)} 
+              />
+            </div>
+            <div className="modal-body">
+              <div className="product-summary">
+                <label>Fragrance</label>
+                <p>{editingStock.name}</p>
+                <label>Current Stock</label>
+                <p>{editingStock.currentQuantity} Units</p>
+              </div>
+
+              <div className="management-controls">
+                <div className="op-toggle">
+                  <button 
+                    className={operation === 'add' ? 'active' : ''} 
+                    onClick={() => setOperation('add')}
+                  >Add Stock</button>
+                  <button 
+                    className={operation === 'deduct' ? 'active' : ''} 
+                    onClick={() => setOperation('deduct')}
+                  >Deduct Stock</button>
+                </div>
+                
+                <div className="input-group">
+                  <label>Quantity to {operation}</label>
+                  <input 
+                    type="number"
+                    placeholder="e.g. 50"
+                    className="styled-input"
+                    value={updateAmount}
+                    onChange={(e) => setUpdateAmount(e.target.value)}
+                  />
+                </div>
+
+                <button 
+                  className="save-btn"
+                  onClick={handleUpdateStock}
+                  disabled={manageStockMutation.isPending}
+                >
+                  {manageStockMutation.isPending ? "Updating..." : "Confirm Update"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

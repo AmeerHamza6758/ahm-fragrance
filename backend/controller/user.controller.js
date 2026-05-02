@@ -352,11 +352,108 @@ const resetPassword = async (req, res) => {
   }
 };
 
-// module.exports = authController;
+const getAllUsers = async (req, res) => {
+  try {
+    const { page = 1, limit = 10 } = req.query;
+    const users = await userModel.find()
+      .select("-password -otpCode -resetToken")
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(parseInt(limit));
+
+    const totalUsers = await userModel.countDocuments();
+
+    res.status(200).json({
+      success: true,
+      data: users,
+      pagination: {
+        totalItems: totalUsers,
+        totalPages: Math.ceil(totalUsers / limit),
+        currentPage: parseInt(page),
+        itemsPerPage: parseInt(limit)
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+const getUserById = async (req, res) => {
+  try {
+    const { id } = req.query;
+    const user = await userModel.findById(id).select("-password -otpCode -resetToken");
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+    res.status(200).json({ success: true, data: user });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+const updateProfile = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const { userName, phone, gender, dateOfBirth, address } = req.body;
+
+    const user = await userModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    if (userName) user.userName = userName;
+    if (phone) user.phone = phone;
+    if (gender) user.gender = gender;
+    if (dateOfBirth) user.dateOfBirth = dateOfBirth;
+    if (address) {
+      user.address = {
+        street: address.street || user.address?.street,
+        city: address.city || user.address?.city,
+        province: address.province || user.address?.province,
+        postalCode: address.postalCode || user.address?.postalCode
+      };
+    }
+
+    await user.save();
+    res.status(200).json({ success: true, message: "Profile updated successfully", data: user });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+const updatePassword = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const { oldPassword, newPassword } = req.body;
+
+    const user = await userModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ success: false, message: "Incorrect current password" });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(newPassword, salt);
+    await user.save();
+
+    res.status(200).json({ success: true, message: "Password updated successfully" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 module.exports = {
     signUp: authController.signUp,
     signIn: authController.signIn,
     test: authController.test,
     otpHandler,
-    resetPassword
+    resetPassword,
+    getAllUsers,
+    getUserById,
+    updateProfile,
+    updatePassword
 };

@@ -31,6 +31,7 @@ app.use('/api/stock', require("./router/stock.router"));
 app.use('/api/faq', require("./router/faq.router"));
 app.use("/api/favorite", require("./router/fovorite.router"));
 app.use("/api/rating-review", require("./router/ratingReview.router"));
+app.use("/api/cms", require("./router/cms.router"));
 
 
 
