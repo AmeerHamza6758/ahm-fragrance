@@ -1,6 +1,6 @@
 import React from 'react'
-import PageSection from "../components/PageSection";
-import "../styles/admin.css"
+import PageSection from "../../components/PageSection";
+import "../../styles/admin.css"
 
 const revenueData = [
     {

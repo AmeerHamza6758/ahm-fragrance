@@ -1,16 +1,16 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import AdminLayout from "./layout/AdminLayout";
-import DashboardPage from "./features/DashboardPage";
+import DashboardPage from "./features/dashboard/DashboardPage";
 import ProductsPage from "./features/products/ProductsPage";
-import CategoriesPage from "./features/CategoriesPage";
+import CategoriesPage from "./features/categories/CategoriesPage";
 import BrandsPage from "./features/BrandsPage";
-import OrdersPage from "./features/OrdersPage";
-import StockPage from "./features/StockPage";
+import OrdersPage from "./features/orders/OrdersPage";
+import StockPage from "./features/stock/StockPage";
 import FaqPage from "./features/FaqPage";
 import CustomersPage from "./features/CustomersPage";
 import SettingsPage from "./features/SettingsPage";
 import AddProducts from "./features/products/AddProducts"
-import AnalyticPage from "./features/AnalyticPage"
+import AnalyticPage from "./features/dashboard/AnalyticPage"
 function App() {
   return (
     <Routes>

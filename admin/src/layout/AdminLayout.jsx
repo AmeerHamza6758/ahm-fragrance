@@ -5,11 +5,11 @@ import "../styles/admin.css";
 
 function AdminLayout() {
   return (
-    <div className="admin-shell">
-      <Sidebar />
-      <div className="admin-content-wrapper">
-        <Topbar />
-        <main className="admin-main bg-[#f8f5f2]!">
+    <div className="admin-layout-container">
+      <Topbar />
+      <div className="admin-body-content">
+        <Sidebar />
+        <main className="admin-main-section">
           <Outlet />
         </main>
       </div>

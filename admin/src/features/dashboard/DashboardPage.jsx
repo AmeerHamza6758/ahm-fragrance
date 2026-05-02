@@ -1,4 +1,4 @@
-import StatCard from "../components/StatCard";
+import StatCard from "../../components/StatCard";
 
 const stats = [
   { title: "Total Products", value: "0", hint: "Source: /api/product/getProducts" },
