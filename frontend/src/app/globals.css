@@ -2670,8 +2670,8 @@ p.product-price {
 /* /////////////////////////////////////////// PRODUCT DETAILS PAGE /////////////////////////////////////////// */
 
 .product-details-main {
-  width: 100%;
-  background: rgb(var(--color-bg-canvas));
+  width: 95%;
+ 
 }
 
 /* Product Details Section */

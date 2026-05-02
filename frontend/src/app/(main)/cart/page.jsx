@@ -89,60 +89,62 @@ const total = subtotal + deliveryCharges - discount;
                   ? buildProductImageUrl(imageRaw)
                   : "/Images/best-1.svg";
 
-                return (
-                  <div
-                    key={cartId}
-                    className="relative flex bg-[#F9F6F2] rounded-[32px] p-6 items-center gap-6 group"
-                  >
-                    {/* Product Image */}
-                    <div className="relative w-32 h-40 md:w-48 md:h-56 shrink-0 overflow-hidden rounded-[24px]">
-                      <Image
-                        src={imageSrc}
-                        alt={name}
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
+               
+                 return (
+  <div
+    key={cartId}
+    className="relative flex bg-[#F9F6F2] rounded-[24px] p-4 md:p-5 items-center gap-5 group"
+  >
+    {/* Product Image - Reduced height from 56 to 40/48 */}
+    <div className="relative w-24 h-32 md:w-36 md:h-40 shrink-0 overflow-hidden rounded-[18px]">
+      <Image
+        src={imageSrc}
+        alt={name}
+        fill
+        className="object-cover"
+      />
+    </div>
 
-                    {/* Product Info & Controls */}
-                    <div className="flex flex-col flex-1 h-full justify-between py-2 min-h-[160px] md:min-h-[200px]">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h3 className="text-[#7E525C] text-xl md:text-2xl font-serif">
-                            {name}
-                          </h3>
-                          <p className="text-[#A69391] text-xs mt-1">
-                            Eau de Parfum | {item.size ?? "50ml"}
-                          </p>
-                        </div>
-                        {/* Remove Button */}
-                        <button
-                          onClick={() => removeItem(String(cartId))}
-                          className="text-[#7e525c] hover:text-[#8b6f76] transition-colors cursor-pointer"
-                        >
-                          <X size={20} strokeWidth={1.5} />
-                        </button>
-                      </div>
+    {/* Product Info & Controls - Removed high min-height */}
+    <div className="flex flex-col flex-1 self-stretch justify-between py-2">
+      <div className="flex justify-between items-start">
+        <div>
+          <h3 className="text-[#7E525C] text-lg md:text-xl font-serif leading-tight">
+            {name}
+          </h3>
+          <p className="text-[#A69391] text-[11px] mt-1">
+            Eau de Parfum | {item.size ?? "50ml"}
+          </p>
+        </div>
+        {/* Remove Button */}
+        <button
+          onClick={() => removeItem(String(cartId))}
+          className="text-[#7e525c] hover:text-[#8b6f76] transition-colors cursor-pointer p-1"
+        >
+          <X size={18} strokeWidth={1.5} />
+        </button>
+      </div>
 
-                      <div className="flex justify-between items-end">
-                        {/* Quantity Selector  */}
-                        <div
-                          className="flex items-center w-fit px-8 py-2"
-                          style={{
-                            border: "1px solid rgb(var(--color-border))",
-                            borderRadius: "6px",
-                          }}
-                        >
-                          <span>{item.quantity ?? 1}</span>
-                        </div>
-                        {/* Price */}
-                        <p className="text-[#7E525C] font-serif text-lg md:text-xl whitespace-nowrap mb-2">
-                          PKR {price.toLocaleString()}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                );
+      <div className="flex justify-between items-end mt-4">
+        {/* Quantity Selector */}
+        <div
+          className="flex items-center justify-center min-w-[60px] px-4 py-1.5"
+          style={{
+            border: "1px solid #D1C3C1",
+            borderRadius: "6px",
+          }}
+        >
+          <span className="text-sm text-[#4E4543]">{item.quantity ?? 1}</span>
+        </div>
+        {/* Price */}
+        <p className="text-[#7E525C] font-serif text-base md:text-lg whitespace-nowrap">
+          PKR {price.toLocaleString()}
+        </p>
+      </div>
+    </div>
+  </div>
+);
+             
               })
             )}
 
@@ -179,8 +181,8 @@ const total = subtotal + deliveryCharges - discount;
               </h2>
 
               <div className="space-y-5">
-                <div className="flex justify-between items-center text-[#4E4543]">
-                  <span className="text-[10px] uppercase tracking-[2px]">
+                <div className="flex justify-between items-center text-[#4E4543] font-bold">
+                  <span className="text-[13px] uppercase tracking-[2px]">
                     Subtotal
                   </span>
                   <span className="text-[#7E525C] font-semibold">
@@ -188,10 +190,10 @@ const total = subtotal + deliveryCharges - discount;
                   </span>
                 </div>
                 <div className="flex justify-between items-center text-[#4E4543]">
-                  <span className="text-[10px] uppercase tracking-[2px]">
+                  <span className="text-[13px] uppercase tracking-[2px] font-bold">
                     Shipping
                   </span>
-                  <span className="text-[#7E525C] font-medium uppercase tracking-widest text-[11px]">
+                  <span className="text-[#7E525C] font-semibold ">
                     150
                   </span>
                 </div>
@@ -199,9 +201,9 @@ const total = subtotal + deliveryCharges - discount;
                 <div className="h-px bg-[#D1C3C1]/40 my-6" />
 
                 <div className="flex justify-between items-center text-[#7E525C]">
-                  <span className="text-xl font-serif font-semibold">
-                    Total
-                  </span>
+                  <span className="text-3xl font-serif font-medium text-[#7E525C]">
+        Total
+      </span>
                   <span className="text-xl font-serif font-semibold">
                     PKR {total.toLocaleString()}
                   </span>

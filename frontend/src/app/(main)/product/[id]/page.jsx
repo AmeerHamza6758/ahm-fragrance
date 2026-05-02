@@ -112,7 +112,7 @@ export default function ProductDetails() {
           <Star
             key={i}
             size={16}
-            className={i < Math.floor(rating) ? "star-filled" : "star-empty"}
+            className={i < Math.floor(rating) ? "star-filled " : "star-empty"}
           />
         ))}
       </div>
@@ -126,12 +126,12 @@ export default function ProductDetails() {
           <div className="product-details-container">
             {/* Product Images */}
             <div className="product-images">
-              <div className="main-image">
+              <div className="main-image ">
                 <Image
                   src={imageUrl}
                   alt={product.name}
                   fill
-                  className="main-product-image"
+                  className="main-product-image "
                 />
               </div>
             </div>
