@@ -206,14 +206,13 @@ color: #1C1C19;
     grid-template-columns: 1fr;
   }
 }
-<<<<<<< amna
 /* //////////////////////////////////////// Product Management page ////////////////////////////////////////////////////////////////// */
 .catalog-container {
   padding: 30px 50px;
   background: #f8f5f2; 
   min-height: 100vh;
   font-family: 'Inter', sans-serif;
-=======
+}
 /* /////////////////////////////////// Product Management ///////////////////////////////////////////////////////// */
 
 .catalog {
@@ -221,7 +220,6 @@ color: #1C1C19;
   max-width: 1200px;
   margin: auto;
   background: #f8f5f2;
->>>>>>> development
 }
 
 /* Header Area */
@@ -304,12 +302,9 @@ color: #1C1C19;
 /* Table Alignment Logic */
 .table-header, .catalog-row {
   display: grid;
-<<<<<<< amna
   grid-template-columns: 2.5fr 1fr 1.5fr 1fr 1fr 1.5fr 0.5fr;
-=======
   grid-template-columns:repeat(7, 1fr);
   gap: 10px;
->>>>>>> development
   align-items: center;
   padding: 15px 0;
 }
@@ -330,13 +325,10 @@ color: #1C1C19;
 }
 
 .catalog-row {
-<<<<<<< amna
   border-bottom: 1px solid #f9f9f9;
   padding: 18px 30px;
-=======
   border-bottom: 1px solid #f0f0f0;
   /* padding-left: 5px; */
->>>>>>> development
 }
 
 /* Product Cell */
@@ -358,7 +350,6 @@ color: #1C1C19;
   font-weight: 600;
   color: #444;
 }
-<<<<<<< amna
 
 .restock-text { color: #888; }
 
@@ -377,14 +368,11 @@ color: #1C1C19;
   padding: 6px 14px;
   border-radius: 10px;
   font-size: 11px;
-=======
+}
 .tag-center {
->>>>>>> development
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-<<<<<<< amna
-=======
   background: #f2e6e6;
   padding: 5px 10px;
   border-radius: 12px;
@@ -392,7 +380,6 @@ color: #1C1C19;
   text-align: center;
   margin-right: 10px;
   align-items: center;
->>>>>>> development
 }
 
 .tag-signature { background: #f2e6e6; color: #7b4b4b; }
@@ -416,7 +403,6 @@ color: #1C1C19;
 
 .figma-dropdown {
   position: absolute;
-<<<<<<< amna
   right: 0;
   top: 40px;
   background: white;
@@ -426,7 +412,6 @@ color: #1C1C19;
   box-shadow: 0 10px 30px rgba(0,0,0,0.08);
   padding: 8px;
   z-index: 50;
-=======
   right: 0px;
   top: 10px;
   background: white;
@@ -437,7 +422,6 @@ color: #1C1C19;
   height: 179px;
   box-shadow: 0 5px 10px rgba(0,0,0,0.1);
   z-index: 1000;
->>>>>>> development
 }
 
 .dropdown-item {
