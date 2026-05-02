@@ -1341,7 +1341,18 @@ box-shadow: 0px 10px 40px -10px #7E525C26;
 }
 
 .hidden-input {
-  display: none;
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.image-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
 }
 
 .aesthetic-tip-box {

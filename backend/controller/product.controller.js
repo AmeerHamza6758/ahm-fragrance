@@ -1,9 +1,327 @@
+// const Product = require('../models/product.model');
+// const Category = require('../models/category.model');
+// const Tag = require('../models/tag.model');
+// const Images = require('../models/images.model');
+// const mongoose = require('mongoose');
+
+
+// const productController = {
+//     addProduct: async (req, res) => {
+//         try {
+//             const { name, price, discountPrice, description, category_id, tag_id, image_id, variants } = req.body;
+
+//             const product = new Product({
+//                 name,
+//                 price,
+//                 discountPrice,
+//                 description,
+//                 category_id,
+//                 tag_id,
+//                 image_id,
+//                 variants
+//             });
+
+//             await product.save();
+//             res.status(201).json({ status: 1, data: product, message: 'Product added successfully' });
+//         } catch (err) {
+//             res.status(400).json({ status: 0, data: err.message, message: 'Error in product creation' });
+//         }
+//     },
+
+
+//     // getProductById: async (req, res) => {
+//     //     try {
+//     //         const product = await Product.findById(req.query.id)
+//     //             .populate('brand_id')
+//     //             .populate('category_id')
+//     //             .populate('tag_id')
+//     //             .populate('image_id');
+//     //         if (!product) return res.status(404).json({ message: 'Product not found' });
+//     //         res.json(product);
+//     //     } catch (err) {
+//     //         res.status(400).json({ error: 'Invalid product ID' });
+//     //     }
+//     // },
+
+
+
+
+
+//     getProductById: async (req, res) => {
+//         try {
+//             const { id } = req.query;
+
+//             if (!mongoose.Types.ObjectId.isValid(id)) {
+//                 return res.status(400).json({ error: "Invalid ObjectId format" });
+//             }
+
+//             const product = await Product.findById(id)
+//                 .populate('category_id')
+//                 .populate('tag_id')
+//                 // .populate('image_id');
+//                 .populate({
+//                     path: 'image_id',
+//                     model: 'images',   // 👈 force correct model name
+//                     select: 'filename path'
+//                 })
+//             if (!product) {
+//                 return res.status(404).json({ message: 'Product not found' });
+//             }
+
+//             res.json(product);
+
+//         } catch (err) {
+//             console.log(err); // 🔥 IMPORTANT
+//             res.status(500).json({ error: 'Server error' });
+//         }
+//     },
+
+
+//     // updateProduct: async (req, res) => {
+//     //     try {
+//     //         const { id } = req.query;
+//     //         const { price, discountPercentage, ...rest } = req.body;
+
+//     //         if (!id) {
+//     //             return res.status(400).json({ message: 'Product ID is required' });
+//     //         }
+
+//     //         const product = await Product.findById(id);
+
+//     //         if (!product) {
+//     //             return res.status(404).json({ message: 'Product not found' });
+//     //         }
+
+//     //         // 🔹 Use existing values if not provided
+//     //         const finalPrice = price ?? product.price;
+//     //         const finalDiscount = discountPercentage ?? product.discountPercentage ?? 0;
+
+//     //         // 🔹 Calculate current price
+//     //         const currentPrice = finalPrice - (finalPrice * finalDiscount / 100);
+
+//     //         const updatedProduct = await Product.findByIdAndUpdate(
+//     //             id,
+//     //             {
+//     //                 ...rest,
+//     //                 price: finalPrice,
+//     //                 discountPercentage: finalDiscount,
+//     //                 currentPrice
+//     //             },
+//     //             { new: true }
+//     //         );
+
+//     //         res.json(updatedProduct);
+
+//     //     } catch (error) {
+//     //         res.status(500).json({ error: error.message });
+//     //     }
+//     // },
+
+
+
+
+//     updateProduct: async (req, res) => {
+//         try {
+//             const { id } = req.query;
+//             const { price, discountPercentage, variants, ...rest } = req.body;
+
+//             if (!id) {
+//                 return res.status(400).json({ message: 'Product ID is required' });
+//             }
+
+//             const product = await Product.findById(id);
+
+//             if (!product) {
+//                 return res.status(404).json({ message: 'Product not found' });
+//             }
+
+//             const finalPrice = price ?? product.price;
+//             const finalDiscount = discountPercentage ?? product.discountPercentage ?? 0;
+
+//             let updatedVariants = product.variants;
+
+//             if (variants && Array.isArray(variants)) {
+//                 updatedVariants = variants.map(v => {
+//                     const vPrice = v.price ?? 0;
+//                     const vDiscount = v.discountPercentage ?? 0;
+
+//                     return {
+//                         size: v.size,
+//                         price: vPrice,
+//                         discountPercentage: vDiscount
+//                     };
+//                 });
+//             }
+
+//             const updatedProduct = await Product.findByIdAndUpdate(
+//                 id,
+//                 {
+//                     ...rest,
+//                     price: finalPrice,
+//                     discountPercentage: finalDiscount,
+//                     variants: updatedVariants
+//                 },
+//                 { new: true }
+//             );
+
+//             res.json(updatedProduct);
+
+//         } catch (error) {
+//             res.status(500).json({ error: error.message });
+//         }
+//     },
+
+//     deleteProduct: async (req, res) => {
+//         try {
+//             const product = await Product.findByIdAndDelete(req.params.id);
+//             if (!product) return res.status(404).json({ message: 'Product not found' });
+//             res.json({ message: 'Product deleted successfully' });
+//         } catch (err) {
+//             res.status(400).json({ error: err.message });
+//         }
+//     },
+
+
+//     getProducts: async (req, res) => {
+//         try {
+//             const { filter, rating, price, tag, page, limit } = req.query;
+
+//             let query = {};
+//             let sortOption = {};
+
+//             // 🔹 CATEGORY FILTER (him/her/unisex)
+//             if (filter) {
+//                 const map = {
+//                     him: 'men',
+//                     her: 'women',
+//                     unisex: 'unisex'
+//                 };
+
+//                 const filtersArray = Array.isArray(filter)
+//                     ? filter
+//                     : filter.split(',');
+
+//                 const categoryNames = filtersArray
+//                     .map(f => map[f.toLowerCase()])
+//                     .filter(Boolean);
+
+//                 if (categoryNames.length > 0) {
+//                     const categories = await Category.find({
+//                         name: { $in: categoryNames }
+//                     });
+
+//                     query.category_id = {
+//                         $in: categories.map(c => c._id)
+//                     };
+//                 }
+//             }
+
+//             // 🔹 TAG FILTER
+//             if (tag) {
+//                 const tagsArray = Array.isArray(tag) ? tag : tag.split(',');
+
+//                 const tags = await Tag.find({
+//                     name: { $in: tagsArray }
+//                 });
+
+//                 query.tag_id = {
+//                     $in: tags.map(t => t._id)
+//                 };
+//             }
+
+//             // 🔹 SORTING: RATING
+//             if (rating) {
+//                 sortOption.rating = rating === 'asc' ? 1 : -1;
+//             }
+
+//             // 🔹 SORTING: PRICE
+//             if (price) {
+//                 sortOption.price = price === 'asc' ? 1 : -1;
+//             }
+
+//             // 🔹 DEFAULT SORT (if nothing provided)
+//             if (Object.keys(sortOption).length === 0) {
+//                 sortOption.createdAt = -1;
+//             }
+
+//             const shouldPaginate = page !== undefined || limit !== undefined;
+//             const parsedPage = Math.max(parseInt(page, 10) || 1, 1);
+//             const requestedLimit = parseInt(limit, 10) || 50;
+//             const parsedLimit = Math.min(Math.max(requestedLimit, 1), 50);
+//             const skip = (parsedPage - 1) * parsedLimit;
+
+//             // 🔹 FINAL QUERY
+//             let productsQuery = Product.find(query)
+//                 .populate('category_id', 'name')
+//                 .populate('tag_id', 'name')
+//                 // .populate('image_id', 'filename path')
+//                 .populate({
+//                     path: 'image_id',
+//                     model: 'images',   // 👈 force correct model name
+//                     select: 'filename path'
+//                 })
+//                 .sort(sortOption);
+
+//             if (shouldPaginate) {
+//                 productsQuery = productsQuery.skip(skip).limit(parsedLimit);
+//             }
+
+//             const products = await productsQuery;
+
+//             if (!shouldPaginate) {
+//                 return res.json(products);
+//             }
+
+//             const totalItems = await Product.countDocuments(query);
+//             const totalPages = Math.ceil(totalItems / parsedLimit) || 1;
+
+//             return res.json({
+//                 status: 1,
+//                 data: products,
+//                 pagination: {
+//                     page: parsedPage,
+//                     limit: parsedLimit,
+//                     totalItems,
+//                     totalPages,
+//                     hasMore: parsedPage < totalPages
+//                 }
+//             });
+
+//         } catch (err) {
+//             res.status(500).json({ error: err.message });
+//         }
+//     },
+
+//      getTotalProducts : async (req, res) => {
+//         try {
+//             const totalProducts = await Product.countDocuments();
+
+//             res.status(200).json({
+//                 success: true,
+//                 totalProducts
+//             });
+
+//         } catch (error) {
+//             res.status(500).json({
+//                 success: false,
+//                 message: 'Failed to get total products',
+//                 error: error.message
+//             });
+//         }
+//     }
+
+// }
+
+// module.exports = productController;
+
+
+
+
 const Product = require('../models/product.model');
 const Category = require('../models/category.model');
 const Tag = require('../models/tag.model');
 const Images = require('../models/images.model');
 const mongoose = require('mongoose');
-
 
 const productController = {
     addProduct: async (req, res) => {
@@ -17,7 +335,8 @@ const productController = {
                 description,
                 category_id,
                 tag_id,
-                image_id,
+                // ✅ FIX: ensure image_id is always array
+                image_id: Array.isArray(image_id) ? image_id : [image_id],
                 variants
             });
 
@@ -27,25 +346,6 @@ const productController = {
             res.status(400).json({ status: 0, data: err.message, message: 'Error in product creation' });
         }
     },
-
-
-    // getProductById: async (req, res) => {
-    //     try {
-    //         const product = await Product.findById(req.query.id)
-    //             .populate('brand_id')
-    //             .populate('category_id')
-    //             .populate('tag_id')
-    //             .populate('image_id');
-    //         if (!product) return res.status(404).json({ message: 'Product not found' });
-    //         res.json(product);
-    //     } catch (err) {
-    //         res.status(400).json({ error: 'Invalid product ID' });
-    //     }
-    // },
-
-
-
-
 
     getProductById: async (req, res) => {
         try {
@@ -58,12 +358,12 @@ const productController = {
             const product = await Product.findById(id)
                 .populate('category_id')
                 .populate('tag_id')
-                // .populate('image_id');
                 .populate({
                     path: 'image_id',
-                    model: 'images',   // 👈 force correct model name
+                    model: 'images',
                     select: 'filename path'
-                })
+                });
+
             if (!product) {
                 return res.status(404).json({ message: 'Product not found' });
             }
@@ -71,59 +371,15 @@ const productController = {
             res.json(product);
 
         } catch (err) {
-            console.log(err); // 🔥 IMPORTANT
+            console.log(err);
             res.status(500).json({ error: 'Server error' });
         }
     },
 
-
-    // updateProduct: async (req, res) => {
-    //     try {
-    //         const { id } = req.query;
-    //         const { price, discountPercentage, ...rest } = req.body;
-
-    //         if (!id) {
-    //             return res.status(400).json({ message: 'Product ID is required' });
-    //         }
-
-    //         const product = await Product.findById(id);
-
-    //         if (!product) {
-    //             return res.status(404).json({ message: 'Product not found' });
-    //         }
-
-    //         // 🔹 Use existing values if not provided
-    //         const finalPrice = price ?? product.price;
-    //         const finalDiscount = discountPercentage ?? product.discountPercentage ?? 0;
-
-    //         // 🔹 Calculate current price
-    //         const currentPrice = finalPrice - (finalPrice * finalDiscount / 100);
-
-    //         const updatedProduct = await Product.findByIdAndUpdate(
-    //             id,
-    //             {
-    //                 ...rest,
-    //                 price: finalPrice,
-    //                 discountPercentage: finalDiscount,
-    //                 currentPrice
-    //             },
-    //             { new: true }
-    //         );
-
-    //         res.json(updatedProduct);
-
-    //     } catch (error) {
-    //         res.status(500).json({ error: error.message });
-    //     }
-    // },
-
-
-
-
     updateProduct: async (req, res) => {
         try {
             const { id } = req.query;
-            const { price, discountPercentage, variants, ...rest } = req.body;
+            const { price, discountPercentage, variants, image_id, ...rest } = req.body;
 
             if (!id) {
                 return res.status(400).json({ message: 'Product ID is required' });
@@ -153,14 +409,21 @@ const productController = {
                 });
             }
 
+            const updateData = {
+                ...rest,
+                price: finalPrice,
+                discountPercentage: finalDiscount,
+                variants: updatedVariants
+            };
+
+            // ✅ FIX: handle image_id as array (only if provided)
+            if (image_id) {
+                updateData.image_id = Array.isArray(image_id) ? image_id : [image_id];
+            }
+
             const updatedProduct = await Product.findByIdAndUpdate(
                 id,
-                {
-                    ...rest,
-                    price: finalPrice,
-                    discountPercentage: finalDiscount,
-                    variants: updatedVariants
-                },
+                updateData,
                 { new: true }
             );
 
@@ -181,7 +444,6 @@ const productController = {
         }
     },
 
-
     getProducts: async (req, res) => {
         try {
             const { filter, rating, price, tag, page, limit } = req.query;
@@ -189,7 +451,6 @@ const productController = {
             let query = {};
             let sortOption = {};
 
-            // 🔹 CATEGORY FILTER (him/her/unisex)
             if (filter) {
                 const map = {
                     him: 'men',
@@ -216,7 +477,6 @@ const productController = {
                 }
             }
 
-            // 🔹 TAG FILTER
             if (tag) {
                 const tagsArray = Array.isArray(tag) ? tag : tag.split(',');
 
@@ -229,17 +489,14 @@ const productController = {
                 };
             }
 
-            // 🔹 SORTING: RATING
             if (rating) {
                 sortOption.rating = rating === 'asc' ? 1 : -1;
             }
 
-            // 🔹 SORTING: PRICE
             if (price) {
                 sortOption.price = price === 'asc' ? 1 : -1;
             }
 
-            // 🔹 DEFAULT SORT (if nothing provided)
             if (Object.keys(sortOption).length === 0) {
                 sortOption.createdAt = -1;
             }
@@ -250,14 +507,12 @@ const productController = {
             const parsedLimit = Math.min(Math.max(requestedLimit, 1), 50);
             const skip = (parsedPage - 1) * parsedLimit;
 
-            // 🔹 FINAL QUERY
             let productsQuery = Product.find(query)
                 .populate('category_id', 'name')
                 .populate('tag_id', 'name')
-                // .populate('image_id', 'filename path')
                 .populate({
                     path: 'image_id',
-                    model: 'images',   // 👈 force correct model name
+                    model: 'images',
                     select: 'filename path'
                 })
                 .sort(sortOption);
@@ -292,7 +547,7 @@ const productController = {
         }
     },
 
-     getTotalProducts : async (req, res) => {
+    getTotalProducts: async (req, res) => {
         try {
             const totalProducts = await Product.countDocuments();
 
@@ -309,7 +564,6 @@ const productController = {
             });
         }
     }
-
-}
+};
 
 module.exports = productController;
