@@ -741,13 +741,12 @@ color: #B91C1C;
 
 .stock-registry {
   /* padding: 30px; */
-  /* background: #f8f5f2; */
   width: 902px;
 height: 900px;
 max-width: 1600px;
 top: 81px;
 left: 9px;
-padding-top: 40px;
+/* padding-top: 40px; */
 padding-right: 48px;
 padding-bottom: 40px;
 padding-left: 48px;
@@ -1102,7 +1101,7 @@ box-shadow: 0px 10px 40px -10px #7E525C26;
 /* /////////////////////////////////  FaqPage CSS  ///////////////////////////////////////////////////////////////// */
 
 .faq-admin-page {
-  padding: 20px;
+  padding: 0px 20px;
   background: #faf8f6;
   min-height: 100vh;
 }

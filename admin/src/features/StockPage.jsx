@@ -70,6 +70,9 @@ const stockData = [
 ];
 function StockPage() {
     const [openMenu, setOpenMenu] = useState(null);
+    const [stocks , setStocks] = useState(null);
+    const [loading , setLoading] = useState(true);
+
     useEffect(() => {
         const handleClickOutside = (e) => {
           if (!e.target.closest(".actions")) {
@@ -78,15 +81,39 @@ function StockPage() {
         };
     
         document.addEventListener("click", handleClickOutside);
-        return () => document.removeEventListener("click", handleClickOutside);
-      }, []);
+        // return () => document.removeEventListener("click", handleClickOutside);
     
-      const handleEdit = (id) => {
-        console.log("Edit:", id);
+      fetch("http://localhost:4000/api/stock/get", {
+        method:"GET",
+        headers: { 
+          "Content-Type": "application/json",
+          Authorization:`Bearer ${localStorage.getItem("token")}`, 
+         },
+      })
+      .then((res) => res.json())
+      .then((data) => {
+        setStocks(data.data || data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.log(err);
+        setLoading(false);
+      });
+      return () => {
+        document.removeEventListener("click", handleClickOutside);
       };
-      const handleDelete = (id) => {
-    console.log("Delete:", id);
-  };
+      }, []);
+         
+      if(loading) {
+        return<h2>Loading...</h2>
+      }
+
+    //   const handleEdit = (id) => {
+    //     console.log("Edit:", id);
+    //   };
+    //   const handleDelete = (id) => {
+    // console.log("Delete:", id);
+    
   return (
     <div className="stock-registry">
 
@@ -120,7 +147,7 @@ function StockPage() {
           <span>Size</span>
           <span>Current Stock</span>
           <span>Previous</span>
-          <span>Last Restock</span>
+          <span>Last Restock</span> 
           <span>Actions</span>
         </div>
 
