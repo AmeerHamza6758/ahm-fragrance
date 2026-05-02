@@ -14,6 +14,7 @@ const products = [
     volume: "100ml",
     category: "Unisex",
     tag: "SIGNATURE",
+    status:"Active",
   },
   {
     id: 2,
@@ -24,6 +25,7 @@ const products = [
     volume: "50ml",
     category: "Female",
     tag: "BEST SELLER",
+    status:"Inactive",
   },
   {
     id: 3,
@@ -34,6 +36,7 @@ const products = [
     volume: "100ml",
     category: "Male",
     tag: "NEW",
+    status:"Active",
   },
   {
     id: 4,
@@ -44,6 +47,7 @@ const products = [
     volume: "100ml",
     category: "Unisex",
     tag: "SEASONAL",
+    status:"Active",
   },
   {
     id: 5,
@@ -54,6 +58,7 @@ const products = [
     volume: "50ml",
     category: "Female",
     tag: "SIGNATURE",
+    status:"Inactive",
   },
   {
     id: 6,
@@ -64,6 +69,7 @@ const products = [
     volume: "100ml",
     category: "Male",
     tag: "  BEST SELLER",
+    status:"Active",
   },
   {
     id: 7,
@@ -74,6 +80,7 @@ const products = [
     volume: "100ml",
     category: "Unisex",
     tag: "NEW",
+    status:"Inactive",
   },
   {
     id: 8,
@@ -84,27 +91,17 @@ const products = [
     volume: "50ml",
     category: "Unisex",
     tag: "SIGNATURE",
+    status:"Active",
   },
 ];
 function ProductsPage() {
-  const [openMenu, setOpenMenu] = useState(null);
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (!e.target.closest(".actions")) {
-        setOpenMenu(null);
-      }
-    };
 
-    document.addEventListener("click", handleClickOutside);
-    return () => document.removeEventListener("click", handleClickOutside);
-  }, []);
-
-  const handleEdit = (id) => {
-    console.log("Edit:", id);
+  function handleEdit(id) {
+    alert("Edit clicked!");
   };
 
-  const handleDelete = (id) => {
-    console.log("Delete:", id);
+  function handleDelete(id) {
+    alert("Item deleted!");
   };
   return (
     <div>
@@ -123,11 +120,12 @@ function ProductsPage() {
       <div className="catalog-table">
         <div className="catalog-table-header">
           <span>Product</span>
-          <span>Quantity</span>
+          {/* <span>Quantity</span> */}
           <span>Restock Date</span>
-          <span>Volume</span>
+          {/* <span>Volume</span> */}
           <span>Category</span>
           <span>Tags</span>
+          <span>Status</span>
           <span>Actions</span>
         </div>
 
@@ -140,31 +138,20 @@ function ProductsPage() {
               <span>{item.name}</span>
             </div>
 
-            <span>{item.qty}</span>
+            {/* <span>{item.qty}</span> */}
             <span>{item.date}</span>
-            <span>{item.volume}</span>
+            {/* <span>{item.volume}</span> */}
             <span>{item.category}</span>
 
             <span className="tag-center">{item.tag}</span>
+            <span>{item.status}</span>
 
             {/* Actions */}
             <div className="actions">
-              <button
-                onClick={(e) =>{
-                  e.stopPropagation();
-                  setOpenMenu(openMenu === item.id ? null : item.id);
-                }}
-              >
-                ⋮
-              </button>
+              <i class="fa-solid fa-pen edit-icon" onClick={handleEdit}></i>
+               <i class="fa-solid fa-ban inactive-icon"></i>             
+              <i class="fa-solid fa-trash delete-icon" onClick={handleDelete}></i>
 
-              {openMenu === item.id && (
-                <div className="dropdown">
-                 <p onClick={() => handleEdit(item.id)}>Edit Product</p>
-                 <p onClick={() => handleDelete(item.id)}>Delete Product</p>
-                 <p>Mark Inactive</p>
-                </div>
-              )}
             </div>
 
           </div>
