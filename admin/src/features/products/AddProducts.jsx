@@ -1,7 +1,7 @@
 import React from 'react';
 import { LuImagePlus } from "react-icons/lu";
 import { MdOutlineFileUpload } from "react-icons/md";
-// import "../styles/admin.css";
+import "/src/styles/admin.css";
 
 function AddProducts() {
   return (
