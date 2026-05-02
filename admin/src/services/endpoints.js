@@ -4,6 +4,7 @@ export const dashboardApi = {
   getProducts: () => http.get("/api/product/getProducts"),
   getTotalProducts: () => http.get("/api/product/totalProducts"),
   getPendingOrders: () => http.get("/api/order/pendingOrders"),
+  getLowStockCount: () => http.get("/api/stock/lowStockCount"),
   getOrdersSummary: () => http.get("/api/order/checkout"),
   getFaqCount: () => http.get("/api/faq/getAllFaq"),
 };

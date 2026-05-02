@@ -8,14 +8,13 @@ const mongoose = require('mongoose');
 const productController = {
     addProduct: async (req, res) => {
         try {
-            const { name, price, discountPrice, description, brand_id, category_id, tag_id, image_id, variants } = req.body;
+            const { name, price, discountPrice, description, category_id, tag_id, image_id, variants } = req.body;
 
             const product = new Product({
                 name,
                 price,
                 discountPrice,
                 description,
-                brand_id,
                 category_id,
                 tag_id,
                 image_id,
@@ -57,7 +56,6 @@ const productController = {
             }
 
             const product = await Product.findById(id)
-                .populate('brand_id')
                 .populate('category_id')
                 .populate('tag_id')
                 // .populate('image_id');
@@ -254,7 +252,6 @@ const productController = {
 
             // 🔹 FINAL QUERY
             let productsQuery = Product.find(query)
-                .populate('brand_id', 'brandName')
                 .populate('category_id', 'name')
                 .populate('tag_id', 'name')
                 // .populate('image_id', 'filename path')

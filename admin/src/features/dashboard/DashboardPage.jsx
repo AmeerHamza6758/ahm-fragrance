@@ -5,6 +5,7 @@ import { dashboardApi } from "../../services/endpoints";
 function DashboardPage() {
   const [totalProducts, setTotalProducts] = useState("0");
   const [pendingOrders, setPendingOrders] = useState("0");
+  const [lowStockAlerts, setLowStockAlerts] = useState("0");
 
   useEffect(() => {
     const fetchTotalProducts = async () => {
@@ -29,14 +30,26 @@ function DashboardPage() {
       }
     };
 
+    const fetchLowStockCount = async () => {
+      try {
+        const res = await dashboardApi.getLowStockCount();
+        if (res.data && res.data.success) {
+          setLowStockAlerts(String(res.data.lowStockCount));
+        }
+      } catch (err) {
+        console.error("Failed to fetch low stock count:", err);
+      }
+    };
+
     fetchTotalProducts();
     fetchPendingOrders();
+    fetchLowStockCount();
   }, []);
 
   const stats = [
     { title: "Total Products", value: totalProducts, hint: "Source: /api/product/totalProducts" },
     { title: "Pending Orders", value: pendingOrders, hint: "Source: /api/order/pendingOrders" },
-    { title: "Low Stock Alerts", value: "0", hint: "Source: /api/stock/get?alerts=true" },
+    { title: "Low Stock Alerts", value: lowStockAlerts, hint: "Source: /api/stock/lowStockCount" },
     { title: "Total Annual Revenue", value: "PKR 8,245,000", hint: "Maintained 92% profit margin" },
   ];
 

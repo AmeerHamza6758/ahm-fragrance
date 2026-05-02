@@ -2,7 +2,7 @@ require("dotenv").config();
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 
-const Brand = require("../models/brand.model");
+// const Brand = require("../models/brand.model");
 const Category = require("../models/category.model");
 const Tag = require("../models/tag.model");
 const Product = require("../models/product.model");
@@ -27,7 +27,7 @@ async function clearSeededCollections() {
     Product.deleteMany({}),
     Tag.deleteMany({}),
     Category.deleteMany({}),
-    Brand.deleteMany({}),
+    // Brand.deleteMany({}),
     Faq.deleteMany({}),
     User.deleteMany({ email: { $in: ["demo@ahm.com", "admin@ahm.com"] } }),
   ]);

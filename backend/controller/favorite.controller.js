@@ -90,12 +90,12 @@ const getFavorites = async (req, res) => {
     const favoriteItems = await Favorite.find({ userId: userId })
       .populate({
         path: 'productId',
-        select: 'name price discountPercentage description variants rating image_id tag_id category_id brand_id isActive',
+        select: 'name price discountPercentage description variants rating image_id tag_id category_id isActive',
         populate: [
           { path: 'image_id', model: 'images', select: 'filename path' },
           { path: 'tag_id', model: 'Tag', select: 'name' },
           { path: 'category_id', model: 'Category', select: 'name' },
-          { path: 'brand_id', model: 'Brand', select: 'brandName' }
+          // { path: 'brand_id', model: 'Brand', select: 'brandName' }
         ]
       });
 
