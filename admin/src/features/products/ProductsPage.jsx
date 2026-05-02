@@ -1,11 +1,7 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
+// import PageSection from "../components/PageSection";
 import "../../styles/admin.css";
 import { NavLink } from "react-router-dom";
-import { MdOutlineEditNote } from "react-icons/md";
-import { AiFillDelete } from "react-icons/ai";
-import { FiXCircle } from "react-icons/fi";
-import { FaRegEyeSlash } from "react-icons/fa";
-import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 
 const products = [
   {
@@ -66,7 +62,7 @@ const products = [
     date: "Oct 20, 2023",
     volume: "100ml",
     category: "Male",
-    tag: "BEST SELLER",
+    tag: "  BEST SELLER",
   },
   {
     id: 7,
@@ -89,27 +85,17 @@ const products = [
     tag: "SIGNATURE",
   },
 ];
-
 function ProductsPage() {
   const [openMenu, setOpenMenu] = useState(null);
-  const dropdownRef = useRef(null);
-
-  const getTagClass = (tag) => {
-    const t = tag.trim().toUpperCase();
-    if (t === "SIGNATURE") return "tag-signature";
-    if (t === "BEST SELLER") return "tag-bestseller";
-    if (t === "NEW") return "tag-new";
-    return "tag-seasonal";
-  };
-
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+    const handleClickOutside = (e) => {
+      if (!e.target.closest(".actions")) {
         setOpenMenu(null);
       }
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
   const handleEdit = (id) => {
@@ -119,21 +105,24 @@ function ProductsPage() {
   const handleDelete = (id) => {
     console.log("Delete:", id);
   };
-
   return (
-    <div className="catalog-container">
-      {/* Top Breadcrumb  */}
-      <div className="top-nav-bar">
-        <span className="brand-label">AHM Fragrances</span>
-        <div className="admin-profile">
-          <span className="admin-name">AHM Admin</span>
-          <div className="avatar-circle">A</div>
+    <div className="catalog">
+
+      {/* Header */}
+      <div className="catalog-header">
+        <div>
+          <h1 className="catalog-title">Product Catalog</h1>
+          <p className="catalog-subtitle">
+            Manage your fragrance inventory and collection details.
+          </p>
         </div>
         <NavLink to="/products/add" className="add-btn">+ Add New Fragrance</NavLink>
+        
       </div>
 
       {/* Table */}
-      <div className="catalog-table-wrapper">
+      <div className="catalog-table">
+
         <div className="catalog-table-header">
           <span>Product</span>
           <span>Quantity</span>
@@ -144,67 +133,60 @@ function ProductsPage() {
           <span>Actions</span>
         </div>
 
-        <div className="catalog-table-body">
-          {products.map((item) => (
-            <div className="catalog-row" key={item.id}>
-              <div className="product-cell">
-                <img src={item.image} alt={item.name} />
-                <span className="p-name">{item.name}</span>
-              </div>
-              
-              <span className="quantity-cell">{item.qty}</span>
-              <span className="date-cell restock-text">{item.date}</span>
-              <span className="volume-cell vol-pill">{item.volume}</span>
-              <span className="category-cell">{item.category}</span>
-              
-              <div className="tags-cell">
-                <span className={`tag-pill ${getTagClass(item.tag)}`}>
-                  {item.tag.toLowerCase()}
-                </span>
-              </div>
+        {products.map((item) => (
+          <div className="catalog-row" key={item.id}>
 
-              <div className="actions-cell actions-wrapper" ref={openMenu === item.id ? dropdownRef : null}>
-                <button 
-                  className="dots-btn" 
-                  onClick={() => setOpenMenu(openMenu === item.id ? null : item.id)}
-                >
-                  ⋮
-                </button>
-
-                {openMenu === item.id && (
-                  <div className="figma-dropdown">
-                    <div className="dropdown-item" onClick={() => handleEdit(item.id)}>
-                      <MdOutlineEditNote className="icon-edit" /> Edit Product
-                    </div>
-                    <div className="dropdown-item delete-red" onClick={() => handleDelete(item.id)}>
-                      <AiFillDelete className="icon-delete" /> Delete Product
-                    </div>
-                    <div className="dropdown-item inactive-grey">
-                      <FaRegEyeSlash className="icon-inactive" /> Mark Inactive
-                    </div>
-                  </div>
-                )}
-              </div>
+            {/* Product */}
+            <div className="product-cell">
+              <img src={item.image} />
+              <span>{item.name}</span>
             </div>
-          ))}
-        </div>
-        
-        {/* --- PAGINATION SECTION START --- */}
-        <div className="pagination-footer">
-          <p className="showing-text">Showing 1 to 8 of 42 fragrances</p>
-          <div className="pagination-controls">
-            <button className="page-arrow"><FiChevronLeft /></button>
-            <button className="page-num active">1</button>
-            <button className="page-num">2</button>
-            <button className="page-num">3</button>
-            <span className="page-dots">...</span>
-            <button className="page-arrow"><FiChevronRight /></button>
+
+            <span>{item.qty}</span>
+            <span>{item.date}</span>
+            <span>{item.volume}</span>
+            <span>{item.category}</span>
+
+            <span className="tag-center">{item.tag}</span>
+
+            {/* Actions */}
+            <div className="actions">
+              <button
+                onClick={(e) =>{
+                  e.stopPropagation();
+                  setOpenMenu(openMenu === item.id ? null : item.id);
+                }}
+              >
+                ⋮
+              </button>
+
+              {openMenu === item.id && (
+                <div className="dropdown">
+                 <p onClick={() => handleEdit(item.id)}>Edit Product</p>
+                 <p onClick={() => handleDelete(item.id)}>Delete Product</p>
+                 <p>Mark Inactive</p>
+                </div>
+              )}
+            </div>
+
           </div>
+        ))}
+
+      </div>
+      <div className="pagination">
+           <div className="pagination-124">
+              <p>SHOWING 1 TO 6 OF 48 ENTRIES</p>
+            </div>
+        <div>
+             <button>{"<"}</button>
+              <button className="active-page">1</button>
+              <button>2</button>
+              <button>3</button>
+              <button>{">"}</button>
         </div>
-        {/* --- PAGINATION SECTION END --- */}
       </div>
     </div>
   );
 }
     
-export default ProductsPage;
+ export default ProductsPage;
