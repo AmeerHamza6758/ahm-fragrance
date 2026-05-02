@@ -119,11 +119,47 @@ useEffect(() => {
 
     {/* Filters and Sort Dropdowns */}
 <section className="w-full px-4 sm:px-6 lg:px-8 py-4">
-  <div className="w-full flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between lg:gap-8">
+  <div className="w-full flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-start lg:gap-8">
     
-    {/* COLLECTION DROPDOWN */}
+  
+    {/* SORT DROPDOWN */}
     <div className="flex flex-col sm:flex-row sm:items-center gap-3 w-full lg:w-auto">
-      <span className="text-[#4E4543] text-xs font-bold tracking-widest whitespace-nowrap">COLLECTION:</span>
+      <span className="text-[#7E525C] text-xs lg:text-xl font-bold tracking-widest whitespace-nowrap">SORT:</span>
+      <div className="relative w-full sm:w-[240px] " ref={sortRef}>
+        <button
+          className="flex items-center justify-between w-full px-5 py-2.5 border border-[#7E525C33] rounded-full text-[#4E4543] text-sm bg-white outline-none"
+          onClick={() => {
+            setSortOpen(!sortOpen);
+            setCategoryOpen(false);
+          }}
+        >
+          <span className="truncate">{sortOptions.find((opt) => opt.id === sortBy)?.label}</span>
+          {sortOpen ? <ChevronUp size={18} className="shrink-0 ml-2" /> : <ChevronDown size={18} className="shrink-0 ml-2" />}
+        </button>
+
+        {sortOpen && (
+          <div className="absolute z-[100] mt-1 w-full bg-white border border-[#7E525C33] rounded-2xl shadow-xl overflow-hidden left-0">
+            {sortOptions.map((opt) => (
+              <button
+                key={opt.id}
+                className={`w-full text-left px-5 py-3  sort-option ${
+                  sortBy === opt.id ? "active" : ""
+                }`}
+                onClick={() => {
+                  setSortBy(opt.id);
+                  setSortOpen(false);
+                }}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+      {/* COLLECTION DROPDOWN */}
+    <div className="flex flex-col sm:flex-row sm:items-center gap-3 w-full lg:w-auto">
+      <span className="text-[#7E525C] text-xs lg:text-xl font-semibold tracking-widest ">COLLECTION:</span>
       <div className="relative w-full sm:w-[240px] " ref={categoryRef}>
         <button
           className="flex items-center justify-between w-full px-5 py-2.5 border border-[#7E525C33] rounded-full text-[#4E4543] text-sm bg-white outline-none"
@@ -157,41 +193,6 @@ useEffect(() => {
       </div>
     </div>
 
-    {/* SORT DROPDOWN */}
-    <div className="flex flex-col sm:flex-row sm:items-center gap-3 w-full lg:w-auto">
-      <span className="text-[#4E4543] text-xs font-bold tracking-widest whitespace-nowrap">SORT:</span>
-      <div className="relative w-full sm:w-[240px] " ref={sortRef}>
-        <button
-          className="flex items-center justify-between w-full px-5 py-2.5 border border-[#7E525C33] rounded-full text-[#4E4543] text-sm bg-white outline-none"
-          onClick={() => {
-            setSortOpen(!sortOpen);
-            setCategoryOpen(false);
-          }}
-        >
-          <span className="truncate">{sortOptions.find((opt) => opt.id === sortBy)?.label}</span>
-          {sortOpen ? <ChevronUp size={18} className="shrink-0 ml-2" /> : <ChevronDown size={18} className="shrink-0 ml-2" />}
-        </button>
-
-        {sortOpen && (
-          <div className="absolute z-[100] mt-1 w-full bg-white border border-[#7E525C33] rounded-2xl shadow-xl overflow-hidden left-0">
-            {sortOptions.map((opt) => (
-              <button
-                key={opt.id}
-                className={`w-full text-left px-5 py-3  sort-option ${
-                  sortBy === opt.id ? "active" : ""
-                }`}
-                onClick={() => {
-                  setSortBy(opt.id);
-                  setSortOpen(false);
-                }}
-              >
-                {opt.label}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
 
   </div>
 </section>

@@ -48,3 +48,7 @@ export const faqApi = {
   update: (id, payload) => http.put(`/api/faq/updateFaq?id=${id}`, payload),
   remove: (id) => http.delete(`/api/faq/deleteFaq/${id}`),
 };
+
+export const tagApi = {
+  list: () => http.get("/api/tag/getTags"),
+};

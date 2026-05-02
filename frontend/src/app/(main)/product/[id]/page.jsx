@@ -104,15 +104,18 @@ export default function ProductDetails() {
       size: selectedSize,
     });
   };
+console.log(product,"pro");
 
   const renderStars = (rating) => {
     return (
       <div className="stars-container">
         {[...Array(5)].map((_, i) => (
-          <Star
+         <Star
             key={i}
-            size={16}
-            className={i < Math.floor(rating) ? "star-filled " : "star-empty"}
+            size={18}
+            fill={i < Math.floor(rating) ? "#FFD700" : "none"}
+            stroke={i < Math.floor(rating) ? "#FFD700" : "#D1D5DB"}
+            className="shrink-0"
           />
         ))}
       </div>
@@ -126,28 +129,28 @@ export default function ProductDetails() {
           <div className="product-details-container">
             {/* Product Images */}
             <div className="product-images">
-              <div className="main-image ">
+              <div className="main-image  bg-[#faf8f5]!">
                 <Image
                   src={imageUrl}
                   alt={product.name}
                   fill
-                  className="main-product-image "
+                  className="main-product-image w-[90%]! "
                 />
               </div>
             </div>
 
             {/* Product Details */}
             <div className="product-info">
-              <h1 className="product-title">{product.name}</h1>
+              <h1 className="product-title capitalize">{product.name}</h1>
 
-              <p className="product-notes-detail">{product.description}</p>
+              <p className="product-notes-detail capitalize!">{product.description}</p>
 
               <div className="rating-section">
                 {renderStars(product.rating || 4)}
                 {/* <span className="review-text">(104 reviews)</span> */}
               </div>
 
-              <p className="product-description">{product.description}</p>
+              {/* <p className="product-description">{product.description}</p> */}
 
               <div className="price-section">
                 <span className="price">
@@ -340,135 +343,140 @@ export default function ProductDetails() {
         </section>
       </main>
 
-      {/* Customer Reviews & Feedback */}
-      <section className="w-full bg-[#faf8f5] flex flex-col items-center justify-center">
-          <div className="text-center mb-8 w-1/2">
-            <h2
-              className="text-[1.9rem] text-[#7e525c] font-normal leading-tight mb-2"
-              style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}
-            >
-              Customer Reviews &amp; Feedback
-            </h2>
-            <p className="text-[#b0909a] text-[13px] font-sans tracking-wide">
-              Share your experience with {product.name}
-            </p>
-          </div>
+    {/* Customer Reviews & Feedback */}
+<section className="w-full bg-[#faf8f5]  px-4 flex flex-col items-center justify-center">
+  {/* Header Container */}
+  <div className="text-center mb-10 max-w-2xl">
+    <h2
+      className="text-[#7e525c] font-normal leading-tight text-[28px] sm:text-[34px] md:text-[38px] mb-3"
+      style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}
+    >
+      Customer Reviews &amp; Feedback
+    </h2>
+    <p className="text-[#b0909a] text-[14px] font-sans tracking-wide">
+      Share your experience with {product.name}
+    </p>
+  </div>
 
-          <div className="bg-white border border-[#e8dde0] rounded-2xl px-8 py-8 shadow-sm w-1/2 mx-auto">
-            {reviewSuccess ? (
-              <div className="text-center py-6">
-                <p
-                  className="text-[#7e525c] text-lg font-semibold"
-                  style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}
-                >
-                  Thank you for your feedback!
-                </p>
-                <p className="text-[#b0909a] text-sm mt-2">
-                  Your review has been submitted.
-                </p>
-                <button
-                  className="mt-5 text-[#7e525c] text-sm underline"
-                  onClick={() => {
-                    setReviewSuccess(false);
-                    setReviewText("");
-                    setReviewRating(4);
-                    setReviewError("");
-                  }}
-                >
-                  Write another review
-                </button>
-              </div>
-            ) : (
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  setReviewError("");
-                  submitReview(
-                    {
-                      productId: product._id,
-                      rating: reviewRating,
-                      review: reviewText,
-                    },
-                    {
-                      onSuccess: () => setReviewSuccess(true),
-                      onError: (err) => {
-                        setReviewError(
-                          err?.response?.data?.message ??
-                            err?.response?.data?.error ??
-                            "Failed to submit review. Please try again.",
-                        );
-                      },
-                    },
-                  );
-                }}
+  {/* Form Container - Adjusted for better alignment and responsiveness */}
+  <div className="bg-white border border-[#e8dde0] rounded-2xl p-6 sm:p-10 shadow-sm w-full max-w-2xl mx-auto">
+    {reviewSuccess ? (
+      <div className="text-center py-8">
+        <p
+          className="text-[#7e525c] text-xl font-semibold mb-2"
+          style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}
+        >
+          Thank you for your feedback!
+        </p>
+        <p className="text-[#b0909a] text-sm">
+          Your review has been submitted successfully.
+        </p>
+        <button
+          className="mt-6 text-[#7e525c] text-sm font-medium underline hover:text-[#6a4450] transition-colors"
+          onClick={() => {
+            setReviewSuccess(false);
+            setReviewText("");
+            setReviewRating(4);
+            setReviewError("");
+          }}
+        >
+          Write another review
+        </button>
+      </div>
+    ) : (
+      <form
+        className="flex flex-col gap-8"
+        onSubmit={(e) => {
+          e.preventDefault();
+          setReviewError("");
+          submitReview(
+            {
+              productId: product._id,
+              rating: reviewRating,
+              review: reviewText,
+            },
+            {
+              onSuccess: () => setReviewSuccess(true),
+              onError: (err) => {
+                setReviewError(
+                  err?.response?.data?.message ??
+                    err?.response?.data?.error ??
+                    "Failed to submit review. Please try again."
+                );
+              },
+            }
+          );
+        }}
+      >
+        {/* Star Rating Section */}
+        <div className="flex flex-col items-center">
+          <p className="text-[11px] tracking-[0.2em] text-[#b0909a] font-bold font-sans uppercase mb-4 text-center">
+            Your Rating
+          </p>
+          <div className="flex justify-center gap-3">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <button
+                key={star}
+                type="button"
+                onClick={() => setReviewRating(star)}
+                onMouseEnter={() => setReviewHover(star)}
+                onMouseLeave={() => setReviewHover(0)}
+                className="focus:outline-none transition-transform hover:scale-110 active:scale-95"
+                aria-label={`Rate ${star} star${star > 1 ? "s" : ""}`}
               >
-                {/* Star Rating */}
-                <div className="mb-6">
-                  <p className="text-[10px] tracking-[0.18em] text-[#b0909a] font-semibold font-sans uppercase mb-3 text-center">
-                    Your Rating
-                  </p>
-                  <div className="flex justify-center gap-2">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <button
-                        key={star}
-                        type="button"
-                        onClick={() => setReviewRating(star)}
-                        onMouseEnter={() => setReviewHover(star)}
-                        onMouseLeave={() => setReviewHover(0)}
-                        className="focus:outline-none transition-transform hover:scale-110"
-                        aria-label={`Rate ${star} star${star > 1 ? "s" : ""}`}
-                      >
-                        <svg
-                          width="28"
-                          height="28"
-                          viewBox="0 0 24 24"
-                          fill={
-                            (reviewHover || reviewRating) >= star
-                              ? "#7e525c"
-                              : "none"
-                          }
-                          stroke="#7e525c"
-                          strokeWidth="1.5"
-                        >
-                          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                        </svg>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Review Text */}
-                <div className="mb-6">
-                  <p className="text-[10px] tracking-[0.18em] text-[#b0909a] font-semibold font-sans uppercase mb-3">
-                    Write Your Review
-                  </p>
-                  <textarea
-                    value={reviewText}
-                    onChange={(e) => setReviewText(e.target.value)}
-                    placeholder="Describe the notes, the longevity, and how it made you feel..."
-                    rows={4}
-                    required
-                    className="w-full border border-[#e8dde0] rounded-lg px-4 py-3 text-[14px] text-[#5a3a42] placeholder-[#c4a8b0] bg-white resize-none focus:outline-none focus:border-[#7e525c] transition-colors font-sans"
-                  />
-                </div>
-
-                {reviewError && (
-                  <p className="text-red-500 text-sm mb-4">{reviewError}</p>
-                )}
-
-                <div className="flex justify-center">
-                  <button
-                    type="submit"
-                    disabled={isSubmittingReview || !reviewText.trim()}
-                    className="bg-[#6a4450] text-white text-[14px] font-semibold font-sans tracking-wide px-10 py-3  rounded-full hover:bg-[#6a4450] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-                  >
-                    {isSubmittingReview ? "Submitting..." : "Send Feedback"}
-                  </button>
-                </div>
-              </form>
-            )}
+                <svg
+                  width="32"
+                  height="32"
+                  viewBox="0 0 24 24"
+                  fill={
+                    (reviewHover || reviewRating) >= star
+                      ? "#FFD700"
+                      : "none"
+                  }
+                  stroke="#FFD700"
+                  strokeWidth="1.5"
+                  className="transition-colors duration-200"
+                >
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                </svg>
+              </button>
+            ))}
           </div>
-      </section>
+        </div>
+
+        {/* Review Text Area Section */}
+        <div className="flex flex-col">
+          <p className="text-[11px] tracking-[0.2em] text-[#b0909a] font-bold font-sans uppercase mb-3">
+            Write Your Review
+          </p>
+          <textarea
+            value={reviewText}
+            onChange={(e) => setReviewText(e.target.value)}
+            placeholder="Describe the notes, the longevity, and how it made you feel..."
+            rows={5}
+            required
+            className="w-full border border-[#e8dde0] rounded-xl px-5 py-4 text-[15px] text-[#5a3a42] placeholder-[#c4a8b0] bg-[#fafafa] resize-none focus:outline-none focus:border-[#7e525c] focus:bg-white transition-all font-sans shadow-inner"
+          />
+        </div>
+
+        {reviewError && (
+          <p className="text-red-500 text-sm text-center font-medium">{reviewError}</p>
+        )}
+
+        {/* Submit Button */}
+        <div className="flex justify-center">
+          <button
+            type="submit"
+            disabled={isSubmittingReview || !reviewText.trim()}
+            className="bg-[#6a4450] text-white text-[15px] font-bold font-sans tracking-widest px-12 py-4 rounded-full hover:bg-[#4d313a] shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none"
+          >
+            {isSubmittingReview ? "Submitting..." : "SUBMIT FEEDBACK"}
+          </button>
+        </div>
+      </form>
+    )}
+  </div>
+</section>
 
       {/* You May Also Like */}
    <section className="w-full bg-[#faf8f5] pb-16 overflow-x-hidden">

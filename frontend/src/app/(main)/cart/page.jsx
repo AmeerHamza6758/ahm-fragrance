@@ -73,7 +73,7 @@ const total = subtotal + deliveryCharges - discount;
     onClick={() => router.push("/collections")}
     className="text-[#4E4543] text-xs  tracking-widest flex items-center gap-2 transition-opacity hover:opacity-70"
   >
-   EXPLORE COLLECTIONS <Handbag className="w-4 h-4" />
+   EXPLORE COLLECTIONS <Handbag className="" size={20} />
   </button>
 </div>
             ) : (

@@ -6,14 +6,14 @@ function Topbar() {
 
   return (
     <header className="admin-topbar">
-      <h3>AHM Fragrances</h3>
+      <img src="/image/logo-primary.png" alt="Logo" width={80} height={70} />
       <div className="ahm-admin">
         <h4>Admin</h4>
         <div className="profile-wrapper" onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
           <button className="ahm-btn">
-            <img 
-              src="/image/admin.png" 
-              alt="Admin Profile" 
+            <img
+              src="/image/admin.png"
+              alt="Admin Profile"
             />
           </button>
           <div className="chevron-container">
