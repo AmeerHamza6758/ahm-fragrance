@@ -79,19 +79,16 @@
 /* ////////////////////////////////////////header////////////////////////////////////////////////// */
 .header {
   width: 100%;
-  height: 84px;
-
+  height: 80px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   padding: 24px 48px;
-  /* background: rgb(var(--color-bg-canvas)); */
   background: rgba(253, 249, 245, 0.8);
   backdrop-filter: blur(24px);
-
   position: sticky;
   top: 0;
+  border-bottom: 1px solid rgb(var(--color-border));
   z-index: 1000;
 }
 
@@ -5334,10 +5331,15 @@ p.product-price {
   min-height: 100vh;
   background: rgb(var(--color-bg-canvas));
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  padding: 40px 16px;
-  padding-top: 120px;
+  padding: 24px 16px 40px;
+}
+
+@media (min-width: 640px) {
+  .auth-page {
+    padding: 40px 16px 64px;
+  }
 }
 
 .auth-card {

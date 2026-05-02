@@ -5,7 +5,8 @@ import { Heart, Menu, ShoppingCart, User, X } from "lucide-react";
 import Link from "next/link";
 import { queryClient, useFavorites, useGetCart } from "@/lib/api";
 import { useEffect, useState } from "react";
-
+import logo from "@/public/Icons/logo.png"
+import Image from "next/image";
 export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
@@ -64,37 +65,17 @@ export default function Header() {
     // { href: "/contact-us", label: "Contact Us" },
   ];
 
-  // if (isAuthPage) {
-  //   return (
-  //     <header className="header">
-  //       <div className="flex items-center gap-3">
-  //         <button
-  //           type="button"
-  //           onClick={() => {
-  //             if (typeof window !== "undefined" && window.history.length > 1) {
-  //               router.back();
-  //             } else {
-  //               router.push("/");
-  //             }
-  //           }}
-  //           aria-label="Go back"
-  //           className="inline-flex items-center justify-center"
-  //         >
-  //           <ArrowLeft size={24} color="#7e525c" />
-  //         </button>
-  //         <Link href="/" className="logo">
-  //           AHM Fragrances
-  //         </Link>
-  //       </div>
-  //     </header>
-  //   );
-  // }
-
   return (
     <>
       <header className="header">
         <Link href="/" className="logo">
-          AHM Fragrances
+          <Image
+            src={logo}
+            alt="logo"
+            width={140}
+            height={140}
+            className="object-fit"
+          />
         </Link>
 
         {/* Desktop Nav */}
@@ -111,7 +92,7 @@ export default function Header() {
         </nav>
 
         <div className="header-icons">
-         
+
           <Link href="/wishlist" className="wishlist-icon-wrapper group">
             <Heart
               size={30}
@@ -163,17 +144,11 @@ export default function Header() {
             )}
           </div>
           <Link href="/cart" className="cart-icon-wrapper">
-            {/* <Image
-              src="/Icons/cart_icon.svg"
-              alt="Shopping Bag"
-              width={20}
-              height={20}
-            /> */}
             <ShoppingCart
-             size={30}
-                  fill={pathname === "/cart" ? "#7e525c" : "none"}
-                  stroke="#7e525c"
-                  strokeWidth={2}
+              size={30}
+              fill={pathname === "/cart" ? "#7e525c" : "none"}
+              stroke="#7e525c"
+              strokeWidth={2}
             />
             {cartCount > 0 && <span className="cart-count">{cartCount}</span>}
           </Link>
