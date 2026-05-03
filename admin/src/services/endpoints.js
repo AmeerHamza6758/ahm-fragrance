@@ -103,3 +103,7 @@ export const contactApi = {
   list: () => http.get("/api/contact/all"),
   remove: (id) => http.delete(`/api/contact/delete?id=${id}`),
 };
+export const circleApi = {
+  list: () => http.get("/api/circle/all"),
+  remove: (id) => http.delete(`/api/circle/remove?id=${id}`),
+};
