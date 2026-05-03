@@ -1,6 +1,8 @@
 import http from "./http";
 
 export const dashboardApi = {
+  getStats: () => http.get("/api/dashboard/stats"),
+  getGraphs: () => http.get("/api/dashboard/graphs"),
   getProducts: () => http.get("/api/product/getProducts"),
   getTotalProducts: () => http.get("/api/product/totalProducts"),
   getPendingOrders: () => http.get("/api/order/pendingOrders"),
