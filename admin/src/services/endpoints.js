@@ -16,8 +16,13 @@ export const productsApi = {
     const query = params ? "?" + new URLSearchParams(params).toString() : "";
     return http.get(`/api/product/getProducts${query}`);
   },
+  list: (params) => {
+    const query = params ? "?" + new URLSearchParams(params).toString() : "";
+    return http.get(`/api/product/getProducts${query}`);
+  },
   getById: (id) => http.get(`/api/product/getProductById?id=${id}`),
   create: (payload) => http.post("/api/product/addProduct", payload),
+  update: (id, payload) => http.put(`/api/product/updateProduct?id=${id}`, payload),
   update: (id, payload) => http.put(`/api/product/updateProduct?id=${id}`, payload),
   remove: (id) => http.delete(`/api/product/deleteProduct/${id}`),
   getStats: () => http.get("/api/product/stats"),
@@ -44,12 +49,22 @@ export const orderApi = {
     return http.get(`/api/order/all${query}`);
   },
   getById: (id) => http.get(`/api/order/${id}`),
+  list: (params) => {
+    const query = params ? "?" + new URLSearchParams(params).toString() : "";
+    return http.get(`/api/order/all${query}`);
+  },
+  getById: (id) => http.get(`/api/order/${id}`),
   create: (payload) => http.post("/api/order/create", payload),
   cancel: (orderId) => http.put(`/api/order/${orderId}/cancel`),
+  updateStatus: (id, payload) => http.put(`/api/order/${id}/status`, payload),
   updateStatus: (id, payload) => http.put(`/api/order/${id}/status`, payload),
 };
 
 export const stockApi = {
+  get: (params) => {
+    const query = params ? "?" + new URLSearchParams(params).toString() : "";
+    return http.get(`/api/stock/get${query}`);
+  },
   get: (params) => {
     const query = params ? "?" + new URLSearchParams(params).toString() : "";
     return http.get(`/api/stock/get${query}`);
@@ -61,6 +76,13 @@ export const faqApi = {
   list: () => http.get("/api/faq/getAllFaq"),
   create: (payload) => http.post("/api/faq/addFaq", payload),
   update: (id, payload) => http.put(`/api/faq/updateFaq?id=${id}`, payload),
+  remove: (id) => http.delete(`/api/faq/deleteFaq?id=${id}`),
+};
+
+export const cmsApi = {
+  get: (key) => http.get(`/api/cms/${key}`),
+  update: (payload) => http.post('/api/cms/update', payload),
+  listKeys: () => http.get('/api/cms/all/keys'),
   remove: (id) => http.delete(`/api/faq/deleteFaq?id=${id}`),
 };
 
