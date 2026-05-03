@@ -2,9 +2,11 @@ import React, { useState } from "react";
 import "../../styles/admin.css";
 import { useNavigate } from "react-router-dom";
 import { GrView } from "react-icons/gr";
+import { MdOutlineModeEditOutline, MdPayment } from "react-icons/md";
 import Pagination from "../../components/Pagination";
 import Loader from "../../components/Loader";
-import { useGetOrders } from "../../services/hooks/order";
+import { useGetOrders, useUpdateOrderStatus } from "../../services/hooks/order";
+import Swal from "sweetalert2";
 
 function OrdersPage() {
   const navigate = useNavigate();
@@ -13,6 +15,7 @@ function OrdersPage() {
   const entriesPerPage = 10;
   
   const { data: ordersRes, isLoading, isError } = useGetOrders(currentPage, entriesPerPage, statusFilter);
+  const updateStatusMutation = useUpdateOrderStatus();
 
   const orders = ordersRes?.data?.data || [];
   const totalEntries = ordersRes?.data?.pagination?.totalItems || 0;
@@ -24,6 +27,53 @@ function OrdersPage() {
 
   const handleView = (id) => {
     navigate(`/orders/view/${id}`);
+  };
+
+  const handleUpdateStatus = async (id, currentStatus) => {
+    const { value: status } = await Swal.fire({
+      title: "Update Order Status",
+      input: "select",
+      inputOptions: {
+        pending: "Pending",
+        confirmed: "Confirmed",
+        shipped: "Shipped",
+        delivered: "Delivered",
+        cancelled: "Cancelled",
+        refunded: "Refunded"
+      },
+      inputValue: currentStatus,
+      showCancelButton: true,
+      confirmButtonColor: "#7E525C",
+      inputValidator: (value) => {
+        return new Promise((resolve) => {
+          resolve();
+        });
+      }
+    });
+
+    if (status) {
+      updateStatusMutation.mutate({ id, status });
+    }
+  };
+
+  const handleUpdatePayment = async (id, currentPaymentStatus) => {
+    const { value: paymentStatus } = await Swal.fire({
+      title: "Update Payment Status",
+      input: "select",
+      inputOptions: {
+        pending: "Pending",
+        paid: "Paid",
+        failed: "Failed",
+        refunded: "Refunded"
+      },
+      inputValue: currentPaymentStatus,
+      showCancelButton: true,
+      confirmButtonColor: "#7E525C"
+    });
+
+    if (paymentStatus) {
+      updateStatusMutation.mutate({ id, paymentStatus });
+    }
   };
 
   const formatDate = (dateString) => {
@@ -123,18 +173,37 @@ function OrdersPage() {
 
               {/* Payment Status */}
               <div className="status-cell justify-center">
-                <span className={`status-badge ${order.paymentStatus === 'paid' ? 'status-active' : 'status-pending'}`}>
+                <span className={`status-badge ${
+                  order.paymentStatus === 'paid' ? 'status-active' : 
+                  order.paymentStatus === 'refunded' ? 'status-inactive' :
+                  order.paymentStatus === 'failed' ? 'status-inactive' : 'status-pending'
+                }`}>
                   {order.paymentStatus}
                 </span>
               </div>
 
               {/* Actions */}
-              <div className="actions justify-center">
+              <div className="actions justify-center" style={{ gap: '1rem' }}>
                 <GrView
                   className="action-icon view-icon"
                   size={18}
+                  title="View Details"
                   style={{ color: "#7E525C", cursor: "pointer" }}
                   onClick={() => handleView(order._id)}
+                />
+                <MdOutlineModeEditOutline
+                  className="action-icon edit-icon"
+                  size={20}
+                  title="Update Status"
+                  style={{ color: "#3b82f6", cursor: "pointer" }}
+                  onClick={() => handleUpdateStatus(order._id, order.orderStatus)}
+                />
+                <MdPayment
+                  className="action-icon payment-icon"
+                  size={18}
+                  title="Update Payment"
+                  style={{ color: "#10b981", cursor: "pointer" }}
+                  onClick={() => handleUpdatePayment(order._id, order.paymentStatus)}
                 />
               </div>
             </div>
