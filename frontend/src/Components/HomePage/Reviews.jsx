@@ -1,6 +1,7 @@
-﻿"use client";
+"use client";
 import React from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
+import { EffectCoverflow, Autoplay } from 'swiper/modules';
 import { EffectCoverflow, Pagination, Autoplay } from 'swiper/modules';
 import { useGetAllReviews } from "@/lib/api/hooks/useCart";
 
@@ -36,6 +37,18 @@ export default function Reviews() {
 
   const reviews = (() => {
     const raw = Array.isArray(data) ? data : (data?.data ?? data?.reviews ?? []);
+    const sorted = [...raw].sort((a, b) => {
+      if ((b.rating || 0) !== (a.rating || 0)) {
+        return (b.rating || 0) - (a.rating || 0);
+      }
+      return (b._id || "").toString().localeCompare((a._id || "").toString());
+    });
+    const final = sorted.length > 0 ? sorted : STATIC_FALLBACK.sort((a, b) => b.rating - a.rating);
+    // Duplicate slides if too few for a smooth loop
+    if (final.length > 0 && final.length < 6) {
+      return [...final, ...final, ...final];
+    }
+    return final;
     return raw.length > 0 ? raw : STATIC_FALLBACK;
   })();
 
@@ -43,6 +56,11 @@ export default function Reviews() {
     name.split(" ").filter(Boolean).slice(0, 2).map((part) => part[0]?.toUpperCase() || "").join("");
 
   return (
+    <section className="py-12 bg-white overflow-hidden mx-2">
+      <h1 className="text-[#7E525C] text-2xl sm:text-2xl md:text-4xl font-noto font-normal text-center pb-12">
+        Voices of Luxury
+      </h1>
+
     <section className="py-12 bg-white overflow-hidden mx-2 ">
        <h1 className="text-[#7E525C] text-2xl sm:text-2xl md:text-4xl font-noto font-normal text-center pb-12">
          Voices of Luxury
@@ -53,12 +71,18 @@ export default function Reviews() {
           <div className="w-8 h-8 border-4 border-[#7e525c] border-t-transparent rounded-full animate-spin" />
         </div>
       ) : (
+        <div className="relative w-full max-w-[90%] md:max-w-6xl mx-auto">
+          <Swiper
+            key={reviews.length}
       <div className="relative w-full max-w-[90%] md:max-w-6xl mx-auto">
           <Swiper
             effect={'coverflow'}
             grabCursor={true}
             centeredSlides={true}
             loop={true}
+            loopedSlides={6}
+            speed={800}
+            slidesPerView={1.2}
           
            slidesPerView={1.2}
             spaceBetween={0}
@@ -66,6 +90,11 @@ export default function Reviews() {
       
               640: { slidesPerView: 2, spaceBetween: 20 },
               1024: { slidesPerView: 3, stretch:-50 },
+            }}
+            autoplay={{ 
+              delay: 1000, 
+              disableOnInteraction: false,
+              pauseOnMouseEnter: true
             }}
             autoplay={{ delay: 3000, disableOnInteraction: false }}
             coverflowEffect={{
@@ -75,16 +104,18 @@ export default function Reviews() {
               modifier: 2.5,
               slideShadows: false,
             }}
+            modules={[EffectCoverflow, Autoplay]}
             pagination={{ clickable: true, }}
             modules={[EffectCoverflow, Pagination, Autoplay]}
             className="max-w-6xl !pb-14 overflow-hidden"
           >
-            {reviews.map((review) => {
+            {reviews.map((review, idx) => {
               const name = review.userName || "Anonymous User";
               const text = review.reviewText || review.review || "";
-              const avatarUrl = review.avatarUrl || "";
 
               return (
+                <SwiperSlide key={`${review._id}-${idx}`}>
+                  <div className="bg-white rounded-2xl p-6 m-2 md:p-8 border border-[#7e525c] shadow-lg h-full flex flex-col transition-all duration-300 hover:shadow-xl">
                 <SwiperSlide key={review.reviewId ?? review._id}>
                   <div className="bg-white rounded-2xl p-6 md:p-8 border border-[#7e525c] shadow-lg h-full flex flex-col transition-all duration-300 mx-2">
                     <div className="mb-4">
