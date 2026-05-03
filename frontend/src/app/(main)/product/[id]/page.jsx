@@ -328,8 +328,8 @@ console.log(product,"pro");
             </div>
             <div className="tab-content">
               {activeTab === "description" && (
-                <div className="description-content">
-                  <h3>The Scent Narrative</h3>
+                <div className="description-content ">
+                  <h3 className="pb-2">The Scent Narrative</h3>
                   <p>{product.description}</p>
                 </div>
               )}
@@ -363,9 +363,9 @@ console.log(product,"pro");
       </main>
 
     {/* Customer Reviews & Feedback */}
-<section className="w-full bg-[#faf8f5]  px-4 flex flex-col items-center justify-center">
+<section className="w-full bg-[#faf8f5]   flex flex-col items-center justify-center">
   {/* Header Container */}
-  <div className="text-center mb-10 max-w-2xl">
+  <div className="text-center mb-8 max-w-2xl">
     <h2
       className="text-[#7e525c] font-normal leading-tight text-[28px] sm:text-[34px] md:text-[38px] mb-3"
       style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}
@@ -378,7 +378,7 @@ console.log(product,"pro");
   </div>
 
   {/* Form Container - Adjusted for better alignment and responsiveness */}
-  <div className="bg-white border border-[#e8dde0] rounded-2xl p-6 sm:p-10 shadow-sm w-full max-w-2xl mx-auto">
+  <div className="bg-white border border-[#e8dde0] rounded-2xl p-2 sm:p-10 shadow-sm w-full max-w-2xl mx-auto">
     {reviewSuccess ? (
       <div className="text-center py-8">
         <p

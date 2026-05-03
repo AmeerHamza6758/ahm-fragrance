@@ -31,6 +31,11 @@ function StarRating({ rating = 5 }) {
 
 export default function Reviews() {
   const { data, isLoading } = useGetAllReviews();
+const reviews = (() => {
+  const raw = Array.isArray(data) ? data : (data?.data ?? data?.reviews ?? []);
+  console.log(raw,"raw");
+  
+  const source = raw.length > 0 ? STATIC_FALLBACK : raw;
 
   const reviews = (() => {
     const raw = Array.isArray(data) ? data : (data?.data ?? data?.reviews ?? []);
@@ -100,6 +105,7 @@ export default function Reviews() {
                   <div className="bg-white rounded-2xl p-6 m-2 md:p-8 border border-[#7e525c] shadow-lg h-full flex flex-col transition-all duration-300 hover:shadow-xl">
                     <div className="mb-4">
                       <StarRating rating={review.rating ?? 5} />
+                      
                       {review.productName && (
                         <p className="text-[10px] md:text-xs mt-2 text-[#7e525c] font-semibold uppercase tracking-widest">
                           {review.productName}
@@ -114,14 +120,19 @@ export default function Reviews() {
                     <div className="flex items-center gap-4 border-t border-gray-100 pt-4 mt-auto">
                       <div className="text-left">
                         <h4 className="font-bold text-gray-800 text-xs md:text-sm">{name}</h4>
-                        <span className="text-[10px] text-gray-400 uppercase font-medium">Verified Buyer</span>
+                        <span className="text-[10px] text-gray-400 uppercase font-medium">
+                          Verified Buyer
+                        </span>
                       </div>
+
                     </div>
                   </div>
+
                 </SwiperSlide>
               );
             })}
           </Swiper>
+
         </div>
       )}
 
