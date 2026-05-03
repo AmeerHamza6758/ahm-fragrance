@@ -5,7 +5,8 @@ import { GrView } from "react-icons/gr";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import Pagination from "../components/Pagination";
 import Loader from "../components/Loader";
-import { useGetUsers } from "../services/hooks/users";
+import { useGetUsers, useDeleteUser } from "../services/hooks/users";
+import { successToaster, errorToaster, confirmationPopup } from "../utils/alert-service";
 
 function CustomersPage() {
   const navigate = useNavigate();
@@ -13,6 +14,7 @@ function CustomersPage() {
   const entriesPerPage = 10;
   
   const { data: usersRes, isLoading, isError } = useGetUsers(currentPage, entriesPerPage);
+  const { mutate: deleteUser, isLoading: isDeleting } = useDeleteUser();
 
   const users = usersRes?.data?.data || [];
   const totalEntries = usersRes?.data?.pagination?.totalItems || 0;
@@ -30,6 +32,20 @@ function CustomersPage() {
 
   const handleView = (id) => {
     navigate(`/customers/view/${id}`);
+  };
+
+  const handleDelete = async (id) => {
+    const result = await confirmationPopup("Are you sure you want to delete this customer? This action cannot be undone.");
+    if (result.isConfirmed) {
+      deleteUser(id, {
+        onSuccess: () => {
+          successToaster("Customer deleted successfully");
+        },
+        onError: (error) => {
+          errorToaster(error.response?.data?.message || "Failed to delete customer");
+        }
+      });
+    }
   };
 
   return (
@@ -101,7 +117,8 @@ function CustomersPage() {
                 <RiDeleteBin6Line
                   className="action-icon delete-icon"
                   size={18}
-                  style={{ color: "#ef4444", cursor: "pointer" }}
+                  style={{ color: "#ef4444", cursor: isDeleting ? "not-allowed" : "pointer" }}
+                  onClick={() => !isDeleting && handleDelete(user._id)}
                 />
               </div>
             </div>

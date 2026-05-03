@@ -14,5 +14,6 @@ router.get("/getAllUsers", authController.getAllUsers);
 router.get("/getUserById", authController.getUserById);
 router.put("/update-profile", authMiddleware, authController.updateProfile);
 router.put("/update-password", authMiddleware, authController.updatePassword);
+router.delete("/deleteUser/:id", authController.deleteUser);
 
 module.exports = router;

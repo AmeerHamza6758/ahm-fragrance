@@ -93,4 +93,5 @@ export const userApi = {
     return http.get(`/api/auth/getAllUsers${query}`);
   },
   getById: (id) => http.get(`/api/auth/getUserById?id=${id}`),
+  remove: (id) => http.delete(`/api/auth/deleteUser/${id}`),
 };
