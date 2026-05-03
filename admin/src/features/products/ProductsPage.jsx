@@ -6,7 +6,8 @@ import { FiEdit } from "react-icons/fi";
 import { GrView } from "react-icons/gr";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import Pagination from "../../components/Pagination";
-import { useGetProducts, useDeleteProduct } from "../../services/hooks/products";
+import StatCard from "../../components/StatCard";
+import { useGetProducts, useDeleteProduct, useGetProductStats } from "../../services/hooks/products";
 import { confirmationPopup } from "../../utils/alert-service";
 
 function ProductsPage() {
@@ -15,7 +16,10 @@ function ProductsPage() {
   const entriesPerPage = 10;
   
   const { data: productsRes, isLoading, isError } = useGetProducts(currentPage, entriesPerPage);
+  const { data: statsRes } = useGetProductStats();
   const deleteMutation = useDeleteProduct();
+
+  const stats = statsRes?.data?.data || { men: 0, women: 0, unisex: 0 };
 
   // Handle both { data: [...] } and { data: { data: [...] } } structures
   const productsBody = productsRes?.data;
@@ -84,6 +88,99 @@ function ProductsPage() {
         <NavLink to="/products/add" className="add-btn">
           <IoMdAdd /> Add New Fragrance
         </NavLink>
+      </div>
+
+      {/* Stats Cards Section */}
+      <div className="dashboard-stats" style={{ 
+        display: "flex", 
+        flexDirection: "row", 
+        gap: "1.5rem", 
+        marginBottom: "2.5rem",
+        flexWrap: "wrap"
+      }}>
+        {/* Men's Card */}
+        <div style={{ 
+          flex: 1, 
+          minWidth: "200px", 
+          background: "white", 
+          borderRadius: "12px", 
+          border: "1px solid #EBE7E4", 
+          overflow: "hidden",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.02)"
+        }}>
+          <div style={{ 
+            backgroundColor: "#FDF9F5", 
+            padding: "10px 16px", 
+            borderBottom: "1px solid #EBE7E4",
+            fontWeight: "700",
+            color: "#7E525C",
+            fontSize: "11px",
+            textTransform: "uppercase",
+            letterSpacing: "0.05em"
+          }}>
+            Him
+          </div>
+          <div style={{ padding: "16px" }}>
+            <h3 style={{ fontSize: "1.75rem", margin: "0 0 4px 0", color: "#2D2726" }}>{stats.men}</h3>
+            <p style={{ margin: 0, fontSize: "0.85rem", color: "#78716C" }}>Total fragrances for men</p>
+          </div>
+        </div>
+
+        {/* Women's Card */}
+        <div style={{ 
+          flex: 1, 
+          minWidth: "200px", 
+          background: "white", 
+          borderRadius: "12px", 
+          border: "1px solid #EBE7E4", 
+          overflow: "hidden",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.02)"
+        }}>
+          <div style={{ 
+            backgroundColor: "#FDF9F5", 
+            padding: "10px 16px", 
+            borderBottom: "1px solid #EBE7E4",
+            fontWeight: "700",
+            color: "#7E525C",
+            fontSize: "11px",
+            textTransform: "uppercase",
+            letterSpacing: "0.05em"
+          }}>
+            Her
+          </div>
+          <div style={{ padding: "16px" }}>
+            <h3 style={{ fontSize: "1.75rem", margin: "0 0 4px 0", color: "#2D2726" }}>{stats.women}</h3>
+            <p style={{ margin: 0, fontSize: "0.85rem", color: "#78716C" }}>Total fragrances for women</p>
+          </div>
+        </div>
+
+        {/* Unisex Card */}
+        <div style={{ 
+          flex: 1, 
+          minWidth: "200px", 
+          background: "white", 
+          borderRadius: "12px", 
+          border: "1px solid #EBE7E4", 
+          overflow: "hidden",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.02)"
+        }}>
+          <div style={{ 
+            backgroundColor: "#FDF9F5", 
+            padding: "10px 16px", 
+            borderBottom: "1px solid #EBE7E4",
+            fontWeight: "700",
+            color: "#7E525C",
+            fontSize: "11px",
+            textTransform: "uppercase",
+            letterSpacing: "0.05em"
+          }}>
+            Unisex
+          </div>
+          <div style={{ padding: "16px" }}>
+            <h3 style={{ fontSize: "1.75rem", margin: "0 0 4px 0", color: "#2D2726" }}>{stats.unisex}</h3>
+            <p style={{ margin: 0, fontSize: "0.85rem", color: "#78716C" }}>Versatile fragrances</p>
+          </div>
+        </div>
       </div>
 
       {/* Table */}
