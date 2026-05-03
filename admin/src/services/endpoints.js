@@ -18,21 +18,22 @@ export const productsApi = {
   create: (payload) => http.post("/api/product/addProduct", payload),
   update: (id, payload) => http.put(`/api/product/updateProduct?id=${id}`, payload),
   remove: (id) => http.delete(`/api/product/deleteProduct/${id}`),
+  getStats: () => http.get("/api/product/stats"),
 };
 
 
 export const categoryApi = {
   list: () => http.get("/api/category/getCategory"),
   create: (payload) => http.post("/api/category/creatCategory", payload),
-  update: (payload) => http.put("/api/category/updateCategory", payload),
-  remove: (payload) => http.delete("/api/category/deleteCategory", { data: payload }),
+  update: (id, payload) => http.put(`/api/category/updateCategory?id=${id}`, payload),
+  remove: (id) => http.delete(`/api/category/deleteCategory?id=${id}`),
 };
 
 export const brandApi = {
   list: () => http.get("/api/brand/getBrand"),
   create: (payload) => http.post("/api/brand/creatBrand", payload),
-  update: (payload) => http.put("/api/brand/updateBrand", payload),
-  remove: (payload) => http.delete("/api/brand/deleteBrand", { data: payload }),
+  update: (id, payload) => http.put(`/api/brand/updateBrand?id=${id}`, payload),
+  remove: (id) => http.delete(`/api/brand/deleteBrand?id=${id}`),
 };
 
 export const orderApi = {
@@ -69,6 +70,9 @@ export const cmsApi = {
 
 export const tagApi = {
   list: () => http.get("/api/tag/getTags"),
+  create: (payload) => http.post("/api/tag/createTag", payload),
+  update: (id, payload) => http.put(`/api/tag/updateTag?id=${id}`, payload),
+  remove: (id) => http.delete(`/api/tag/deleteTag?id=${id}`),
 };
 
 export const imageApi = {
@@ -93,4 +97,13 @@ export const userApi = {
     return http.get(`/api/auth/getAllUsers${query}`);
   },
   getById: (id) => http.get(`/api/auth/getUserById?id=${id}`),
+  remove: (id) => http.delete(`/api/auth/deleteUser/${id}`),
+};
+export const contactApi = {
+  list: () => http.get("/api/contact/all"),
+  remove: (id) => http.delete(`/api/contact/delete?id=${id}`),
+};
+export const circleApi = {
+  list: () => http.get("/api/circle/all"),
+  remove: (id) => http.delete(`/api/circle/remove?id=${id}`),
 };

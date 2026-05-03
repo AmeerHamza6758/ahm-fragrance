@@ -28,7 +28,7 @@ export function useAddCategory() {
 export function useUpdateCategory() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (payload) => categoryApi.update(payload),
+    mutationFn: ({ id, data }) => categoryApi.update(id, data),
     onSuccess: () => {
       successToaster("Category updated successfully");
       queryClient.invalidateQueries({ queryKey: [CATEGORIES_KEY] });
@@ -42,7 +42,7 @@ export function useUpdateCategory() {
 export function useDeleteCategory() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (id) => categoryApi.remove({ id }),
+    mutationFn: (id) => categoryApi.remove(id),
     onSuccess: () => {
       successToaster("Category deleted successfully");
       queryClient.invalidateQueries({ queryKey: [CATEGORIES_KEY] });

@@ -7,4 +7,6 @@ export * from "./products";
 export * from "./auth";
 export * from "./favorites";
 export * from "./cart";
+export * from "./contact";
+export * from "./circle";
 

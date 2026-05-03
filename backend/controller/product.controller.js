@@ -563,6 +563,34 @@ const productController = {
                 error: error.message
             });
         }
+    },
+
+    getProductStats: async (req, res) => {
+        try {
+            const categories = await Category.find({ name: { $in: ['men', 'women', 'unisex'] } });
+            
+            const stats = {
+                men: 0,
+                women: 0,
+                unisex: 0
+            };
+
+            for (const category of categories) {
+                const count = await Product.countDocuments({ category_id: category._id });
+                stats[category.name.toLowerCase()] = count;
+            }
+
+            res.status(200).json({
+                success: true,
+                data: stats
+            });
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                message: 'Failed to get product stats',
+                error: error.message
+            });
+        }
     }
 };
 
