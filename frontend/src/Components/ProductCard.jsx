@@ -115,7 +115,7 @@ export default function ProductCard({ product }) {
 
           {/* Notes / Description */}
           {displayNotes && (
-            <p className="text-secondary text-sm tracking-wider">
+            <p className="text-secondary text-sm tracking-wider line-clamp-3">
               {displayNotes}
             </p>
           )}

@@ -129,38 +129,34 @@ console.log(product,"pro");
           <div className="product-details-container">
             {/* Product Images */}
            {/* Product Images Section */}
-
-<div className="flex flex-col gap-4 items-end">
+<div className="flex flex-col gap-4 items-center h-[90%]!">
   {/* Main Large Image */}
-  <div 
-  className="relative aspect-square w-[90%] bg-[#faf8f5] rounded-xl! overflow-hidden ">
-  <Image
-  src={imageUrl}
-  alt={product.name}
-  fill
-  className="object-contain p-4 rounded-lg! detail-img"
-  priority
-/>
+  <div className="relative aspect-square w-[90%]   bg-[#faf8f5] rounded-4xl! overflow-hidden">
+    <Image
+      src={imageUrl}
+      alt={product.name}
+      fill
+      className="object-contain  rounded-4xl! absolute rounded-b-4xl! lg:rounded-4xl"
+      priority
+    />
   </div>
 
   {/* Thumbnails Row */}
-  <div className="flex flex-row justify-center gap-3 relative w-[90%] rounded-lg!">
-  {[1, 2].map((_, index) => (
-  <div 
-    key={index} 
-    className="relative aspect-square bg-[#faf8f5] !rounded-xl overflow-hidden transition-colors h-[30%] w-[30%]"
-  >
-    <Image
-      src={imageUrl}
-      alt={`${product.name} thumb ${index}`}
-      fill
-      className="object-contain p-2 detail-img"
-    />
+  <div className="flex flex-row justify-center gap-3 w-[90%]">
+    {[1, 2].map((_, index) => (
+      <div 
+        key={index} 
+        className="relative aspect-square bg-[#faf8f5] rounded-xl overflow-hidden w-[30%]"
+      >
+        <Image
+          src={imageUrl}
+          alt={`${product.name} thumb ${index}`}
+          fill
+          className="object-contain p-2 detail-img"
+        />
+      </div>
+    ))}
   </div>
-))}
-  
-  
-</div>
 </div>
 
             {/* Product Details */}
@@ -174,7 +170,6 @@ console.log(product,"pro");
                 {/* <span className="review-text">(104 reviews)</span> */}
               </div>
 
-              {/* <p className="product-description">{product.description}</p> */}
 
               <div className="price-section">
                 <span className="price">

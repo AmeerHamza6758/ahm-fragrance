@@ -118,7 +118,7 @@ useEffect(() => {
       </section>
 
     {/* Filters and Sort Dropdowns */}
-<section className="w-full px-4 sm:px-6 lg:px-8 py-4">
+<section className="w-full px-4 sm:px-6 lg:px-8 py-4  rounded-2xl ">
   <div className="w-full flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-start lg:gap-8">
     
   
