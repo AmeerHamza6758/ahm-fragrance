@@ -9,6 +9,7 @@ import Pagination from "../../components/Pagination";
 import StatCard from "../../components/StatCard";
 import { useGetProducts, useDeleteProduct, useGetProductStats } from "../../services/hooks/products";
 import { confirmationPopup } from "../../utils/alert-service";
+import { API_BASE_URL } from "../../services/http";
 
 function ProductsPage() {
   const navigate = useNavigate();
@@ -73,7 +74,6 @@ function ProductsPage() {
     };
   };
 
-  const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
   return (
     <div>
@@ -211,8 +211,9 @@ function ProductsPage() {
               {/* Product */}
               <div className="product-cell">
                 <img 
-                  src={item.image_id?.[0]?.path ? `${BASE_URL}/${item.image_id[0].path}` : "/image/placeholder.png"} 
+                  src={item.image_id?.[0]?.path ? `${API_BASE_URL}/${item.image_id[0].path}` : "https://via.placeholder.com/40"} 
                   alt={item.name} 
+                  className="product-thumb"
                 />
                 <span>{item.name}</span>
               </div>
