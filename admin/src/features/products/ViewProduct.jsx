@@ -4,6 +4,7 @@ import { useGetProductById, useGetStockByProductId } from '../../services/hooks/
 import { IoArrowBack } from 'react-icons/io5';
 import Loader from '../../components/Loader';
 import "../../styles/admin.css";
+import { API_BASE_URL } from "../../services/http";
 
 function ViewProduct() {
   const { id } = useParams();
@@ -45,9 +46,8 @@ function ViewProduct() {
     return { backgroundColor: colors[index].bg, color: colors[index].text, border: `1px solid ${colors[index].text}20` };
   };
 
-  const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
   const imageUrl = product?.image_id?.[0]?.path
-    ? `${BASE_URL}/${product.image_id[0].path}`
+    ? `${API_BASE_URL}/${product.image_id[0].path}`
     : "/image/placeholder.png";
 
   return (
@@ -77,7 +77,7 @@ function ViewProduct() {
             <div className="thumbnail-strip">
               {product.image_id.map((img, idx) => (
                 <div key={idx} className={`thumb-box ${idx === 0 ? 'active' : ''}`}>
-                  <img src={`${BASE_URL}/${img.path}`} alt={`View ${idx}`} />
+                  <img src={`${API_BASE_URL}/${img.path}`} alt={`View ${idx}`} />
                 </div>
               ))}
             </div>
