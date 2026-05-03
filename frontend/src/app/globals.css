@@ -3088,7 +3088,7 @@ height: 100%;
   font-size: 24px;
   font-weight: 700;
   color: rgb(var(--color-foreground));
-  margin: 0 0 20px;
+
 }
 
 .description-content p,
@@ -3098,7 +3098,7 @@ height: 100%;
   font-size: 16px;
   line-height: 1.7;
   color: rgb(var(--color-primary));
-  margin: 0 0 20px;
+
 }
 
 .scent-notes {
