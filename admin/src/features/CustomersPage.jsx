@@ -6,6 +6,8 @@ import { RiDeleteBin6Line } from "react-icons/ri";
 import Pagination from "../components/Pagination";
 import Loader from "../components/Loader";
 import { useGetUsers, useDeleteUser } from "../services/hooks/users";
+import { useGetContacts, useDeleteContact } from "../services/hooks/contacts";
+import { useGetCircleMembers, useRemoveCircleMember } from "../services/hooks/circle";
 import { successToaster, errorToaster, confirmationPopup } from "../utils/alert-service";
 
 function CustomersPage() {
@@ -15,10 +17,17 @@ function CustomersPage() {
   
   const { data: usersRes, isLoading, isError } = useGetUsers(currentPage, entriesPerPage);
   const { mutate: deleteUser, isLoading: isDeleting } = useDeleteUser();
+  const { data: contactsRes, isLoading: contactsLoading } = useGetContacts();
+  const deleteContactMutation = useDeleteContact();
+  const { data: circleRes, isLoading: circleLoading } = useGetCircleMembers();
+  const removeCircleMutation = useRemoveCircleMember();
 
   const users = usersRes?.data?.data || [];
   const totalEntries = usersRes?.data?.pagination?.totalItems || 0;
   const totalPages = usersRes?.data?.pagination?.totalPages || 1;
+
+  const contacts = contactsRes?.data?.data || [];
+  const circleMembers = circleRes?.data?.data || [];
 
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
@@ -48,6 +57,20 @@ function CustomersPage() {
     }
   };
 
+  const handleDeleteContact = async (id) => {
+    const result = await confirmationPopup("Are you sure you want to delete this contact message?");
+    if (result.isConfirmed) {
+      deleteContactMutation.mutate(id);
+    }
+  };
+
+  const handleRemoveCircle = async (id) => {
+    const result = await confirmationPopup("Are you sure you want to remove this member from the Fragrance Circle?");
+    if (result.isConfirmed) {
+      removeCircleMutation.mutate(id);
+    }
+  };
+
   return (
     <div className="customers-page-container">
       {/* Header */}
@@ -60,12 +83,104 @@ function CustomersPage() {
         </div>
       </div>
 
-      {/* Table */}
+      <div className="admin-stacked-sections" style={{ display: "flex", flexDirection: "column", gap: "3rem", marginBottom: "3rem" }}>
+        {/* Contact Inquiries Section */}
+        <div className="section-wrapper">
+          <div className="catalog-header" style={{ marginBottom: "1rem" }}>
+            <div>
+              <h2 className="catalog-title" style={{ fontSize: "1.25rem" }}>Contact Inquiries</h2>
+              <p className="catalog-subtitle">Recent messages from your visitors.</p>
+            </div>
+          </div>
+          
+          <div className="catalog-table">
+            <div className="catalog-table-header" style={{ gridTemplateColumns: "1.5fr 1.5fr 1fr 3fr 1fr 0.5fr" }}>
+              <span>Name</span>
+              <span>Email</span>
+              <span>Subject</span>
+              <span>Message</span>
+              <span>Date</span>
+              <span>Actions</span>
+            </div>
+
+            {contactsLoading ? (
+              <Loader text="Loading inquiries..." />
+            ) : contacts.length === 0 ? (
+              <div className="empty-state">No new inquiries.</div>
+            ) : (
+              contacts.map((contact) => (
+                <div className="catalog-row" key={contact._id} style={{ gridTemplateColumns: "1.5fr 1.5fr 1fr 3fr 1fr 0.5fr" }}>
+                  <span style={{ fontWeight: 600 }}>{contact.name}</span>
+                  <span className="truncate">{contact.email}</span>
+                  <span>{contact.subject || "No Subject"}</span>
+                  <span className="description-text-small" style={{ fontSize: "12px", color: "#666" }}>{contact.message}</span>
+                  <span>{formatDate(contact.createdAt)}</span>
+                  <div className="actions">
+                    <RiDeleteBin6Line
+                      className="action-icon delete-icon"
+                      size={18}
+                      style={{ color: "#ef4444", cursor: "pointer" }}
+                      onClick={() => handleDeleteContact(contact._id)}
+                    />
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        {/* Fragrance Circle Section */}
+        <div className="section-wrapper">
+          <div className="catalog-header" style={{ marginBottom: "1rem" }}>
+            <div>
+              <h2 className="catalog-title" style={{ fontSize: "1.25rem" }}>Fragrance Circle Members</h2>
+              <p className="catalog-subtitle">Managing your newsletter community.</p>
+            </div>
+          </div>
+          
+          <div className="catalog-table">
+            <div className="catalog-table-header" style={{ gridTemplateColumns: "3fr 1fr 0.5fr" }}>
+              <span>Member Email</span>
+              <span>Date Joined</span>
+              <span>Actions</span>
+            </div>
+
+            {circleLoading ? (
+              <Loader text="Loading members..." />
+            ) : circleMembers.length === 0 ? (
+              <div className="empty-state">No members joined.</div>
+            ) : (
+              circleMembers.map((member) => (
+                <div className="catalog-row" key={member._id} style={{ gridTemplateColumns: "3fr 1fr 0.5fr" }}>
+                  <span style={{ fontWeight: 600 }}>{member.email}</span>
+                  <span>{formatDate(member.subscribedAt)}</span>
+                  <div className="actions">
+                    <RiDeleteBin6Line
+                      className="action-icon delete-icon"
+                      size={18}
+                      style={{ color: "#ef4444", cursor: "pointer" }}
+                      onClick={() => handleRemoveCircle(member._id)}
+                    />
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="catalog-header" style={{ marginBottom: "1rem" }}>
+        <div>
+          <h2 className="catalog-title" style={{ fontSize: "1.25rem" }}>Registered Users</h2>
+        </div>
+      </div>
+
+      {/* Users Table */}
       <div className="catalog-table">
         <div className="catalog-table-header customer-grid-simple">
           <span>Identity</span>
           <span>Contact Details</span>
-          <span>Gender</span>
+          <span>Status</span>
           <span>Member Since</span>
           <span>Verification</span>
           <span>Actions</span>
@@ -85,6 +200,9 @@ function CustomersPage() {
               {/* Customer Name */}
               <div className="product-cell">
                 <span className="user-name">{user.userName}</span>
+                {user.isCircleMember && (
+                  <span className="status-badge status-active" style={{ fontSize: "10px", padding: "2px 6px", marginLeft: "8px", background: "#7e525c", color: "#fff" }}>Circle Member</span>
+                )}
               </div>
 
               {/* Contact */}
@@ -93,7 +211,7 @@ function CustomersPage() {
                 <span className="user-phone">{user.phone || "No contact"}</span>
               </div>
 
-              {/* Gender */}
+              {/* Gender/Status */}
               <span className="capitalize">{user.gender || "N/A"}</span>
 
               {/* Join Date */}

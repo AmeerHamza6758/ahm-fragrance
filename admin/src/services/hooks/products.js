@@ -77,3 +77,10 @@ export function useGetStockByProductId(productId) {
     enabled: !!productId,
   });
 }
+
+export function useGetProductStats() {
+  return useQuery({
+    queryKey: [PRODUCTS_KEY, "stats"],
+    queryFn: () => productsApi.getStats(),
+  });
+}

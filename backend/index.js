@@ -32,6 +32,8 @@ app.use('/api/faq', require("./router/faq.router"));
 app.use("/api/favorite", require("./router/fovorite.router"));
 app.use("/api/rating-review", require("./router/ratingReview.router"));
 app.use("/api/cms", require("./router/cms.router"));
+app.use("/api/contact", require("./router/contact.router"));
+app.use("/api/circle", require("./router/circle.router"));
 
 
 

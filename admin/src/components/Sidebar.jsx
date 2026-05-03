@@ -17,7 +17,7 @@ export const navItems = [
   { path: "/dashboard", label: "Dashboard" },
   { path: "/customers", label: "Customers" },
   { path: "/products", label: "Products" },
-  { path: "/categories", label: "Categories" },
+  { path: "/categories", label: "Categories & Tags" },
   // { path: "/brands", label: "Brands" },
   { path: "/stock", label: "Stock" },
   { path: "/orders", label: "Orders" },

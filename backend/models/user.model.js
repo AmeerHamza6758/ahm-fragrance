@@ -73,6 +73,10 @@ const userSchema = new mongoose.Schema({
       type: Date,
       default: null
    },
+   isCircleMember: {
+      type: Boolean,
+      default: false
+   },
    createdAt: (Date),
    updatedAt: (Date),
    
