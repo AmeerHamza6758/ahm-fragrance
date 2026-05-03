@@ -77,7 +77,7 @@ function CustomersPage() {
       <div className="catalog-header">
         <div>
           <h1 className="catalog-title">Customer Directory</h1>
-          <p className="catalog-subtitle">
+          <p className="catalog-subtitle" style={{height:"15px"}}>
             Manage your registered botanical enthusiasts and their preferences.
           </p>
         </div>
@@ -88,13 +88,13 @@ function CustomersPage() {
         <div className="section-wrapper">
           <div className="catalog-header" style={{ marginBottom: "1rem" }}>
             <div>
-              <h2 className="catalog-title" style={{ fontSize: "1.25rem" }}>Contact Inquiries</h2>
-              <p className="catalog-subtitle">Recent messages from your visitors.</p>
+              <h2 className="catalog-title" style={{ fontSize: "1.25rem", height:"20px"}}>Contact Inquiries</h2>
+              <p className="catalog-subtitle" style={{}}>Recent messages from your visitors.</p>
             </div>
           </div>
           
-          <div className="catalog-table">
-            <div className="catalog-table-header" style={{ gridTemplateColumns: "1.5fr 1.5fr 1fr 3fr 1fr 0.5fr" }}>
+          <div className="catalog-table" style={{maxHeight:"420px", overflowY:"auto", height:"300px"}}>
+            <div className="catalog-table-header" style={{ gridTemplateColumns: "1.5fr 2.5fr 1.5fr 3fr 1.5fr 0.5fr", position:"sticky",top:"0px", zIndex:"10" }}>
               <span>Name</span>
               <span>Email</span>
               <span>Subject</span>
@@ -109,10 +109,10 @@ function CustomersPage() {
               <div className="empty-state">No new inquiries.</div>
             ) : (
               contacts.map((contact) => (
-                <div className="catalog-row" key={contact._id} style={{ gridTemplateColumns: "1.5fr 1.5fr 1fr 3fr 1fr 0.5fr" }}>
-                  <span style={{ fontWeight: 600 }}>{contact.name}</span>
-                  <span className="truncate">{contact.email}</span>
-                  <span>{contact.subject || "No Subject"}</span>
+                <div className="catalog-row" key={contact._id} style={{ gridTemplateColumns: "1.5fr 2.5fr 1.5fr 3fr 1.5fr 0.5fr", justifyContent:"space-between" }}>
+                  <span style={{ fontWeight: "600" }}>{contact.name}</span>
+                  <span className="truncate" style={{width:"110px"}}>{contact.email}</span>
+                  <span style={{}}>{contact.subject || "No Subject"}</span>
                   <span className="description-text-small" style={{ fontSize: "12px", color: "#666" }}>{contact.message}</span>
                   <span>{formatDate(contact.createdAt)}</span>
                   <div className="actions">
