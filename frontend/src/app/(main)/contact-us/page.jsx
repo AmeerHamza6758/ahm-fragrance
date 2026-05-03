@@ -2,11 +2,56 @@
 
 import React, { useEffect, useState } from "react";
 import { getFaqs } from "@/lib/api/endpoints/faq";
+import { submitContact } from "@/lib/api/endpoints/contact";
+import Swal from "sweetalert2";
 
 export default function ContactPage() {
   const [open, setOpen] = useState(null);
   const [faqs, setFaqs] = useState([]);
   const [faqLoading, setFaqLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    subject: "",
+    message: ""
+  });
+
+  const handleChange = (e) => {
+    const { id, value } = e.target;
+    setFormData((prev) => ({ ...prev, [id]: value }));
+  };
+
+  const handleContactSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const res = await submitContact(formData);
+      if (res.success) {
+        Swal.fire({
+          icon: 'success',
+          title: 'Message Sent',
+          text: 'Thank you for reaching out! Our artisans will get back to you soon.',
+          confirmButtonColor: '#7e525c'
+        });
+        setFormData({ name: "", email: "", subject: "", message: "" });
+      } else {
+        throw new Error(res.error || "Failed to send message");
+      }
+    } catch (error) {
+      console.error("Submission error:", error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Submission Failed',
+        text: error.message || 'Something went wrong. Please try again later.',
+        confirmButtonColor: '#7e525c'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     let isMounted = true;
@@ -66,6 +111,7 @@ export default function ContactPage() {
         <form
           className="w-full max-w-xl bg-white/0 rounded-2xl border border-[#ede6e1] p-8 md:p-6 flex flex-col gap-6 shadow-none"
           style={{ boxShadow: "0 0 0 0 transparent" }}
+          onSubmit={handleContactSubmit}
         >
           <div className="flex flex-col sm:flex-row gap-4 ">
             <div className="flex-1 flex flex-col gap-2">
@@ -78,9 +124,12 @@ export default function ContactPage() {
               <input
                 id="name"
                 type="text"
+                value={formData.name}
+                onChange={handleChange}
                 placeholder="Your Full Name"
                 className="rounded-md border border-[#ede6e1] bg-[#fdf9f5] px-4 py-2 text-[15px] text-[#1c1c19] font-normal focus:outline-none focus:border-[#7e525c] transition"
                 style={{ fontFamily: "Arial, sans-serif" }}
+                required
               />
             </div>
             <div className="flex-1 flex flex-col gap-2">
@@ -93,9 +142,12 @@ export default function ContactPage() {
               <input
                 id="email"
                 type="email"
+                value={formData.email}
+                onChange={handleChange}
                 placeholder="hello@example.com"
                 className="rounded-md border border-[#ede6e1] bg-[#fdf9f5] px-4 py-2 text-[15px] text-[#1c1c19] font-normal focus:outline-none focus:border-[#7e525c] transition"
                 style={{ fontFamily: "Arial, sans-serif" }}
+                required
               />
             </div>
           </div>
@@ -109,9 +161,12 @@ export default function ContactPage() {
             <input
               id="subject"
               type="text"
+              value={formData.subject}
+              onChange={handleChange}
               placeholder="How can we help?"
               className="rounded-md border border-[#ede6e1] bg-[#fdf9f5] px-4 py-2 text-[15px] text-[#1c1c19] font-normal focus:outline-none focus:border-[#7e525c] transition"
               style={{ fontFamily: "Arial, sans-serif" }}
+              required
             />
           </div>
           <div className="flex flex-col gap-2">
@@ -124,17 +179,21 @@ export default function ContactPage() {
             <textarea
               id="message"
               rows={4}
+              value={formData.message}
+              onChange={handleChange}
               placeholder="Write your botanical inquiry here..."
               className="rounded-md border border-[#ede6e1] bg-[#fdf9f5] px-4 py-2 text-[15px] text-[#1c1c19] font-normal focus:outline-none focus:border-[#7e525c] transition resize-none"
               style={{ fontFamily: "Arial, sans-serif" }}
+              required
             />
           </div>
           <button
             type="submit"
-            className="mt-2 w-50 self-start rounded-full bg-[#7e525c] px-8 py-3 text-white text-[15px] font-semibold tracking-[1px] uppercase shadow-none hover:bg-[#6a4450] transition-colors"
+            disabled={loading}
+            className={`mt-2 w-50 self-start rounded-full bg-[#7e525c] px-8 py-3 text-white text-[15px] font-semibold tracking-[1px] uppercase shadow-none transition-colors ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#6a4450]'}`}
             style={{ fontFamily: "Arial, sans-serif" }}
           >
-            Send Message
+            {loading ? 'Sending...' : 'Send Message'}
           </button>
         </form>
       </section>

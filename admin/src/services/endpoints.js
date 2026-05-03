@@ -99,3 +99,7 @@ export const userApi = {
   getById: (id) => http.get(`/api/auth/getUserById?id=${id}`),
   remove: (id) => http.delete(`/api/auth/deleteUser/${id}`),
 };
+export const contactApi = {
+  list: () => http.get("/api/contact/all"),
+  remove: (id) => http.delete(`/api/contact/delete?id=${id}`),
+};
