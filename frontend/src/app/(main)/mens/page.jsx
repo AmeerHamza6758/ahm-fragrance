@@ -1,24 +1,62 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import ProductCard from "@/Components/ProductCard";
 import { useInfiniteProducts } from "@/lib/api";
+import { ChevronDown, ChevronUp } from "lucide-react";
+
+const categories = [
+  { id: "all", label: "All Collection" },
+  { id: "Fresh", label: "Fresh" },
+  { id: "Woody", label: "Woody" },
+  { id: "Floral", label: "Floral" },
+  { id: "Oriental", label: "Oriental" },
+  { id: "Musk", label: "Musk" },
+  { id: "Spicy", label: "Spicy" },
+];
+
+const sortOptions = [
+  { id: "newest", label: "Newest First" },
+  { id: "price-asc", label: "Price: Low to High" },
+  { id: "price-desc", label: "Price: High to Low" },
+];
 
 export default function MensPage() {
   const [activeCategory, setActiveCategory] = useState("men");
+  const [activeTag, setActiveTag] = useState("all");
+  const [sortBy, setSortBy] = useState("newest");
+  const [sortOpen, setSortOpen] = useState(false);
+  const [tagOpen, setTagOpen] = useState(false);
+  
+  const tagRef = useRef(null);
+  const sortRef = useRef(null);
   const router = useRouter();
 
   const filters = {};
+  
+  // Base category filter
   if (activeCategory === "men" || activeCategory === "bestsellers") {
     filters.category = "men";
+  } else if (activeCategory === "women") {
+    filters.category = "women";
   }
-  else if (activeCategory === "women") filters.category = "women";
+
+  // Sorting
+  if (sortBy === "price-asc") filters.price = "asc";
+  if (sortBy === "price-desc") filters.price = "desc";
+  if (sortBy === "newest") filters.sort = "newest";
+
+  // Tag filtering (Collection)
+  if (activeTag !== "all") {
+    filters.tag = activeTag;
+  }
+
+  // Bestsellers rating sort
   if (activeCategory === "bestsellers") {
     filters.rating = "desc";
   }
-  // bestsellers: no category filter, just all products
 
   const {
     data,
@@ -29,24 +67,21 @@ export default function MensPage() {
     isFetchingNextPage,
   } = useInfiniteProducts(filters, 50);
 
-  const allProducts = data?.pages?.flatMap((page) => page.data) ?? [];
-  const totalItems = data?.pages?.[0]?.pagination?.totalItems ?? allProducts.length;
+  const products = data?.pages?.flatMap((page) => page.data) ?? [];
+  const totalItems = data?.pages?.[0]?.pagination?.totalItems ?? products.length;
 
-  // Client-side filter to ensure only men products show by default
-  const filteredProducts = allProducts.filter((product) => {
-    if (activeCategory === "men") {
-      // Show only men's products
-      return (
-        product.category_id?.name?.toLowerCase() === "men" ||
-        !product.category_id
-      );
-    } else if (activeCategory === "bestsellers") {
-      return product.category_id?.name?.toLowerCase() === "men";
-    } else if (activeCategory === "women") {
-      return product.category_id?.name?.toLowerCase() === "women";
-    }
-    return true; // bestsellers: show all
-  });
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (tagOpen && tagRef.current && !tagRef.current.contains(event.target)) {
+        setTagOpen(false);
+      }
+      if (sortOpen && sortRef.current && !sortRef.current.contains(event.target)) {
+        setSortOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [tagOpen, sortOpen]);
 
   const hasMore = totalItems > 50 && !!hasNextPage;
 
@@ -113,6 +148,94 @@ export default function MensPage() {
         </div>
       </section>
 
+      {/* Filters and Sort Dropdowns */}
+      <section className="w-full px-4 sm:px-6 lg:px-8 py-4">
+        <div className="w-full flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-start lg:gap-8">
+          {/* SORT DROPDOWN */}
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 w-full lg:w-auto">
+            <span className="text-[#7E525C] text-xs lg:text-xl font-bold tracking-widest whitespace-nowrap">
+              SORT:
+            </span>
+            <div className="relative w-full sm:w-[240px]" ref={sortRef}>
+              <button
+                className="flex items-center justify-between w-full px-5 py-2.5 border border-[#7E525C33] rounded-full text-[#4E4543] text-sm bg-white outline-none"
+                onClick={() => {
+                  setSortOpen(!sortOpen);
+                  setTagOpen(false);
+                }}
+              >
+                <span className="truncate">
+                  {sortOptions.find((opt) => opt.id === sortBy)?.label}
+                </span>
+                {sortOpen ? (
+                  <ChevronUp size={18} className="shrink-0 ml-2" />
+                ) : (
+                  <ChevronDown size={18} className="shrink-0 ml-2" />
+                )}
+              </button>
+
+              {sortOpen && (
+                <div className="absolute z-[100] mt-1 w-full bg-white border border-[#7E525C33] rounded-2xl shadow-xl overflow-hidden left-0">
+                  {sortOptions.map((opt) => (
+                    <button
+                      key={opt.id}
+                      className={`w-full text-left px-5 py-3 sort-option ${sortBy === opt.id ? "active" : ""}`}
+                      onClick={() => {
+                        setSortBy(opt.id);
+                        setSortOpen(false);
+                      }}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+          {/* COLLECTION DROPDOWN */}
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 w-full lg:w-auto">
+            <span className="text-[#7E525C] text-xs lg:text-xl font-semibold tracking-widest">
+              COLLECTION:
+            </span>
+            <div className="relative w-full sm:w-[240px]" ref={tagRef}>
+              <button
+                className="flex items-center justify-between w-full px-5 py-2.5 border border-[#7E525C33] rounded-full text-[#4E4543] text-sm bg-white outline-none"
+                onClick={() => {
+                  setTagOpen(!tagOpen);
+                  setSortOpen(false);
+                }}
+              >
+                <span className="truncate">
+                  {categories.find((cat) => cat.id === activeTag)?.label}
+                </span>
+                {tagOpen ? (
+                  <ChevronUp size={18} className="shrink-0 ml-2" />
+                ) : (
+                  <ChevronDown size={18} className="shrink-0 ml-2" />
+                )}
+              </button>
+
+              {tagOpen && (
+                <div className="absolute z-[100] mt-1 w-full bg-white border border-[#7E525C33] rounded-2xl shadow-xl max-h-[220px] overflow-y-auto left-0">
+                  {categories.map((cat) => (
+                    <button
+                      key={cat.id}
+                      className={`w-full text-left px-5 py-3 text-sm sort-option ${activeTag === cat.id ? "active" : ""}`}
+                      onClick={() => {
+                        setActiveTag(cat.id);
+                        setTagOpen(false);
+                      }}
+                    >
+                      {cat.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Products Grid */}
       <section className="w-full px-4 sm:px-6 lg:px-8 xl:px-10 2xl:px-12 pt-5">
         {isLoading && (
@@ -127,16 +250,16 @@ export default function MensPage() {
           </div>
         )}
 
-        {!isLoading && !isError && filteredProducts.length === 0 && (
+        {!isLoading && !isError && products.length === 0 && (
           <div className="text-center py-20 text-[#a08a8a] text-sm">
             No products found.
           </div>
         )}
 
-        {!isLoading && !isError && filteredProducts.length > 0 && (
+        {!isLoading && !isError && products.length > 0 && (
           <>
             <div className="grid grid-cols-1 md:grid-cols-[repeat(auto-fit,minmax(220px,260px))] justify-items-center md:justify-items-stretch md:justify-start gap-x-5 gap-y-10">
-              {filteredProducts.map((product) => (
+              {products.map((product) => (
                 <div key={product._id || product.id} className="w-full max-w-[340px] md:max-w-[260px]">
                   <ProductCard product={product} />
                 </div>

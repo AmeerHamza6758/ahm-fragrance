@@ -2243,7 +2243,7 @@ p.product-price {
 }
 /* /////////////////////////////////////////// COLLECTIONS PAGE /////////////////////////////////////////// */
 
-.page-main-spacing {
+/* .page-main-spacing {
   padding-top: 24px;
   padding-bottom: 40px;
 }
@@ -2253,7 +2253,7 @@ p.product-price {
     padding-top: 40px;
     padding-bottom: 64px;
   }
-}
+} */
 
 .collections-main {
   width: 100%;
@@ -3145,7 +3145,7 @@ p.product-price {
 }
 
 .usage-list li::before {
-  content: "•";
+  content: "â€¢";
   position: absolute;
   left: 0;
   color: rgb(var(--color-primary));
@@ -5503,4 +5503,100 @@ p.product-price {
 
 .hero-content {
   padding-top: 0 !important;
+}
+
+/* CMS Content Rendering Styles */
+.cms-rich-content, .cms-content-render {
+  max-width: 800px;
+  margin: 0 auto;
+  line-height: 1.8;
+  color: #4a4a4a;
+  font-size: 1.1rem;
+}
+
+.cms-rich-content h1, .cms-rich-content h2, .cms-rich-content h3,
+.cms-content-render h1, .cms-content-render h2, .cms-content-render h3 {
+  color: #1a1716;
+  margin-top: 2.5rem;
+  margin-bottom: 1.5rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-family: 'Noto Serif', Georgia, serif;
+}
+
+.cms-content-render h2 {
+  font-size: 2.5rem;
+  font-weight: 600;
+}
+
+.cms-rich-content p, .cms-content-render p {
+  margin-bottom: 1.5rem;
+}
+
+.cms-rich-content ul, .cms-content-render ul {
+  list-style: none;
+  padding-left: 0;
+  margin-bottom: 2rem;
+}
+
+.cms-rich-content li, .cms-content-render li {
+  position: relative;
+  padding-left: 1.5rem;
+  margin-bottom: 0.8rem;
+}
+
+.cms-rich-content li::before, .cms-content-render li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.7em;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #7e525c;
+}
+
+.cms-content-render blockquote {
+  font-style: italic;
+  color: #7e525c;
+  border-left: 4px solid #ede6e1;
+  padding-left: 1.5rem;
+  margin: 3rem 0;
+  font-size: 1.25rem;
+}
+
+/* Company Page Specific Styles */
+.company-hero {
+  position: relative;
+  height: 40vh;
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #1a1716;
+  text-align: center;
+  color: white;
+}
+.company-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(126, 82, 92, 0.15) 0%, transparent 70%);
+}
+.company-hero-content {
+  position: relative;
+  z-index: 10;
+}
+.company-hero-title {
+  font-size: 3.5rem;
+  font-weight: 300;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+}
+.company-hero-divider {
+  width: 80px;
+  height: 1px;
+  background: #7e525c;
+  margin: 0 auto;
 }

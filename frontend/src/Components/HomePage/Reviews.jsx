@@ -47,11 +47,8 @@ export default function Reviews() {
     return final;
   })();
 
-  const getInitials = (name = "Anonymous") =>
-    name.split(" ").filter(Boolean).slice(0, 2).map((part) => part[0]?.toUpperCase() || "").join("");
-
   return (
-    <section className="py-12 bg-white overflow-hidden mx-2">
+    <section className="pt-10 bg-white overflow-hidden">
       <h1 className="text-[#7E525C] text-2xl sm:text-2xl md:text-4xl font-noto font-normal text-center pb-12">
         Voices of Luxury
       </h1>
