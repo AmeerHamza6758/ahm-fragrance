@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Mail } from "lucide-react";
 import { joinFragranceCircle } from "@/lib/api/endpoints/circle";
-import Swal from "sweetalert2";
+import { successToaster, warningToaster, errorToaster } from "@/utils/alert-service";
 
 export default function NewsletterSection() {
   const [email, setEmail] = useState("");
@@ -13,34 +13,17 @@ export default function NewsletterSection() {
     e.preventDefault();
 
     if (!email) {
-      Swal.fire({
-        title: "Email Required",
-        text: "Please enter your email address to join.",
-        icon: "warning",
-        confirmButtonColor: "#7e525c"
-      });
+      warningToaster("Please enter your email address to join.");
       return;
     }
 
     setIsLoading(true);
     try {
       const res = await joinFragranceCircle(email);
-      
-      Swal.fire({
-        title: "Welcome!",
-        text: res.message || "You have successfully joined the Fragrance Circle.",
-        icon: "success",
-        confirmButtonColor: "#7e525c"
-      });
-
+      successToaster(res.message || "You have successfully joined the Fragrance Circle.");
       setEmail("");
     } catch (error) {
-      Swal.fire({
-        title: "Submission Failed",
-        text: error.response?.data?.message || "Something went wrong. Please try again later.",
-        icon: "error",
-        confirmButtonColor: "#7e525c"
-      });
+      errorToaster(error.response?.data?.message || "Something went wrong. Please try again later.");
     } finally {
       setIsLoading(false);
     }

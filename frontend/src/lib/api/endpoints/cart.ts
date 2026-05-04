@@ -68,3 +68,8 @@ export async function getAllReviews() {
   const response = await apiClient.get("/api/rating-review/all-reviews");
   return response.data;
 }
+
+export async function checkUserReviewStatus(productId: string) {
+  const response = await apiClient.get(`/api/rating-review/check-status?productId=${productId}`);
+  return response.data;
+}

@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { addToCart, getCart, removeFromCartApi, createOrder, CreateOrderPayload, addRatingReview, RatingReviewPayload, getAllReviews } from "../endpoints";
+import { addToCart, getCart, removeFromCartApi, createOrder, CreateOrderPayload, addRatingReview, RatingReviewPayload, getAllReviews, checkUserReviewStatus } from "../endpoints";
 
 export function useGetCart() {
   const isAuthenticated =
@@ -55,6 +55,17 @@ export function useGetAllReviews() {
     queryKey: ["all-reviews"],
     queryFn: getAllReviews,
     staleTime: 5 * 60 * 1000,
+  });
+}
+
+export function useCheckReviewStatus(productId: string) {
+  const isAuthenticated =
+    typeof window !== "undefined" ? !!localStorage.getItem("token") : false;
+  return useQuery({
+    queryKey: ["review-status", productId],
+    queryFn: () => checkUserReviewStatus(productId),
+    enabled: isAuthenticated && !!productId,
+    staleTime: 0,
   });
 }
 

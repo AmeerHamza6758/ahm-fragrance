@@ -3,8 +3,9 @@
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { Heart, Star, Minus, Plus , Package } from "lucide-react";
+import { successToaster } from "@/utils/alert-service";
 import {
   useFavorites,
   useProduct,
@@ -12,6 +13,7 @@ import {
   useToggleFavorite,
   useAddToCart,
   useAddRatingReview,
+  useCheckReviewStatus,
   queryClient,
 } from "@/lib/api";
 import ProductCard from "@/Components/ProductCard";
@@ -22,6 +24,7 @@ export default function ProductDetails() {
   const { mutate: submitReview, isPending: isSubmittingReview } =
     useAddRatingReview();
   const params = useParams();
+  const router = useRouter();
   const productId = Array.isArray(params?.id) ? params.id[0] : (params?.id || "");
   const { data: product, isLoading, isError } = useProduct(productId);
 
@@ -33,6 +36,9 @@ export default function ProductDetails() {
   const [reviewText, setReviewText] = useState("");
   const [reviewSuccess, setReviewSuccess] = useState(false);
   const [reviewError, setReviewError] = useState("");
+  const { data: reviewData } = useCheckReviewStatus(productId);
+  const hasAlreadyReviewed = reviewData?.hasReviewed;
+
   const { data: wishlistProducts = [] } = useFavorites();
   const { mutate: toggleFavorite, isPending: isTogglingFavorite } =
     useToggleFavorite();
@@ -394,7 +400,22 @@ console.log(product,"pro");
 
   {/* Form Container - Adjusted for better alignment and responsiveness */}
   <div className="bg-white border border-[#e8dde0] rounded-2xl p-6 sm:p-8 shadow-sm w-full max-w-2xl mx-auto">
-    {reviewSuccess ? (
+    {hasAlreadyReviewed ? (
+      <div className="text-center py-8">
+        <div className="flex justify-center mb-4">
+          <Star className="text-[#FFD700]" fill="#FFD700" size={32} />
+        </div>
+        <p
+          className="text-[#7e525c] text-xl font-semibold mb-2"
+          style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}
+        >
+          You&apos;ve already shared your thoughts!
+        </p>
+        <p className="text-[#b0909a] text-sm">
+          Thank you for your valuable feedback on this fragrance.
+        </p>
+      </div>
+    ) : reviewSuccess ? (
       <div className="text-center py-8">
         <p
           className="text-[#7e525c] text-xl font-semibold mb-2"
@@ -405,17 +426,6 @@ console.log(product,"pro");
         <p className="text-[#b0909a] text-sm">
           Your review has been submitted successfully.
         </p>
-        <button
-          className="mt-6 text-[#7e525c] text-sm font-medium underline hover:text-[#6a4450] transition-colors"
-          onClick={() => {
-            setReviewSuccess(false);
-            setReviewText("");
-            setReviewRating(4);
-            setReviewError("");
-          }}
-        >
-          Write another review
-        </button>
       </div>
     ) : (
       <form
@@ -430,7 +440,14 @@ console.log(product,"pro");
               review: reviewText,
             },
             {
-              onSuccess: () => setReviewSuccess(true),
+              onSuccess: () => {
+                setReviewSuccess(true);
+                queryClient.invalidateQueries({ queryKey: ["review-status", productId] });
+                successToaster("Thank you! Your review has been submitted successfully.");
+                setTimeout(() => {
+                  router.back();
+                }, 2000);
+              },
               onError: (err) => {
                 setReviewError(
                   err?.response?.data?.message ??

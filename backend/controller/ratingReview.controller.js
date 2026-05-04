@@ -225,8 +225,40 @@ const addRatingReview = async (req, res) => {
   }
 };
 
+const checkUserReviewStatus = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const { productId } = req.query;
+
+    if (!productId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Product ID is required'
+      });
+    }
+
+    const existingReview = await RatingReview.findOne({
+      userId: userId,
+      productId: productId
+    });
+
+    return res.status(200).json({
+      success: true,
+      hasReviewed: !!existingReview
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to check review status',
+      error: error.message
+    });
+  }
+};
+
 module.exports = {
   addRatingReview,
   // getProductReviews,
-  getAllReviews
+  getAllReviews,
+  checkUserReviewStatus
 };

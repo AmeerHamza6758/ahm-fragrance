@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { getFaqs } from "@/lib/api/endpoints/faq";
 import { sendContactInquiry } from "@/lib/api/endpoints/contact";
-import Swal from "sweetalert2";
+import { successToaster, warningToaster, errorToaster } from "@/utils/alert-service";
 
 export default function ContactPage() {
   const [open, setOpen] = useState(null);
@@ -27,34 +27,17 @@ export default function ContactPage() {
     e.preventDefault();
     
     if (!formData.name || !formData.email || !formData.message) {
-      Swal.fire({
-        title: "Missing Information",
-        text: "Please provide your name, email, and message.",
-        icon: "warning",
-        confirmButtonColor: "#7e525c"
-      });
+      warningToaster("Please provide your name, email, and message.");
       return;
     }
 
     setIsSubmitting(true);
     try {
       await sendContactInquiry(formData);
-      
-      Swal.fire({
-        title: "Message Sent!",
-        text: "Our artisans will respond to your inquiry shortly.",
-        icon: "success",
-        confirmButtonColor: "#7e525c"
-      });
-
+      successToaster("Our artisans will respond to your inquiry shortly.");
       setFormData({ name: "", email: "", subject: "", message: "" });
     } catch (error) {
-      Swal.fire({
-        title: "Delivery Failed",
-        text: "We couldn't deliver your message. Please try again.",
-        icon: "error",
-        confirmButtonColor: "#7e525c"
-      });
+      errorToaster("We couldn't deliver your message. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
