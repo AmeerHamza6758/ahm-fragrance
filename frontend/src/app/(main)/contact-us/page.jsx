@@ -2,11 +2,63 @@
 
 import React, { useEffect, useState } from "react";
 import { getFaqs } from "@/lib/api/endpoints/faq";
+import { sendContactInquiry } from "@/lib/api/endpoints/contact";
+import Swal from "sweetalert2";
 
 export default function ContactPage() {
   const [open, setOpen] = useState(null);
   const [faqs, setFaqs] = useState([]);
   const [faqLoading, setFaqLoading] = useState(true);
+  
+  // Form State
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    subject: "",
+    message: ""
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!formData.name || !formData.email || !formData.message) {
+      Swal.fire({
+        title: "Missing Information",
+        text: "Please provide your name, email, and message.",
+        icon: "warning",
+        confirmButtonColor: "#7e525c"
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await sendContactInquiry(formData);
+      
+      Swal.fire({
+        title: "Message Sent!",
+        text: "Our artisans will respond to your inquiry shortly.",
+        icon: "success",
+        confirmButtonColor: "#7e525c"
+      });
+
+      setFormData({ name: "", email: "", subject: "", message: "" });
+    } catch (error) {
+      Swal.fire({
+        title: "Delivery Failed",
+        text: "We couldn't deliver your message. Please try again.",
+        icon: "error",
+        confirmButtonColor: "#7e525c"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   useEffect(() => {
     let isMounted = true;
@@ -61,9 +113,9 @@ export default function ContactPage() {
         </div>
       </section>
 
-      {/* Contact Form */}
       <section className="flex justify-center mt-24">
         <form
+          onSubmit={handleSubmit}
           className="w-full max-w-xl bg-white/0 rounded-2xl border border-[#ede6e1] p-8 md:p-6 flex flex-col gap-6 shadow-none"
           style={{ boxShadow: "0 0 0 0 transparent" }}
         >
@@ -78,6 +130,8 @@ export default function ContactPage() {
               <input
                 id="name"
                 type="text"
+                value={formData.name}
+                onChange={handleChange}
                 placeholder="Your Full Name"
                 className="rounded-md border border-[#ede6e1] bg-[#fdf9f5] px-4 py-2 text-[15px] text-[#1c1c19] font-normal focus:outline-none focus:border-[#7e525c] transition"
                 style={{ fontFamily: "Arial, sans-serif" }}
@@ -93,6 +147,8 @@ export default function ContactPage() {
               <input
                 id="email"
                 type="email"
+                value={formData.email}
+                onChange={handleChange}
                 placeholder="hello@example.com"
                 className="rounded-md border border-[#ede6e1] bg-[#fdf9f5] px-4 py-2 text-[15px] text-[#1c1c19] font-normal focus:outline-none focus:border-[#7e525c] transition"
                 style={{ fontFamily: "Arial, sans-serif" }}
@@ -109,6 +165,8 @@ export default function ContactPage() {
             <input
               id="subject"
               type="text"
+              value={formData.subject}
+              onChange={handleChange}
               placeholder="How can we help?"
               className="rounded-md border border-[#ede6e1] bg-[#fdf9f5] px-4 py-2 text-[15px] text-[#1c1c19] font-normal focus:outline-none focus:border-[#7e525c] transition"
               style={{ fontFamily: "Arial, sans-serif" }}
@@ -124,6 +182,8 @@ export default function ContactPage() {
             <textarea
               id="message"
               rows={4}
+              value={formData.message}
+              onChange={handleChange}
               placeholder="Write your botanical inquiry here..."
               className="rounded-md border border-[#ede6e1] bg-[#fdf9f5] px-4 py-2 text-[15px] text-[#1c1c19] font-normal focus:outline-none focus:border-[#7e525c] transition resize-none"
               style={{ fontFamily: "Arial, sans-serif" }}
@@ -131,10 +191,11 @@ export default function ContactPage() {
           </div>
           <button
             type="submit"
-            className="mt-2 w-50 self-start rounded-full bg-[#7e525c] px-8 py-3 text-white text-[15px] font-semibold tracking-[1px] uppercase shadow-none hover:bg-[#6a4450] transition-colors"
+            disabled={isSubmitting}
+            className={`mt-2 w-50 self-start rounded-full bg-[#7e525c] px-8 py-3 text-white text-[15px] font-semibold tracking-[1px] uppercase shadow-none transition-colors ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#6a4450]'}`}
             style={{ fontFamily: "Arial, sans-serif" }}
           >
-            Send Message
+            {isSubmitting ? "Sending..." : "Send Message"}
           </button>
         </form>
       </section>
