@@ -7,6 +7,7 @@ import { GrView } from "react-icons/gr";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import Pagination from "../../components/Pagination";
 import StatCard from "../../components/StatCard";
+import { API_BASE_URL } from "../../services/http";
 import { useGetProducts, useDeleteProduct, useGetProductStats } from "../../services/hooks/products";
 import { confirmationPopup, errorToaster, successToaster } from "../../utils/alert-service";
 
@@ -81,7 +82,6 @@ function ProductsPage() {
     };
   };
 
-  const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
   return (
     <div>
@@ -219,7 +219,7 @@ function ProductsPage() {
               {/* Product */}
               <div className="product-cell">
                 <img 
-                  src={item.image_id?.[0]?.path ? `${BASE_URL}/${item.image_id[0].path.replace(/\\/g, '/')}` : "/image/placeholder.png"} 
+                  src={item.image_id?.[0]?.url || "/image/placeholder.png"} 
                   alt={item.name} 
                 />
                 <span>{item.name}</span>
@@ -245,22 +245,22 @@ function ProductsPage() {
               {/* Actions */}
               <div className="actions">
                 <GrView
-                  className="action-icon view-icon"
+                  className="action-icon-btn view"
                   size={18}
-                  style={{ color: "#10b981", cursor: "pointer" }}
                   onClick={() => handleView(item._id)}
+                  title="View Product"
                 />
                 <FiEdit
-                  className="action-icon edit-icon"
+                  className="action-icon-btn edit"
                   size={18}
                   onClick={() => handleEdit(item._id)}
-                  style={{ color: "#3b82f6", cursor: "pointer" }}
+                  title="Edit Product"
                 />
                 <RiDeleteBin6Line
-                  className="action-icon delete-icon"
+                  className="action-icon-btn delete"
                   size={18}
                   onClick={() => handleDelete(item._id)}
-                  style={{ color: "#ef4444", cursor: "pointer" }}
+                  title="Delete Product"
                 />
               </div>
             </div>

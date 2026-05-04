@@ -4,10 +4,10 @@ import { successToaster, errorToaster } from "../../utils/alert-service";
 
 export const CONTACTS_KEY = "contacts";
 
-export function useGetContacts() {
+export function useGetContacts(page = 1, limit = 10) {
   return useQuery({
-    queryKey: [CONTACTS_KEY],
-    queryFn: () => contactApi.list(),
+    queryKey: [CONTACTS_KEY, page, limit],
+    queryFn: () => contactApi.list({ page, limit }),
   });
 }
 

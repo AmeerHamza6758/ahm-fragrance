@@ -4,17 +4,22 @@ import Pagination from "../../components/Pagination";
 import Loader from "../../components/Loader";
 import { useGetStock, useManageStock } from "../../services/hooks/stock";
 import { FiEdit } from "react-icons/fi";
+import { GrView } from "react-icons/gr";
 import { IoClose } from "react-icons/io5";
+import { useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "../../services/http";
 
 function StockPage() {
+  const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState("");
+  const [search, setSearch] = useState("");
   const [editingStock, setEditingStock] = useState(null); // {productId, name, currentQuantity}
   const [updateAmount, setUpdateAmount] = useState("");
   const [operation, setOperation] = useState("add");
   const entriesPerPage = 10;
 
-  const { data: stockRes, isLoading, isError } = useGetStock(currentPage, entriesPerPage, statusFilter);
+  const { data: stockRes, isLoading, isError } = useGetStock(currentPage, entriesPerPage, statusFilter, search);
   const manageStockMutation = useManageStock();
 
   const stocks = stockRes?.data?.data || [];
@@ -26,6 +31,8 @@ function StockPage() {
     setCurrentPage(page);
   };
 
+  const [reason, setReason] = useState("");
+
   const handleUpdateStock = () => {
     if (!updateAmount || isNaN(updateAmount)) return;
     
@@ -33,11 +40,12 @@ function StockPage() {
       productId: editingStock.productId,
       quantity: parseInt(updateAmount),
       operation: operation,
-      reason: "manual_admin_update"
+      reason: reason || "manual_admin_update"
     }, {
       onSuccess: () => {
         setEditingStock(null);
         setUpdateAmount("");
+        setReason("");
       }
     });
   };
@@ -79,6 +87,18 @@ function StockPage() {
       {/* Filters */}
       <div className="inline-filters-container">
          <div className="filter-group">
+            <input 
+              type="text" 
+              placeholder="Search fragrances..." 
+              className="styled-input-small" 
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setCurrentPage(1);
+              }}
+            />
+         </div>
+         <div className="filter-group">
             <select 
               className="styled-select-small"
               value={statusFilter}
@@ -97,10 +117,12 @@ function StockPage() {
 
       {/* Table */}
       <div className="catalog-table">
-        <div className="catalog-table-header stock-grid-layout">
-          <span>Product Details</span>
-          <span>Current Level</span>
-          <span>Previous</span>
+        <div className="catalog-table-header stock-registry-grid-layout">
+          <span>Product & Category</span>
+          <span className="text-center">Inventory</span>
+          <span className="text-center">Reserved</span>
+          <span className="text-center">Threshold</span>
+          <span className="text-center">Stock Value</span>
           <span>Last Restock</span>
           <span className="text-center">Status</span>
           <span className="text-center">Actions</span>
@@ -118,21 +140,46 @@ function StockPage() {
           stocks.map((stock) => {
             const isLow = stock.quantity <= stock.lowStockThreshold && stock.quantity > 0;
             const isOut = stock.quantity === 0;
+            const history = stock.stockHistory || [];
+            const price = stock.variantPrice || 0;
+            const stockValue = stock.quantity * price;
             
             return (
-              <div className="catalog-row stock-grid-layout" key={stock._id}>
+              <div className="catalog-row stock-registry-grid-layout" key={stock._id}>
                 <div className="product-cell">
-                  <span className="user-name">{stock.productId?.name}</span>
-                  <span className="user-email">ID: {stock.productId?._id}</span>
+                  <img
+                    src={stock.productId?.images?.[0]?.url || (stock.productId?.images?.[0]?.path ? `${API_BASE_URL}/${stock.productId.images[0].path.replace(/\\/g, '/')}` : "/image/placeholder.png")}
+                    alt={stock.productId?.name}
+                    className="product-thumbnail"
+                  />
+                  <div className="product-info-wrapper">
+                    <span className="user-name">{stock.productId?.name || "Unknown Product"}</span>
+                    <div className="product-meta-tags">
+                       <span className="meta-tag category">{stock.productId?.category || 'N/A'}</span>
+                       {stock.variantSize && (
+                         <span className="meta-tag variant">{stock.variantSize}</span>
+                       )}
+                    </div>
+                  </div>
                 </div>
 
-                <div className="stock-level-cell">
+                <div className="text-center">
                    <span className={`stock-count ${isOut ? 'critical' : isLow ? 'warning' : ''}`}>
-                     {stock.quantity} Units
+                     {stock.quantity}
                    </span>
                 </div>
 
-                <span>{stock.stockHistory?.[stock.stockHistory.length - 2]?.newQuantity || 0}</span>
+                <div className="text-center">
+                   <span className="reserved-count">{stock.reservedQuantity || 0}</span>
+                </div>
+
+                <div className="text-center">
+                   <span className="threshold-count">{stock.lowStockThreshold}</span>
+                </div>
+
+                <div className="text-center">
+                   <span className="stock-value">Rs. {stockValue.toLocaleString()}</span>
+                </div>
 
                 <span>{formatDate(stock.lastRestockedAt)}</span>
 
@@ -143,15 +190,24 @@ function StockPage() {
                 </div>
 
                 <div className="actions justify-center">
-                  <FiEdit
-                    className="action-icon edit-icon"
+                  <GrView
+                    className="action-icon-btn view"
                     size={18}
-                    style={{ color: "#7E525C", cursor: "pointer" }}
+                    onClick={() => navigate(`/stock/view/${stock.productId?._id}`)}
+                    title="View Details"
+                  />
+                  <FiEdit
+                    className="action-icon-btn edit"
+                    size={18}
                     onClick={() => setEditingStock({
                       productId: stock.productId?._id,
                       name: stock.productId?.name,
-                      currentQuantity: stock.quantity
+                      currentQuantity: stock.quantity,
+                      variants: stock.productId?.variants,
+                      variantId: stock.variantId,
+                      variantSize: stock.variantSize
                     })}
+                    title="Quick Update"
                   />
                 </div>
               </div>
@@ -203,15 +259,27 @@ function StockPage() {
                   >Deduct Stock</button>
                 </div>
                 
-                <div className="input-group">
-                  <label>Quantity to {operation}</label>
-                  <input 
-                    type="number"
-                    placeholder="e.g. 50"
-                    className="styled-input"
-                    value={updateAmount}
-                    onChange={(e) => setUpdateAmount(e.target.value)}
-                  />
+                <div className="input-row">
+                   <div className="input-group">
+                    <label>Quantity</label>
+                    <input 
+                      type="number"
+                      placeholder="e.g. 50"
+                      className="styled-input"
+                      value={updateAmount}
+                      onChange={(e) => setUpdateAmount(e.target.value)}
+                    />
+                  </div>
+                  <div className="input-group">
+                    <label>Reason</label>
+                    <input 
+                      type="text"
+                      placeholder="e.g. Restock"
+                      className="styled-input"
+                      value={reason}
+                      onChange={(e) => setReason(e.target.value)}
+                    />
+                  </div>
                 </div>
 
                 <button 

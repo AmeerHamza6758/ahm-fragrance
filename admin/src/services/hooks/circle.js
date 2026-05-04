@@ -4,10 +4,10 @@ import { successToaster, errorToaster } from "../../utils/alert-service";
 
 export const CIRCLE_KEY = "circle";
 
-export function useGetCircleMembers() {
+export function useGetCircleMembers(page = 1, limit = 10) {
   return useQuery({
-    queryKey: [CIRCLE_KEY],
-    queryFn: () => circleApi.list(),
+    queryKey: [CIRCLE_KEY, page, limit],
+    queryFn: () => circleApi.list({ page, limit }),
   });
 }
 

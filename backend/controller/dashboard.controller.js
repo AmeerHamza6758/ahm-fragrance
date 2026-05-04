@@ -137,7 +137,14 @@ const dashboardController = {
     try {
       const totalProducts = await Product.countDocuments();
       const totalPendingOrders = await Order.countDocuments({ orderStatus: 'pending' });
-      const lowStockCount = await Stock.countDocuments({ quantity: { $lt: 5 } });
+      const lowStockCount = await Stock.countDocuments({
+        $expr: {
+          $and: [
+            { $lte: ['$quantity', '$lowStockThreshold'] },
+            { $gt: ['$quantity', 0] }
+          ]
+        }
+      });
 
       res.json({
         success: true,

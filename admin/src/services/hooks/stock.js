@@ -4,10 +4,10 @@ import { successToaster, errorToaster } from "../../utils/alert-service";
 
 export const STOCK_KEY = "stock";
 
-export function useGetStock(page = 1, limit = 10, status = "") {
+export function useGetStock(page = 1, limit = 10, status = "", search = "", productId = "") {
   return useQuery({
-    queryKey: [STOCK_KEY, page, limit, status],
-    queryFn: () => stockApi.get({ page, limit, status, getAll: true }),
+    queryKey: [STOCK_KEY, page, limit, status, search, productId],
+    queryFn: () => stockApi.get({ page, limit, status, search, productId, getAll: true }),
   });
 }
 

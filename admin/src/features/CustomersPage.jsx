@@ -12,47 +12,52 @@ import { successToaster, errorToaster, confirmationPopup } from "../utils/alert-
 
 function CustomersPage() {
   const navigate = useNavigate();
-  const [currentPage, setCurrentPage] = useState(1);
   const entriesPerPage = 10;
-  
-  const { data: usersRes, isLoading, isError } = useGetUsers(currentPage, entriesPerPage);
-  const { mutate: deleteUser, isLoading: isDeleting } = useDeleteUser();
-  const { data: contactsRes, isLoading: contactsLoading } = useGetContacts();
+
+  // Pagination states for different sections
+  const [userPage, setUserPage] = useState(1);
+  const [contactPage, setContactPage] = useState(1);
+  const [circlePage, setCirclePage] = useState(1);
+
+  // Data Fetching
+  const { data: usersRes, isLoading: usersLoading, isError: usersError } = useGetUsers(userPage, entriesPerPage);
+  const { data: contactsRes, isLoading: contactsLoading } = useGetContacts(contactPage, entriesPerPage);
+  const { data: circleRes, isLoading: circleLoading } = useGetCircleMembers(circlePage, entriesPerPage);
+
+  // Mutations
+  const { mutate: deleteUser, isPending: isDeleting } = useDeleteUser();
   const deleteContactMutation = useDeleteContact();
-  const { data: circleRes, isLoading: circleLoading } = useGetCircleMembers();
   const removeCircleMutation = useRemoveCircleMember();
 
+  // Processed Data
   const users = usersRes?.data?.data || [];
-  const totalEntries = usersRes?.data?.pagination?.totalItems || 0;
-  const totalPages = usersRes?.data?.pagination?.totalPages || 1;
+  const usersTotal = usersRes?.data?.pagination?.totalItems || 0;
+  const usersPages = usersRes?.data?.pagination?.totalPages || 1;
 
   const contacts = contactsRes?.data?.data || [];
+  const contactsTotal = contactsRes?.data?.pagination?.totalItems || 0;
+  const contactsPages = contactsRes?.data?.pagination?.totalPages || 1;
+
   const circleMembers = circleRes?.data?.data || [];
+  const circleTotal = circleRes?.data?.pagination?.totalItems || 0;
+  const circlePages = circleRes?.data?.pagination?.totalPages || 1;
 
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     const date = new Date(dateString);
-    return isNaN(date.getTime()) ? "N/A" : date.toLocaleDateString();
-  };
-
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-  };
-
-  const handleView = (id) => {
-    navigate(`/customers/view/${id}`);
+    return isNaN(date.getTime()) ? "N/A" : date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
   };
 
   const handleDelete = async (id) => {
     const result = await confirmationPopup("Are you sure you want to delete this customer? This action cannot be undone.");
     if (result.isConfirmed) {
       deleteUser(id, {
-        onSuccess: () => {
-          successToaster("Customer deleted successfully");
-        },
-        onError: (error) => {
-          errorToaster(error.response?.data?.message || "Failed to delete customer");
-        }
+        onSuccess: () => successToaster("Customer deleted successfully"),
+        onError: (error) => errorToaster(error.response?.data?.message || "Failed to delete customer")
       });
     }
   };
@@ -73,186 +78,211 @@ function CustomersPage() {
 
   return (
     <div className="customers-page-container">
-      {/* Header */}
-      <div className="catalog-header">
+      {/* Page Header */}
+      <div className="catalog-header" style={{ marginBottom: '2rem' }}>
         <div>
-          <h1 className="catalog-title">Customer Directory</h1>
-          <p className="catalog-subtitle" style={{height:"15px"}}>
-            Manage your registered botanical enthusiasts and their preferences.
+          <h1 className="catalog-title">Customer Relationship Management</h1>
+          <p className="catalog-subtitle">
+            Oversee your botanical enthusiasts, community members, and direct inquiries.
           </p>
         </div>
       </div>
 
-      <div className="admin-stacked-sections" style={{ display: "flex", flexDirection: "column", gap: "3rem", marginBottom: "3rem" }}>
-        {/* Contact Inquiries Section */}
+      <div className="admin-stacked-sections">
+        
+        {/* 1. Registered Users Section */}
         <div className="section-wrapper">
-          <div className="catalog-header" style={{ marginBottom: "1rem" }}>
+          <div className="section-header-flex">
             <div>
-              <h2 className="catalog-title" style={{ fontSize: "1.25rem", height:"20px"}}>Contact Inquiries</h2>
-              <p className="catalog-subtitle" style={{}}>Recent messages from your visitors.</p>
+              <h2 className="section-title-premium">Registered Users</h2>
+              <p className="section-subtitle-premium">Profiles of enthusiasts within your ecosystem.</p>
             </div>
+            <div className="count-pill">{usersTotal} Total Users</div>
           </div>
-          
-          <div className="catalog-table" style={{maxHeight:"420px", overflowY:"auto", height:"300px"}}>
-            <div className="catalog-table-header" style={{ gridTemplateColumns: "1.5fr 2.5fr 1.5fr 3fr 1.5fr 0.5fr", position:"sticky",top:"0px", zIndex:"10" }}>
+
+          <div className="catalog-table">
+            <div className="catalog-table-header">
+              <span>Identity</span>
+              <span>Contact</span>
+              <span>Gender</span>
+              <span>Join Date</span>
+              <span>Verification</span>
+              <span>Actions</span>
+            </div>
+
+            {usersLoading ? (
+              <Loader text="Gathering enthusiasts..." />
+            ) : usersError ? (
+              <div className="error-state">Failed to retrieve the customer list.</div>
+            ) : users.length === 0 ? (
+              <div className="empty-state">No customers found.</div>
+            ) : (
+              users.map((user) => (
+                <div className="catalog-row" key={user._id}>
+                  <div className="product-cell">
+                    <div className="user-info-stack">
+                      <span className="user-name">{user.userName}</span>
+                      {user.isCircleMember && (
+                        <span className="mini-pill">Fragrance Circle</span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="contact-cell">
+                    <span className="user-email">{user.email}</span>
+                    <span className="user-phone">{user.phone || "---"}</span>
+                  </div>
+
+                  <span className="capitalize">{user.gender || "N/A"}</span>
+                  <span>{formatDate(user.createdAt)}</span>
+
+                  <div className="status-cell">
+                    <span className={`status-pill ${user.isEmailVerified ? "active" : "inactive"}`}>
+                      {user.isEmailVerified ? "Verified" : "Pending"}
+                    </span>
+                  </div>
+
+                  <div className="actions">
+                    <GrView
+                      className="action-icon-btn view"
+                      size={18}
+                      onClick={() => navigate(`/customers/view/${user._id}`)}
+                      title="View Profile"
+                    />
+                    <RiDeleteBin6Line
+                      className="action-icon-btn delete"
+                      size={18}
+                      onClick={() => !isDeleting && handleDelete(user._id)}
+                      title="Delete User"
+                    />
+                  </div>
+                </div>
+              ))
+            )}
+
+            {usersTotal > entriesPerPage && (
+              <Pagination
+                currentPage={userPage}
+                totalPages={usersPages}
+                onPageChange={setUserPage}
+                totalEntries={usersTotal}
+                startEntry={(userPage - 1) * entriesPerPage + 1}
+                endEntry={Math.min(userPage * entriesPerPage, usersTotal)}
+              />
+            )}
+          </div>
+        </div>
+
+        {/* 2. Contact Inquiries Section */}
+        <div className="section-wrapper">
+          <div className="section-header-flex">
+            <div>
+              <h2 className="section-title-premium">Direct Inquiries</h2>
+              <p className="section-subtitle-premium">Personalized communication from your visitors.</p>
+            </div>
+            <div className="count-pill">{contactsTotal} Inquiries</div>
+          </div>
+
+          <div className="catalog-table">
+            <div className="catalog-table-header" style={{ gridTemplateColumns: "1.5fr 2fr 1.5fr 3fr 1.2fr 0.6fr" }}>
               <span>Name</span>
               <span>Email</span>
               <span>Subject</span>
-              <span>Message</span>
-              <span>Date</span>
+              <span>Message Snippet</span>
+              <span>Received On</span>
               <span>Actions</span>
             </div>
 
             {contactsLoading ? (
               <Loader text="Loading inquiries..." />
             ) : contacts.length === 0 ? (
-              <div className="empty-state">No new inquiries.</div>
+              <div className="empty-state">No new inquiries to display.</div>
             ) : (
               contacts.map((contact) => (
-                <div className="catalog-row" key={contact._id} style={{ gridTemplateColumns: "1.5fr 2.5fr 1.5fr 3fr 1.5fr 0.5fr", justifyContent:"space-between" }}>
-                  <span style={{ fontWeight: "600" }}>{contact.name}</span>
-                  <span className="truncate" style={{width:"110px"}}>{contact.email}</span>
-                  <span style={{}}>{contact.subject || "No Subject"}</span>
-                  <span className="description-text-small" style={{ fontSize: "12px", color: "#666" }}>{contact.message}</span>
+                <div className="catalog-row" key={contact._id} style={{ gridTemplateColumns: "1.5fr 2fr 1.5fr 3fr 1.2fr 0.6fr" }}>
+                  <span style={{ fontWeight: "700", color: "#1A1716" }}>{contact.name}</span>
+                  <span className="truncate" style={{ fontSize: '13px' }}>{contact.email}</span>
+                  <span style={{ fontWeight: '500' }}>{contact.subject || "No Subject"}</span>
+                  <span className="description-text-small truncate-multi" title={contact.message}>
+                    {contact.message}
+                  </span>
                   <span>{formatDate(contact.createdAt)}</span>
                   <div className="actions">
                     <RiDeleteBin6Line
-                      className="action-icon delete-icon"
+                      className="action-icon-btn delete"
                       size={18}
-                      style={{ color: "#ef4444", cursor: "pointer" }}
                       onClick={() => handleDeleteContact(contact._id)}
+                      title="Delete Inquiry"
                     />
                   </div>
                 </div>
               ))
             )}
+
+            {contactsTotal > entriesPerPage && (
+              <Pagination
+                currentPage={contactPage}
+                totalPages={contactsPages}
+                onPageChange={setContactPage}
+                totalEntries={contactsTotal}
+                startEntry={(contactPage - 1) * entriesPerPage + 1}
+                endEntry={Math.min(contactPage * entriesPerPage, contactsTotal)}
+              />
+            )}
           </div>
         </div>
 
-        {/* Fragrance Circle Section */}
+        {/* 3. Fragrance Circle Section */}
         <div className="section-wrapper">
-          <div className="catalog-header" style={{ marginBottom: "1rem" }}>
+          <div className="section-header-flex">
             <div>
-              <h2 className="catalog-title" style={{ fontSize: "1.25rem" }}>Fragrance Circle Members</h2>
-              <p className="catalog-subtitle">Managing your newsletter community.</p>
+              <h2 className="section-title-premium">Fragrance Circle</h2>
+              <p className="section-subtitle-premium">Managing your community of newsletter subscribers.</p>
             </div>
+            <div className="count-pill">{circleTotal} Members</div>
           </div>
-          
+
           <div className="catalog-table">
-            <div className="catalog-table-header" style={{ gridTemplateColumns: "3fr 1fr 0.5fr" }}>
-              <span>Member Email</span>
-              <span>Date Joined</span>
+            <div className="catalog-table-header" style={{ gridTemplateColumns: "1fr 1fr 0.5fr" }}>
+              <span>Subscriber Email</span>
+              <span>Joining Date</span>
               <span>Actions</span>
             </div>
 
             {circleLoading ? (
-              <Loader text="Loading members..." />
+              <Loader text="Loading community members..." />
             ) : circleMembers.length === 0 ? (
-              <div className="empty-state">No members joined.</div>
+              <div className="empty-state">Your circle is currently empty.</div>
             ) : (
               circleMembers.map((member) => (
-                <div className="catalog-row" key={member._id} style={{ gridTemplateColumns: "3fr 1fr 0.5fr" }}>
-                  <span style={{ fontWeight: 600 }}>{member.email}</span>
+                <div className="catalog-row" key={member._id} style={{ gridTemplateColumns: "1fr 1fr 0.5fr" }}>
+                  <span style={{ fontWeight: 700, color: "#1A1716" }}>{member.email}</span>
                   <span>{formatDate(member.subscribedAt)}</span>
                   <div className="actions">
                     <RiDeleteBin6Line
-                      className="action-icon delete-icon"
+                      className="action-icon-btn delete"
                       size={18}
-                      style={{ color: "#ef4444", cursor: "pointer" }}
                       onClick={() => handleRemoveCircle(member._id)}
+                      title="Remove Member"
                     />
                   </div>
                 </div>
               ))
             )}
+
+            {circleTotal > entriesPerPage && (
+              <Pagination
+                currentPage={circlePage}
+                totalPages={circlePages}
+                onPageChange={setCirclePage}
+                totalEntries={circleTotal}
+                startEntry={(circlePage - 1) * entriesPerPage + 1}
+                endEntry={Math.min(circlePage * entriesPerPage, circleTotal)}
+              />
+            )}
           </div>
         </div>
-      </div>
 
-      <div className="catalog-header" style={{ marginBottom: "1rem" }}>
-        <div>
-          <h2 className="catalog-title" style={{ fontSize: "1.25rem" }}>Registered Users</h2>
-        </div>
-      </div>
-
-      {/* Users Table */}
-      <div className="catalog-table">
-        <div className="catalog-table-header customer-grid-simple">
-          <span>Identity</span>
-          <span>Contact Details</span>
-          <span>Status</span>
-          <span>Member Since</span>
-          <span>Verification</span>
-          <span>Actions</span>
-        </div>
-
-        {isLoading ? (
-          <Loader text="Gathering customer data..." />
-        ) : isError ? (
-          <div className="error-state">
-             <p>Failed to retrieve the customer list.</p>
-          </div>
-        ) : users.length === 0 ? (
-          <div className="empty-state">No customers found.</div>
-        ) : (
-          users.map((user) => (
-            <div className="catalog-row customer-grid-simple" key={user._id}>
-              {/* Customer Name */}
-              <div className="product-cell">
-                <span className="user-name">{user.userName}</span>
-                {user.isCircleMember && (
-                  <span className="status-badge status-active" style={{ fontSize: "10px", padding: "2px 6px", marginLeft: "8px", background: "#7e525c", color: "#fff" }}>Circle Member</span>
-                )}
-              </div>
-
-              {/* Contact */}
-              <div className="contact-cell">
-                <span className="user-email">{user.email}</span>
-                <span className="user-phone">{user.phone || "No contact"}</span>
-              </div>
-
-              {/* Gender/Status */}
-              <span className="capitalize">{user.gender || "N/A"}</span>
-
-              {/* Join Date */}
-              <span>{formatDate(user.createdAt)}</span>
-
-              {/* Status */}
-              <div className="status-cell">
-                <span className={`status-badge ${user.isEmailVerified ? "status-active" : "status-inactive"}`}>
-                  {user.isEmailVerified ? "Verified" : "Pending"}
-                </span>
-              </div>
-
-              {/* Actions */}
-              <div className="actions">
-                <GrView
-                  className="action-icon view-icon"
-                  size={18}
-                  style={{ color: "#10b981", cursor: "pointer" }}
-                  onClick={() => handleView(user._id)}
-                />
-                <RiDeleteBin6Line
-                  className="action-icon delete-icon"
-                  size={18}
-                  style={{ color: "#ef4444", cursor: isDeleting ? "not-allowed" : "pointer" }}
-                  onClick={() => !isDeleting && handleDelete(user._id)}
-                />
-              </div>
-            </div>
-          ))
-        )}
-
-        {totalEntries > 0 && (
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-            totalEntries={totalEntries}
-            startEntry={(currentPage - 1) * entriesPerPage + 1}
-            endEntry={Math.min(currentPage * entriesPerPage, totalEntries)}
-          />
-        )}
       </div>
     </div>
   );

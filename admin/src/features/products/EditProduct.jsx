@@ -6,6 +6,7 @@ import { IoArrowBack, IoAddCircleOutline, IoTrashOutline } from "react-icons/io5
 import "../../styles/admin.css";
 import { categoryApi, tagApi, imageApi } from "../../services/endpoints";
 import { useGetProductById, useUpdateProduct } from "../../services/hooks/products";
+import { API_BASE_URL } from "../../services/http";
 import Loader from "../../components/Loader";
 import { errorToaster, successToaster } from "../../utils/alert-service";
 
@@ -54,12 +55,11 @@ function EditProduct() {
 
   const { data: productRes, isLoading: isFetching } = useGetProductById(id);
   const updateMutation = useUpdateProduct();
-  const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
   // Initialize form with existing data
   useEffect(() => {
-    if (productRes?.data) {
-      const p = productRes.data;
+    if (productRes?.data?.data) {
+      const p = productRes.data.data;
       setProductName(p.name || "");
       setDescription(p.description || "");
       setCategoryId(p.category_id?._id || p.category_id || "");
@@ -78,17 +78,17 @@ function EditProduct() {
       // Set existing images
       const newImages = [...images];
       if (p.image_id?.[0]) {
-        newImages[0] = { file: null, preview: `${BASE_URL}/${p.image_id[0].path}`, existingId: p.image_id[0]._id };
+        newImages[0] = { file: null, preview: p.image_id[0].url || `${API_BASE_URL}/${p.image_id[0].path.replace(/\\/g, '/')}`, existingId: p.image_id[0]._id };
       }
       if (p.image_id?.[1]) {
-        newImages[1] = { file: null, preview: `${BASE_URL}/${p.image_id[1].path}`, existingId: p.image_id[1]._id };
+        newImages[1] = { file: null, preview: p.image_id[1].url || `${API_BASE_URL}/${p.image_id[1].path.replace(/\\/g, '/')}`, existingId: p.image_id[1]._id };
       }
       if (p.image_id?.[2]) {
-        newImages[2] = { file: null, preview: `${BASE_URL}/${p.image_id[2].path}`, existingId: p.image_id[2]._id };
+        newImages[2] = { file: null, preview: p.image_id[2].url || `${API_BASE_URL}/${p.image_id[2].path.replace(/\\/g, '/')}`, existingId: p.image_id[2]._id };
       }
       setImages(newImages);
     }
-  }, [productRes, BASE_URL]);
+  }, [productRes, API_BASE_URL]);
 
   useEffect(() => {
     const fetchData = async () => {

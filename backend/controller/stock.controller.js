@@ -6,8 +6,10 @@ const manageStock = async (req, res) => {
   try {
     const { 
       productId, 
+      variantId,
+      variantSize,
       quantity, 
-      operation,  // 'add' ya 'deduct' only
+      operation,  // 'add' or 'deduct'
       reason = 'manual_update'
     } = req.body;
     
@@ -15,48 +17,29 @@ const manageStock = async (req, res) => {
 
     // Validation
     if (!productId) {
-      return res.status(400).json({
-        success: false,
-        message: 'Product ID is required'
-      });
+      return res.status(400).json({ success: false, message: 'Product ID is required' });
     }
 
     if (!operation) {
-      return res.status(400).json({
-        success: false,
-        message: 'Operation is required. Use: add or deduct'
-      });
+      return res.status(400).json({ success: false, message: 'Operation is required. Use: add or deduct' });
     }
 
     if (operation !== 'add' && operation !== 'deduct') {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid operation. Use: add or deduct'
-      });
+      return res.status(400).json({ success: false, message: 'Invalid operation. Use: add or deduct' });
     }
 
     if (!quantity || quantity <= 0) {
-      return res.status(400).json({
-        success: false,
-        message: 'Positive quantity is required'
-      });
+      return res.status(400).json({ success: false, message: 'Positive quantity is required' });
     }
 
     // Check product exists
-    const product = await Product.findOne({ 
-      _id: productId, 
-      isActive: true 
-    });
-
+    const product = await Product.findOne({ _id: productId, isActive: true });
     if (!product) {
-      return res.status(404).json({
-        success: false,
-        message: `Product with ID ${productId} not found or is inactive`
-      });
+      return res.status(404).json({ success: false, message: `Product not found or is inactive` });
     }
 
-    // Find existing stock
-    let stock = await Stock.findOne({ productId });
+    // Find existing stock for this product and variant
+    let stock = await Stock.findOne({ productId, variantId: variantId || null });
 
     // CREATE if no stock exists
     if (!stock) {
@@ -67,9 +50,11 @@ const manageStock = async (req, res) => {
         });
       }
       
-      // Create new stock (only for add operation)
+      // Create new stock
       stock = new Stock({
         productId,
+        variantId: variantId || null,
+        variantSize: variantSize || (variantId ? product.variants.find(v => v._id.toString() === variantId.toString())?.size : null),
         quantity: quantity,
         lowStockThreshold: 10,
         lastUpdatedBy: userId,
@@ -87,10 +72,11 @@ const manageStock = async (req, res) => {
       
       return res.status(201).json({
         success: true,
-        message: `✅ Stock created for ${product.name}: ${quantity} units`,
+        message: `✅ Stock created for ${product.name} ${variantSize || ''}: ${quantity} units`,
         data: {
           productId: product._id,
           productName: product.name,
+          variantSize,
           operation: 'create',
           currentStock: quantity
         }
@@ -168,152 +154,165 @@ const manageStock = async (req, res) => {
 const getStock = async (req, res) => {
   try {
     const { 
-      productId,      // Get by specific product
-      getAll,         // Get all stock (true/false)
-      alerts,         // Get low stock alerts (true/false)
-      status,         // 'lowStock', 'outOfStock', 'inStock'
+      productId, 
+      status,         
+      search = "",
       page = 1, 
-      limit = 20,
-      minQuantity,
-      maxQuantity
+      limit = 10,
     } = req.query;
 
-    // CASE 1: Get low stock alerts
-    if (alerts === 'true') {
-      const stocks = await Stock.find()
-        .populate('productId', 'name price sku images isActive')
-        .sort({ quantity: 1 });
+    const pPage = Math.max(1, parseInt(page));
+    const pLimit = Math.max(1, parseInt(limit));
+    const skip = (pPage - 1) * pLimit;
 
-      const lowStockItems = stocks.filter(stock => 
-        stock.quantity <= stock.lowStockThreshold && stock.quantity > 0
-      );
-      
-      const outOfStockItems = stocks.filter(stock => stock.quantity === 0);
-      
-      const criticalItems = stocks.filter(stock => 
-        stock.quantity <= stock.lowStockThreshold / 2 && stock.quantity > 0
-      );
-
-      if (lowStockItems.length === 0 && outOfStockItems.length === 0) {
-        return res.status(200).json({
-          success: true,
-          message: '✅ No stock alerts. All products have sufficient stock.',
-          data: {
-            alerts: [],
-            summary: {
-              totalProducts: stocks.length,
-              lowStock: 0,
-              outOfStock: 0,
-              critical: 0,
-              healthy: stocks.length
-            }
-          }
-        });
-      }
-
-      return res.status(200).json({
-        success: true,
-        message: `⚠️ ${lowStockItems.length + outOfStockItems.length} stock alert(s) found`,
-        data: {
-          alerts: {
-            lowStock: lowStockItems,
-            outOfStock: outOfStockItems,
-            critical: criticalItems
-          },
-          summary: {
-            totalProducts: stocks.length,
-            lowStock: lowStockItems.length,
-            outOfStock: outOfStockItems.length,
-            critical: criticalItems.length,
-            healthy: stocks.length - (lowStockItems.length + outOfStockItems.length)
-          }
-        }
-      });
-    }
-
-    // CASE 2: Get stock by specific product ID
+    // CASE 1: Get specific product stock details (returns all variant stocks for that product)
     if (productId) {
-      const stock = await Stock.findOne({ productId })
-        .populate('productId', 'name price sku images description isActive')
-        .populate('lastUpdatedBy', 'userName email');
+      const product = await Product.findById(productId).populate('category_id', 'name');
+      if (!product) return res.status(404).json({ success: false, message: 'Product not found' });
 
-      if (!stock) {
-        const product = await Product.findById(productId);
-        if (!product) {
-          return res.status(404).json({
-            success: false,
-            message: `Product with ID ${productId} not found`
-          });
-        }
-        return res.status(404).json({
-          success: false,
-          message: `No stock entry found for ${product.name}`,
-          suggestion: 'Use POST /api/stock/manage with operation: "create" to add stock'
-        });
-      }
-
-      const stockStatus = {
-        isLowStock: stock.quantity <= stock.lowStockThreshold && stock.quantity > 0,
-        isOutOfStock: stock.quantity === 0,
-        isInStock: stock.quantity > 0,
-        needsRestock: stock.quantity <= stock.lowStockThreshold
-      };
-
-      return res.status(200).json({
-        success: true,
-        message: 'Stock details retrieved',
-        data: { ...stock.toObject(), stockStatus }
-      });
-    }
-
-    // CASE 3: Get all stock (with filters)
-    if (getAll === 'true' || !productId) {
-      const query = {};
-      
-      if (minQuantity) query.quantity = { $gte: parseInt(minQuantity) };
-      if (maxQuantity) query.quantity = { ...query.quantity, $lte: parseInt(maxQuantity) };
-
-      let stocks = await Stock.find(query)
-        .populate('productId', 'name price sku images isActive')
-        .populate('lastUpdatedBy', 'userName email')
-        .sort({ createdAt: -1 })
-        .skip((parseInt(page) - 1) * parseInt(limit))
-        .limit(parseInt(limit));
-
-      // Apply status filter
-      if (status === 'lowStock') {
-        stocks = stocks.filter(s => s.quantity <= s.lowStockThreshold && s.quantity > 0);
-      } else if (status === 'outOfStock') {
-        stocks = stocks.filter(s => s.quantity === 0);
-      } else if (status === 'inStock') {
-        stocks = stocks.filter(s => s.quantity > 0);
-      }
-
-      const totalCount = await Stock.countDocuments(query);
-      const lowStockCount = stocks.filter(s => s.quantity <= s.lowStockThreshold && s.quantity > 0).length;
-      const outOfStockCount = stocks.filter(s => s.quantity === 0).length;
-      const inStockCount = stocks.filter(s => s.quantity > 0).length;
+      const variants = product.variants || [];
+      const stockDetails = await Promise.all(variants.map(async (v) => {
+        const s = await Stock.findOne({ productId, variantId: v._id });
+        return {
+          _id: s?._id || `new_${productId}_${v._id}`,
+          productId: {
+            _id: product._id,
+            name: product.name,
+            description: product.description,
+            category: product.category_id?.name,
+            images: product.image_id
+          },
+          variantId: v._id,
+          variantSize: v.size,
+          variantPrice: v.price,
+          quantity: s?.quantity || 0,
+          reservedQuantity: s?.reservedQuantity || 0,
+          lowStockThreshold: s?.lowStockThreshold || 10,
+          lastRestockedAt: s?.lastRestockedAt,
+          stockHistory: s?.stockHistory || []
+        };
+      }));
 
       return res.status(200).json({
         success: true,
-        message: `${stocks.length} stock entries found`,
-        data: stocks,
-        pagination: {
-          currentPage: parseInt(page),
-          totalPages: Math.ceil(totalCount / parseInt(limit)),
-          totalItems: totalCount,
-          itemsPerPage: parseInt(limit)
-        },
-        summary: {
-          total: totalCount,
-          lowStock: lowStockCount,
-          outOfStock: outOfStockCount,
-          inStock: inStockCount
-        }
+        data: stockDetails,
+        pagination: { totalItems: stockDetails.length, totalPages: 1, currentPage: 1 }
       });
     }
+
+    // CASE 2: Registry List with filtering and pagination
+    const productMatch = { isActive: true };
+    if (search) {
+      productMatch.name = { $regex: search, $options: 'i' };
+    }
+
+    const basePipeline = [
+      { $match: productMatch },
+      {
+        $lookup: {
+          from: 'categories',
+          localField: 'category_id',
+          foreignField: '_id',
+          as: 'category'
+        }
+      },
+      { $unwind: { path: '$category', preserveNullAndEmptyArrays: true } },
+      { $unwind: { path: '$variants', preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: 'stocks',
+          let: { pId: '$_id', vId: '$variants._id' },
+          pipeline: [
+            { $match: { $expr: { $and: [{ $eq: ['$productId', '$$pId'] }, { $eq: ['$variantId', '$$vId'] }] } } }
+          ],
+          as: 's'
+        }
+      },
+      { $unwind: { path: '$s', preserveNullAndEmptyArrays: true } },
+      {
+        $project: {
+          productId: {
+            _id: '$_id',
+            name: '$name',
+            images: '$image_id',
+            category: '$category.name'
+          },
+          variantId: '$variants._id',
+          variantSize: '$variants.size',
+          variantPrice: '$variants.price',
+          quantity: { $ifNull: ['$s.quantity', 0] },
+          reservedQuantity: { $ifNull: ['$s.reservedQuantity', 0] },
+          lowStockThreshold: { $ifNull: ['$s.lowStockThreshold', 10] },
+          lastRestockedAt: '$s.lastRestockedAt',
+          stockHistory: '$s.stockHistory'
+        }
+      }
+    ];
+
+    if (status === 'lowStock') {
+      basePipeline.push({ $match: { $expr: { $and: [{ $lte: ['$quantity', '$lowStockThreshold'] }, { $gt: ['$quantity', 0] }] } } });
+    } else if (status === 'outOfStock') {
+      basePipeline.push({ $match: { quantity: 0 } });
+    } else if (status === 'inStock') {
+      basePipeline.push({ $match: { $expr: { $gt: ['$quantity', '$lowStockThreshold'] } } });
+    }
+
+    const countRes = await Product.aggregate([...basePipeline, { $count: 'total' }]);
+    const totalEntries = countRes.length > 0 ? countRes[0].total : 0;
+
+    const dataPipeline = [
+      ...basePipeline,
+      { $sort: { quantity: 1, 'productId.name': 1 } },
+      { $skip: skip },
+      { $limit: pLimit }
+    ];
+    const stocks = await Product.aggregate(dataPipeline);
+
+    const summaryRes = await Product.aggregate([
+      { $match: { isActive: true } },
+      { $unwind: '$variants' },
+      {
+        $lookup: {
+          from: 'stocks',
+          let: { pId: '$_id', vId: '$variants._id' },
+          pipeline: [{ $match: { $expr: { $and: [{ $eq: ['$productId', '$$pId'] }, { $eq: ['$variantId', '$$vId'] }] } } }],
+          as: 's'
+        }
+      },
+      { $unwind: { path: '$s', preserveNullAndEmptyArrays: true } },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: 1 },
+          lowStock: {
+            $sum: {
+              $cond: [
+                { $and: [{ $lte: [{ $ifNull: ['$s.quantity', 0] }, { $ifNull: ['$s.lowStockThreshold', 10] }] }, { $gt: [{ $ifNull: ['$s.quantity', 0] }, 0] }] },
+                1, 0
+              ]
+            }
+          },
+          outOfStock: { $sum: { $cond: [{ $eq: [{ $ifNull: ['$s.quantity', 0] }, 0] }, 1, 0] } }
+        }
+      }
+    ]);
+
+    const summary = summaryRes.length > 0 ? summaryRes[0] : { total: 0, lowStock: 0, outOfStock: 0 };
+
+    return res.status(200).json({
+      success: true,
+      data: stocks,
+      pagination: {
+        currentPage: pPage,
+        totalPages: Math.ceil(totalEntries / pLimit),
+        totalItems: totalEntries,
+        itemsPerPage: pLimit
+      },
+      summary
+    });
 
   } catch (error) {
+    console.error('GetStock Error:', error);
     return res.status(500).json({
       success: false,
       message: 'Failed to retrieve stock',
@@ -321,6 +320,7 @@ const getStock = async (req, res) => {
     });
   }
 };
+
 
 
 

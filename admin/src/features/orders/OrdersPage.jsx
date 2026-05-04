@@ -183,26 +183,23 @@ function OrdersPage() {
               </div>
 
               {/* Actions */}
-              <div className="actions justify-center" style={{ gap: '1rem' }}>
+              <div className="actions justify-center" style={{ gap: '0.5rem' }}>
                 <GrView
-                  className="action-icon view-icon"
+                  className="action-icon-btn view"
                   size={18}
                   title="View Details"
-                  style={{ color: "#7E525C", cursor: "pointer" }}
                   onClick={() => handleView(order._id)}
                 />
                 <MdOutlineModeEditOutline
-                  className="action-icon edit-icon"
+                  className="action-icon-btn edit"
                   size={20}
                   title="Update Status"
-                  style={{ color: "#3b82f6", cursor: "pointer" }}
                   onClick={() => handleUpdateStatus(order._id, order.orderStatus)}
                 />
                 <MdPayment
-                  className="action-icon payment-icon"
+                  className="action-icon-btn payment"
                   size={18}
                   title="Update Payment"
-                  style={{ color: "#10b981", cursor: "pointer" }}
                   onClick={() => handleUpdatePayment(order._id, order.paymentStatus)}
                 />
               </div>

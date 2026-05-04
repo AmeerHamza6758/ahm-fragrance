@@ -1,168 +1,130 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../../styles/admin.css";
+import { categoryApi, tagApi } from "../../services/endpoints";
 import { IoMdAdd } from "react-icons/io";
 import { FiEdit } from "react-icons/fi";
 import { RiDeleteBin6Line } from "react-icons/ri";
-import Pagination from "../../components/Pagination";
 import Loader from "../../components/Loader";
-import { useGetCategories, useDeleteCategory, useAddCategory, useUpdateCategory } from "../../services/hooks/categories";
-import { useGetTags, useDeleteTag, useAddTag, useUpdateTag } from "../../services/hooks/tags";
-import { confirmationPopup, successToaster, errorToaster } from "../../utils/alert-service";
-import Swal from "sweetalert2";
+import { successToaster, errorToaster, confirmationPopup } from "../../utils/alert-service";
+
+// Child Components
+import CategoryModal from "./CategoryModal";
+import TagModal from "./TagModal";
 
 function CategoriesPage() {
-  // Categories State
-  const [catPage, setCatPage] = useState(1);
-  const entriesPerPage = 5;
+  const [allCategories, setAllCategories] = useState([]);
+  const [catLoading, setCatLoading] = useState(true);
+  const [catError, setCatError] = useState(false);
+
+  const [allTags, setAllTags] = useState([]);
+  const [tagLoading, setTagLoading] = useState(true);
   
-  const { data: categoriesRes, isLoading: catLoading, isError: catError } = useGetCategories();
-  const deleteCatMutation = useDeleteCategory();
-  const addCatMutation = useAddCategory();
-  const updateCatMutation = useUpdateCategory();
+  // Modal Visibility States
+  const [showCatModal, setShowCatModal] = useState(false);
+  const [editingCat, setEditingCat] = useState(null);
 
-  const allCategories = categoriesRes?.data || [];
-  const catTotalEntries = allCategories.length;
-  const catTotalPages = Math.ceil(catTotalEntries / entriesPerPage);
-  const currentCategories = allCategories.slice((catPage - 1) * entriesPerPage, catPage * entriesPerPage);
+  const [showTagModal, setShowTagModal] = useState(false);
+  const [editingTag, setEditingTag] = useState(null);
 
-  // Tags State
-  const [tagPage, setTagPage] = useState(1);
-  const { data: tagsRes, isLoading: tagLoading, isError: tagError } = useGetTags();
-  const deleteTagMutation = useDeleteTag();
-  const addTagMutation = useAddTag();
-  const updateTagMutation = useUpdateTag();
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-  const allTags = Array.isArray(tagsRes?.data) ? tagsRes.data : [];
-  const tagTotalEntries = allTags.length;
-  const tagTotalPages = Math.ceil(tagTotalEntries / entriesPerPage);
-  const currentTags = allTags.slice((tagPage - 1) * entriesPerPage, tagPage * entriesPerPage);
-
-  // Category Handlers
-  const handleAddCategory = async () => {
-    const { value: formValues } = await Swal.fire({
-      title: 'Add New Category',
-      html:
-        '<input id="swal-input1" class="swal2-input" placeholder="Category Name">' +
-        '<textarea id="swal-input2" class="swal2-textarea" placeholder="Description"></textarea>',
-      focusConfirm: false,
-      showCancelButton: true,
-      confirmButtonText: 'Create',
-      preConfirm: () => {
-        const name = document.getElementById('swal-input1').value;
-        const description = document.getElementById('swal-input2').value;
-        if (!name) {
-          Swal.showValidationMessage('Name is required');
-        }
-        return { name, description };
-      }
-    });
-
-    if (formValues) {
-      addCatMutation.mutate(formValues);
+  const fetchData = async () => {
+    setCatLoading(true);
+    setTagLoading(true);
+    try {
+      const [catRes, tagRes] = await Promise.all([
+        categoryApi.list(),
+        tagApi.list()
+      ]);
+      setAllCategories(catRes.data || []);
+      setAllTags(tagRes.data || []);
+    } catch (err) {
+      setCatError(true);
+      errorToaster("Failed to retrieve the essence collection.");
+      console.error("Fetch Data Error:", err);
+    } finally {
+      setCatLoading(false);
+      setTagLoading(false);
     }
   };
 
-  const handleEditCategory = async (category) => {
-    const { value: formValues } = await Swal.fire({
-      title: 'Edit Category',
-      html:
-        `<input id="swal-input1" class="swal2-input" value="${category.name}" placeholder="Category Name">` +
-        `<textarea id="swal-input2" class="swal2-textarea" placeholder="Description">${category.description || ''}</textarea>`,
-      focusConfirm: false,
-      showCancelButton: true,
-      confirmButtonText: 'Update',
-      preConfirm: () => {
-        const name = document.getElementById('swal-input1').value;
-        const description = document.getElementById('swal-input2').value;
-        if (!name) {
-          Swal.showValidationMessage('Name is required');
-        }
-        return { name, description };
-      }
-    });
+  // Category Handlers
+  const handleAddCategory = () => {
+    setEditingCat(null);
+    setShowCatModal(true);
+  };
 
-    if (formValues) {
-      updateCatMutation.mutate({ id: category._id, data: formValues });
-    }
+  const handleEditCategory = (item) => {
+    setEditingCat(item);
+    setShowCatModal(true);
   };
 
   const handleDeleteCategory = async (id) => {
-    const result = await confirmationPopup("Are you sure you want to delete this fragrance family?");
-    if (result.isConfirmed) {
-      deleteCatMutation.mutate(id);
+    const res = await confirmationPopup("Delete this essence family? This might affect associated products.");
+    if (res.isConfirmed) {
+      try {
+        await categoryApi.remove(id);
+        successToaster("Category removed.");
+        fetchData();
+      } catch (err) {
+        errorToaster("Failed to delete category.");
+      }
     }
   };
 
   // Tag Handlers
-  const handleAddTag = async () => {
-    const { value: formValues } = await Swal.fire({
-      title: 'Add New Tag',
-      html:
-        '<input id="swal-input1" class="swal2-input" placeholder="Tag Name">' +
-        '<textarea id="swal-input2" class="swal2-textarea" placeholder="Description"></textarea>',
-      focusConfirm: false,
-      showCancelButton: true,
-      confirmButtonText: 'Create',
-      preConfirm: () => {
-        const name = document.getElementById('swal-input1').value;
-        const description = document.getElementById('swal-input2').value;
-        if (!name) {
-          Swal.showValidationMessage('Name is required');
-        }
-        return { name, description };
-      }
-    });
-
-    if (formValues) {
-      addTagMutation.mutate(formValues);
-    }
+  const handleAddTag = () => {
+    setEditingTag(null);
+    setShowTagModal(true);
   };
 
-  const handleEditTag = async (tag) => {
-    const { value: formValues } = await Swal.fire({
-      title: 'Edit Tag',
-      html:
-        `<input id="swal-input1" class="swal2-input" value="${tag.name}" placeholder="Tag Name">` +
-        `<textarea id="swal-input2" class="swal2-textarea" placeholder="Description">${tag.description || ''}</textarea>`,
-      focusConfirm: false,
-      showCancelButton: true,
-      confirmButtonText: 'Update',
-      preConfirm: () => {
-        const name = document.getElementById('swal-input1').value;
-        const description = document.getElementById('swal-input2').value;
-        if (!name) {
-          Swal.showValidationMessage('Name is required');
-        }
-        return { name, description };
-      }
-    });
-
-    if (formValues) {
-      updateTagMutation.mutate({ id: tag._id, data: formValues });
-    }
+  const handleEditTag = (item) => {
+    setEditingTag(item);
+    setShowTagModal(true);
   };
 
   const handleDeleteTag = async (id) => {
-    const result = await confirmationPopup("Are you sure you want to delete this tag?");
-    if (result.isConfirmed) {
-      deleteTagMutation.mutate(id);
+    const res = await confirmationPopup("Delete this fragrance tag permanently?");
+    if (res.isConfirmed) {
+      try {
+        await tagApi.remove(id);
+        successToaster("Tag removed.");
+        fetchData();
+      } catch (err) {
+        errorToaster("Failed to delete tag.");
+      }
     }
   };
 
-  const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
-    const date = new Date(dateString);
-    return isNaN(date.getTime()) ? "N/A" : date.toLocaleDateString();
-  };
+  const formatDate = (ds) => ds ? new Date(ds).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  }) : "---";
+
+  // Global Key Listener for Modals
+  useEffect(() => {
+    const handleEsc = (event) => {
+      if (event.key === 'Escape') {
+        setShowCatModal(false);
+        setShowTagModal(false);
+      }
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, []);
 
   return (
-    <div className="categories-page-container">
-      {/* Categories Table */}
-      <div className="section-wrapper" style={{ marginBottom: "3rem" }}>
+    <div className="categories-admin-container">
+      
+      {/* Categories Section */}
+      <section className="admin-section-block">
         <div className="catalog-header">
           <div>
-            <h1 className="catalog-title">Fragrance Families</h1>
-            <p className="catalog-subtitle">Manage your fragrance categories and olfactory families.</p>
+            <h1 className="catalog-title">Essence Families</h1>
+            <p className="catalog-subtitle">Defining the primary classifications of your fragrance collection.</p>
           </div>
           <button onClick={handleAddCategory} className="add-btn">
             <IoMdAdd size={18} /> Add Category
@@ -170,7 +132,7 @@ function CategoriesPage() {
         </div>
 
         <div className="catalog-table">
-          <div className="catalog-table-header category-grid-layout">
+          <div className="category-header-row">
             <span>Name</span>
             <span>Description</span>
             <span>Products</span>
@@ -183,41 +145,30 @@ function CategoriesPage() {
           ) : catError ? (
             <div className="error-state"><p>Failed to retrieve categories.</p></div>
           ) : allCategories.length === 0 ? (
-            <div className="empty-state">No categories defined.</div>
+            <div className="empty-state">No categories defined yet.</div>
           ) : (
-            currentCategories.map((item) => (
-              <div className="catalog-row category-grid-layout" key={item._id}>
+            allCategories.map((item) => (
+              <div className="category-body-row" key={item._id}>
                 <div className="product-cell"><span className="user-name">{item.name}</span></div>
-                <div className="description-cell"><p className="description-text-small">{item.description || "No description."}</p></div>
+                <div className="description-cell"><p className="description-text-small truncate-multi" title={item.description}>{item.description || "No description."}</p></div>
                 <div className="count-cell"><span className="status-badge status-active">{item.productCount || 0} Essence{item.productCount !== 1 ? 's' : ''}</span></div>
-                <span>{formatDate(item.createdAt)}</span>
+                <div className="date-cell"><span>{formatDate(item.createdAt)}</span></div>
                 <div className="actions">
-                  <FiEdit className="action-icon edit-icon" size={18} style={{ color: "#7E525C", cursor: "pointer" }} onClick={() => handleEditCategory(item)} />
-                  <RiDeleteBin6Line className="action-icon delete-icon" size={18} onClick={() => handleDeleteCategory(item._id)} style={{ color: "#ef4444", cursor: "pointer" }} />
+                  <FiEdit className="action-icon-btn edit" size={18} onClick={() => handleEditCategory(item)} title="Edit Category" />
+                  <RiDeleteBin6Line className="action-icon-btn delete" size={18} onClick={() => handleDeleteCategory(item._id)} title="Delete Category" />
                 </div>
               </div>
             ))
           )}
-
-          {catTotalEntries > 0 && (
-            <Pagination
-              currentPage={catPage}
-              totalPages={catTotalPages}
-              onPageChange={setCatPage}
-              totalEntries={catTotalEntries}
-              startEntry={(catPage - 1) * entriesPerPage + 1}
-              endEntry={Math.min(catPage * entriesPerPage, catTotalEntries)}
-            />
-          )}
         </div>
-      </div>
+      </section>
 
-      {/* Tags Table */}
-      <div className="section-wrapper">
+      {/* Tags Section */}
+      <section className="admin-section-block" style={{ marginTop: '3.5rem' }}>
         <div className="catalog-header">
           <div>
-            <h1 className="catalog-title">Descriptive Tags</h1>
-            <p className="catalog-subtitle">Manage tags for product filtering and organization.</p>
+            <h1 className="catalog-title">Fragrance Nuances</h1>
+            <p className="catalog-subtitle">Subtle tags and specialized descriptors for refined filtering.</p>
           </div>
           <button onClick={handleAddTag} className="add-btn">
             <IoMdAdd size={18} /> Add Tag
@@ -225,7 +176,7 @@ function CategoriesPage() {
         </div>
 
         <div className="catalog-table">
-          <div className="catalog-table-header category-grid-layout">
+          <div className="tag-header-row">
             <span>Tag Name</span>
             <span>Description</span>
             <span>Usage</span>
@@ -234,38 +185,41 @@ function CategoriesPage() {
           </div>
 
           {tagLoading ? (
-            <Loader text="Gathering tags..." />
-          ) : tagError ? (
-            <div className="error-state"><p>Failed to retrieve tags.</p></div>
+            <Loader text="Extracting tag essence..." />
           ) : allTags.length === 0 ? (
-            <div className="empty-state">No tags defined.</div>
+            <div className="empty-state">No nuances defined yet.</div>
           ) : (
-            currentTags.map((item) => (
-              <div className="catalog-row category-grid-layout" key={item._id}>
+            allTags.map((item) => (
+              <div className="tag-body-row" key={item._id}>
                 <div className="product-cell"><span className="user-name">{item.name}</span></div>
-                <div className="description-cell"><p className="description-text-small">{item.description || "No description."}</p></div>
+                <div className="description-cell"><p className="description-text-small truncate-multi" title={item.description}>{item.description || "No description."}</p></div>
                 <div className="count-cell"><span className="status-badge status-active">Active</span></div>
-                <span>{formatDate(item.createdAt)}</span>
+                <div className="date-cell"><span>{formatDate(item.createdAt)}</span></div>
                 <div className="actions">
-                  <FiEdit className="action-icon edit-icon" size={18} style={{ color: "#7E525C", cursor: "pointer" }} onClick={() => handleEditTag(item)} />
-                  <RiDeleteBin6Line className="action-icon delete-icon" size={18} onClick={() => handleDeleteTag(item._id)} style={{ color: "#ef4444", cursor: "pointer" }} />
+                  <FiEdit className="action-icon-btn edit" size={18} onClick={() => handleEditTag(item)} title="Edit Tag" />
+                  <RiDeleteBin6Line className="action-icon-btn delete" size={18} onClick={() => handleDeleteTag(item._id)} title="Delete Tag" />
                 </div>
               </div>
             ))
           )}
-
-          {tagTotalEntries > 0 && (
-            <Pagination
-              currentPage={tagPage}
-              totalPages={tagTotalPages}
-              onPageChange={setTagPage}
-              totalEntries={tagTotalEntries}
-              startEntry={(tagPage - 1) * entriesPerPage + 1}
-              endEntry={Math.min(tagPage * entriesPerPage, tagTotalEntries)}
-            />
-          )}
         </div>
-      </div>
+      </section>
+
+      {/* Reusable Modals */}
+      <CategoryModal 
+        show={showCatModal} 
+        onClose={() => setShowCatModal(false)} 
+        onSuccess={fetchData} 
+        editingCat={editingCat} 
+      />
+
+      <TagModal 
+        show={showTagModal} 
+        onClose={() => setShowTagModal(false)} 
+        onSuccess={fetchData} 
+        editingTag={editingTag} 
+      />
+
     </div>
   );
 }

@@ -10,6 +10,7 @@ const CategoriesPage = lazy(() => import("./features/categories/CategoriesPage")
 const OrdersPage = lazy(() => import("./features/orders/OrdersPage"));
 const ViewOrder = lazy(() => import("./features/orders/ViewOrder"));
 const StockPage = lazy(() => import("./features/stock/StockPage"));
+const ViewStockDetails = lazy(() => import("./features/stock/ViewStockDetails"));
 const FaqPage = lazy(() => import("./features/FaqPage"));
 const CustomersPage = lazy(() => import("./features/CustomersPage"));
 const SettingsPage = lazy(() => import("./features/SettingsPage"));
@@ -35,8 +36,9 @@ function App() {
             <Route path="products" element={<ProductsPage />} />
             <Route path="categories" element={<CategoriesPage />} />
             <Route path="orders" element={<OrdersPage />} />
-            <Route path="orders/view/:id" element={<ViewOrder />} />
+             <Route path="orders/view/:id" element={<ViewOrder />} />
             <Route path="stock" element={<StockPage />} />
+            <Route path="stock/view/:id" element={<ViewStockDetails />} />
             <Route path="faq" element={<FaqPage />} />
             <Route path="customers" element={<CustomersPage />} />
             <Route path="customers/view/:id" element={<ViewCustomer />} />

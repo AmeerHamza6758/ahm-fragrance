@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useGetProductById, useGetStockByProductId } from '../../services/hooks/products';
-import { IoArrowBack } from 'react-icons/io5';
+import { IoArrowBack, IoStar } from 'react-icons/io5';
+import { API_BASE_URL } from "../../services/http";
 import Loader from '../../components/Loader';
 import "../../styles/admin.css";
 
@@ -10,17 +11,19 @@ function ViewProduct() {
   const navigate = useNavigate();
   const { data: productRes, isLoading, error } = useGetProductById(id);
   const { data: stockRes } = useGetStockByProductId(id);
-  const product = productRes?.data;
-  const stockCount = stockRes?.data?.data?.quantity ?? "N/A";
+  const product = productRes?.data?.data;
+  const stockCount = stockRes?.data?.data?.quantity ?? 0;
+
+  const [activeImg, setActiveImg] = useState(0);
 
   if (isLoading) {
     return <Loader text="Unveiling fragrance details..." />;
   }
 
-  if (error) {
+  if (error || !product) {
     return (
       <div className="error-container">
-        <p>Failed to load product details.</p>
+        <p>Failed to load product details or fragrance not found.</p>
         <button onClick={() => navigate('/products')} className="back-btn">
           <IoArrowBack /> Back to Catalog
         </button>
@@ -45,10 +48,8 @@ function ViewProduct() {
     return { backgroundColor: colors[index].bg, color: colors[index].text, border: `1px solid ${colors[index].text}20` };
   };
 
-  const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
-  const imageUrl = product?.image_id?.[0]?.path
-    ? `${BASE_URL}/${product.image_id[0].path.replace(/\\/g, '/')}`
-    : "/image/placeholder.png";
+  const images = Array.isArray(product.image_id) ? product.image_id : [];
+  const currentImageUrl = images[activeImg]?.url || (images[activeImg]?.path ? `${API_BASE_URL}/${images[activeImg].path.replace(/\\/g, '/')}` : "/image/placeholder.png");
 
   return (
     <section className="view-product-container">
@@ -57,76 +58,89 @@ function ViewProduct() {
           <div className="back-arrow-btn" onClick={() => navigate('/products')}>
             <IoArrowBack size={24} />
           </div>
-          <h1 className="catalog-title">Product Details</h1>
+          <h1 className="catalog-title">Fragrance Analysis</h1>
         </div>
         <div className="header-actions">
           <button className="edit-action-btn" onClick={() => navigate(`/products/edit/${id}`)}>
-            Edit Details
+            Refine Details
           </button>
         </div>
       </div>
 
       <div className="admin-view-grid">
-        {/* Visual Showcase */}
+        {/* Visual Showcase - Left Side */}
         <div className="visual-section">
           <div className="main-display-card">
-            <img src={imageUrl} alt={product?.name} className="main-product-img" />
+            <img src={currentImageUrl} alt={product.name} className="main-product-img" />
           </div>
 
-          {product?.image_id && product.image_id.length > 1 && (
+          {images.length > 1 && (
             <div className="thumbnail-strip">
-              {product.image_id.map((img, idx) => (
-                <div key={idx} className={`thumb-box ${idx === 0 ? 'active' : ''}`}>
-                  <img src={`${BASE_URL}/${img.path.replace(/\\/g, '/')}`} alt={`View ${idx}`} />
+              {images.map((img, idx) => (
+                <div 
+                  key={idx} 
+                  className={`thumb-box ${activeImg === idx ? 'active' : ''}`}
+                  onClick={() => setActiveImg(idx)}
+                >
+                  <img src={img.url || `${API_BASE_URL}/${img.path.replace(/\\/g, '/')}`} alt={`View ${idx}`} />
                 </div>
               ))}
             </div>
           )}
         </div>
 
-        {/* Detailed Information */}
+        {/* Detailed Information - Right Side */}
         <div className="information-section">
           <div className="admin-card">
-            <h3 className="card-heading">Fragrance Specification</h3>
+            <div className="card-header-flex">
+               <h3 className="card-heading">Olfactory Profile</h3>
+               <div className="rating-badge">
+                 <IoStar size={14} color="#FFD700" />
+                 <span>{product.rating || "4.5"}</span>
+               </div>
+            </div>
+            
             <div className="spec-grid">
               <div className="spec-item full-width">
                 <label>Product Title</label>
-                <div className="spec-value-large">{product?.name}</div>
+                <div className="spec-value-large">{product.name}</div>
               </div>
               <div className="spec-item full-width">
-                <label>Description</label>
+                <label>Scent Narrative (Description)</label>
                 <p className="description-text">
-                  {product?.description || "No description available."}
+                  {product.description || "The story of this fragrance is yet to be told."}
                 </p>
               </div>
               <div className="spec-item">
-                <label>Category</label>
-                <div className="spec-value">{product?.category_id?.name || 'N/A'}</div>
+                <label>Essence Category</label>
+                <div className="spec-value">{product.category_id?.name || 'N/A'}</div>
               </div>
               <div className="spec-item">
                 <label>Fragrance Family</label>
                 <div
                   className="spec-tag"
-                  style={getTagStyle(product?.tag_id?.name)}
+                  style={getTagStyle(product.tag_id?.name)}
                 >
-                  {product?.tag_id?.name || "General"}
+                  {product.tag_id?.name || "Unspecified"}
                 </div>
               </div>
               <div className="spec-item">
-                <label>Status</label>
+                <label>Visibility Status</label>
                 <div className="spec-value">
-                  <span className="status-pill active">Active</span>
+                  <span className={`status-pill ${product.isActive ? 'active' : 'inactive'}`}>
+                    {product.isActive ? "Live in Collection" : "Archived"}
+                  </span>
                 </div>
               </div>
               <div className="spec-item">
-                <label>In-stock Units</label>
+                <label>Available Stock</label>
                 <div className="spec-value">{stockCount} Units</div>
               </div>
             </div>
           </div>
 
           <div className="admin-card">
-            <h3 className="card-heading">Volume Variants & Pricing</h3>
+            <h3 className="card-heading">Volume Variants & Commercials</h3>
             <div className="variants-table">
               <div className="v-header">
                 <span>Volume</span>
@@ -134,7 +148,7 @@ function ViewProduct() {
                 <span>Discount</span>
                 <span>Current Price</span>
               </div>
-              {product?.variants && product.variants.length > 0 ? (
+              {product.variants && product.variants.length > 0 ? (
                 product.variants.map((v, idx) => (
                   <div key={idx} className="v-row">
                     <span className="v-size-label">{v.size}</span>
@@ -145,10 +159,7 @@ function ViewProduct() {
                 ))
               ) : (
                 <div className="v-row">
-                  <span className="v-size-label">Standard</span>
-                  <span>PKR {product?.price?.toLocaleString()}</span>
-                  <span>0%</span>
-                  <span className="v-final">PKR {product?.price?.toLocaleString()}</span>
+                   <span className="v-empty">No volume variants configured for this fragrance.</span>
                 </div>
               )}
             </div>

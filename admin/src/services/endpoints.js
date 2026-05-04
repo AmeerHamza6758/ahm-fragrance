@@ -103,10 +103,16 @@ export const userApi = {
   remove: (id) => http.delete(`/api/auth/deleteUser/${id}`),
 };
 export const contactApi = {
-  list: () => http.get("/api/contact/all"),
+  list: (params) => {
+    const query = params ? "?" + new URLSearchParams(params).toString() : "";
+    return http.get(`/api/contact/all${query}`);
+  },
   remove: (id) => http.delete(`/api/contact/delete?id=${id}`),
 };
 export const circleApi = {
-  list: () => http.get("/api/circle/all"),
+  list: (params) => {
+    const query = params ? "?" + new URLSearchParams(params).toString() : "";
+    return http.get(`/api/circle/all${query}`);
+  },
   remove: (id) => http.delete(`/api/circle/remove?id=${id}`),
 };

@@ -1,63 +1,76 @@
 const CMS = require('../models/cms.model');
 
 const cmsController = {
-  // Get content by key
+  // Get content by key (public)
   getContent: async (req, res) => {
     try {
       const { key } = req.params;
-      let content = await CMS.findOne({ key });
-      
+      const content = await CMS.findOne({ key });
       if (!content) {
-        // Return empty structure if not found
-        return res.status(200).json({
-          status: 1,
-          data: { key, title: '', content: '' },
-          message: 'Content not initialized'
+        return res.status(404).json({
+          status: 0,
+          message: 'Content not found'
         });
       }
-
       res.status(200).json({
         status: 1,
-        data: content,
-        message: 'Content fetched successfully'
+        data: content
       });
-    } catch (err) {
-      res.status(500).json({ status: 0, message: err.message });
+    } catch (error) {
+      res.status(500).json({
+        status: 0,
+        message: 'Server error',
+        error: error.message
+      });
     }
   },
 
-  // Create or Update content
+  // Update or Create content (admin)
   updateContent: async (req, res) => {
     try {
       const { key, title, content } = req.body;
-
-      if (!key || !title || !content) {
-        return res.status(400).json({ status: 0, message: 'Missing required fields' });
+      
+      if (!key || !content) {
+        return res.status(400).json({
+          status: 0,
+          message: 'Key and content are required'
+        });
       }
 
-      let cmsItem = await CMS.findOneAndUpdate(
+      const updatedCMS = await CMS.findOneAndUpdate(
         { key },
-        { title, content },
+        { title: title || '', content },
         { new: true, upsert: true }
       );
 
       res.status(200).json({
         status: 1,
-        data: cmsItem,
-        message: `${title} updated successfully`
+        message: 'Content updated successfully',
+        data: updatedCMS
       });
-    } catch (err) {
-      res.status(500).json({ status: 0, message: err.message });
+    } catch (error) {
+      res.status(500).json({
+        status: 0,
+        message: 'Server error',
+        error: error.message
+      });
     }
   },
 
-  // Get all CMS keys (for admin overview)
+  // Get all keys (admin)
   getAllKeys: async (req, res) => {
     try {
-      const contents = await CMS.find({}, 'key title updatedAt');
-      res.status(200).json({ status: 1, data: contents });
-    } catch (err) {
-      res.status(500).json({ status: 0, message: err.message });
+      const contents = await CMS.find({}, 'key title');
+      res.status(200).json({
+        status: 1,
+        data: contents
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: 0,
+        message: 'Server error',
+        error: error.message
+      });
     }
   }
 };

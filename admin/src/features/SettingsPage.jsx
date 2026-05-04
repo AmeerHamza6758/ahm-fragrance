@@ -31,21 +31,23 @@ function SettingsPage() {
   const { data: cmsRes, isLoading: cmsLoading } = useGetCMSContent(isCmsTab ? activeTab : null);
   const updateCmsMutation = useUpdateCMSContent();
 
-  const [cmsForm, setCmsForm] = useState({ title: '', content: '' });
+  const [cmsForm, setCmsForm] = useState({ content: '' });
 
   useEffect(() => {
-    if (cmsRes?.data?.data) {
-      setCmsForm({
-        title: cmsRes.data.data.title || '',
-        content: cmsRes.data.data.content || ''
-      });
+    if (isCmsTab) {
+      if (cmsRes?.data?.data) {
+        setCmsForm({
+          content: cmsRes.data.data.content || ''
+        });
+      } else if (!cmsLoading) {
+        setCmsForm({ content: '' });
+      }
     }
-  }, [cmsRes, activeTab]);
+  }, [cmsRes, activeTab, isCmsTab, cmsLoading]);
 
   const handleCmsSave = () => {
     updateCmsMutation.mutate({
       key: activeTab,
-      title: cmsForm.title,
       content: cmsForm.content
     });
   };
@@ -68,10 +70,19 @@ function SettingsPage() {
 
   const modules = {
     toolbar: [
-      [{ 'header': [1, 2, 3, false] }],
+      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+      [{ 'font': [] }],
+      [{ 'size': ['small', false, 'large', 'huge'] }],
       ['bold', 'italic', 'underline', 'strike'],
-      [{'list': 'ordered'}, {'list': 'bullet'}],
-      ['link', 'clean']
+      [{ 'color': [] }, { 'background': [] }],
+      [{ 'script': 'sub'}, { 'script': 'super' }],
+      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+      [{ 'indent': '-1'}, { 'indent': '+1' }],
+      [{ 'direction': 'rtl' }],
+      [{ 'align': [] }],
+      ['link', 'image', 'video'],
+      ['blockquote', 'code-block'],
+      ['clean']
     ],
   };
 
@@ -209,21 +220,12 @@ function SettingsPage() {
               {cmsLoading ? <Loader text="Loading manuscript..." /> : (
                 <div className="editor-workspace">
                   <div className="editor-field-group">
-                    <label className="field-label">Document Title</label>
-                    <input 
-                      type="text" 
-                      className="premium-input-field"
-                      value={cmsForm.title}
-                      onChange={(e) => setCmsForm({...cmsForm, title: e.target.value})}
-                    />
-                  </div>
-                  <div className="editor-field-group">
                     <label className="field-label">Document Manuscript</label>
                     <div className="rich-editor-container">
                       <ReactQuill 
                         theme="snow" 
                         value={cmsForm.content} 
-                        onChange={(content) => setCmsForm({...cmsForm, content})}
+                        onChange={(content) => setCmsForm({ content })}
                         modules={modules}
                       />
                     </div>
