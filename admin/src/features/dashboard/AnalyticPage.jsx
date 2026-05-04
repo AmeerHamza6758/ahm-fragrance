@@ -1,115 +1,108 @@
-import React from 'react'
-import PageSection from "../../components/PageSection";
+import React, { useState, useEffect } from 'react'
+import { dashboardApi } from "../../services/endpoints";
+import Loader from "../../components/Loader";
 import "../../styles/admin.css"
 
-const revenueData = [
-    {
-        month:"June 2024",
-        order:"1890",
-        refunded:"28",
-        deliverd:"1820",
-        status:"PAID",
-        gross:"1,450,000",
-        refunds:"21,000",
-        net:"1,429,000"
-    },
-    {
-        month:"May 2024",
-        order:"1720",
-        refunded:"19",
-        deliverd:"1690",
-        gross:"1,280,000",
-        refunds:"14,500",
-        net:"1,265,500"
-    },
-    {
-        month:"April 2024",
-        order:"1640",
-        refunded:"24",
-        deliverd:"1610",
-        gross:"1,210,000",
-        refunds:"18,200",
-        net:"1,191,800"
-    },
-    {
-        month:"March 2024",
-        order:"1910",
-        refunded:"24",
-        deliverd:"1880",
-        gross:"1,520,000",
-        refunds:"32,100",
-        net:"1,487,900"
-    },
-    {
-        month:"February 2024",
-        order:"1420",
-        refunded:"16",
-        deliverd:"1390",
-        gross:"1,090,000",
-        refunds:"12,400",
-        net:"1,077,600"
-    },
-    {
-        month:"January 2024",
-        order:"1680",
-        refunded:"58",
-        deliverd:"1650",
-        gross:"1,295,000",
-        refunds:"44,100",
-        net:"1,250,900"
-    },
-]
 function AnalyticPage() {
+  const [ledgerData, setLedgerData] = useState([]);
+  const [summary, setSummary] = useState({ users: 0, revenue: 0, refunds: 0 });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [ledgerRes, statsRes, graphsRes] = await Promise.all([
+          dashboardApi.getLedger(),
+          dashboardApi.getStats(),
+          dashboardApi.getGraphs()
+        ]);
+
+        if (ledgerRes.data && ledgerRes.data.success) {
+          setLedgerData(ledgerRes.data.data);
+        }
+
+        if (statsRes.data && statsRes.data.success && graphsRes.data && graphsRes.data.success) {
+          // Calculate annual summary from graph data if needed, or use specific stats
+          const totalRevenue = graphsRes.data.data.revenueVsRefunded.find(d => d.name === 'Revenue')?.value || 0;
+          const totalRefunds = graphsRes.data.data.revenueVsRefunded.find(d => d.name === 'Refunded')?.value || 0;
+          const totalUsers = graphsRes.data.data.usersPerMonth.reduce((acc, curr) => acc + (curr.users || 0), 0);
+
+          setSummary({
+            users: totalUsers,
+            revenue: totalRevenue,
+            refunds: totalRefunds
+          });
+        }
+      } catch (err) {
+        console.error("Failed to fetch analytic data:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (loading) return <Loader text="Compiling financial history..." />;
+
   return (
     <div className='revenue-analytic'>
         <div className='revenue-header'>
             <p className='overview-text'>FINANCIAL OVERVIEW</p>
             <h1 className='revenue-heading'>Revenue Analytics Ledger</h1>
-            <p className='revenue-subheading'>A detailed chronicle of fiscal performance, tracking the growth of our AHM Fragrance scent collection across the previous six months.</p>
+            <p className='revenue-subheading'>A detailed chronicle of fiscal performance, tracking the growth of our AHM Fragrance scent collection.</p>
         </div> 
+
         <div className='analytic-summary-card'>
             <div className='analytic-card'>
-                <p>Total Annual Users</p>
-                <h2>12,842</h2>
-                <p>+14% from previous year</p>
+                <p>Total Community Members</p>
+                <h2>{summary.users.toLocaleString()}</h2>
+                <p>Global reach across all regions</p>
             </div>
             <div className='analytic-card'>
-                <p>Total Annual Revenue</p>
-                <h2>PKR 8,245,000</h2>
-                <p>Maintained 92% profit margin</p>
+                <p>Total Revenue (Delivered)</p>
+                <h2>PKR {summary.revenue.toLocaleString()}</h2>
+                <p>Accumulated artisan sales</p>
             </div>
             <div className='analytic-card'>
-                <p>Total Annual Refunds</p>
-                <h2 style={{color:" #BA1A1A"}}>PKR 142,300</h2>
-                <p >1.7% of gross revenue</p>
+                <p>Total Refunded Value</p>
+                <h2 style={{color:" #BA1A1A"}}>PKR {summary.refunds.toLocaleString()}</h2>
+                <p>{summary.revenue > 0 ? ((summary.refunds / summary.revenue) * 100).toFixed(1) : 0}% of gross revenue</p>
             </div>
         </div>
+
         <div className='revenue-ledger'>
             <h2 className='ledger-title'>Monthly Revenue Ledger</h2>
             <div className='ledger-table'>
                 <div className='ledger-table-header'>
                     <span>Month</span>
-                    <span>Total Orders</span>
-                    <span>Refunded Orders</span>
+                    <span>Orders</span>
+                    <span>Refunded</span>
                     <span>Delivered</span>
-                    <span>Payment Status</span>
+                    <span>Payment</span>
                     <span>Gross (PKR)</span>
                     <span>Refunds (PKR)</span>
-                    <span>Net Revenue (PKR)</span> 
+                    <span>Net (PKR)</span> 
                 </div> 
 
-                {revenueData.map((item, index) => (
-                    <div className='ledger-table-row' key={index}>
-                       <span>{item.month} </span>
-                       <span>{item.order} </span>
-                       <span>{item.refunded} </span>
-                       <span>{item.deliverd} </span>
-                       <span className='paid-status'>PAID</span>
-                    <span>{item.gross} </span>
-                    <span>{item.refunds} </span>
-                    <span>{item.net} </span>
-                   </div>  
-                ))}      
+                {ledgerData.length === 0 ? (
+                    <div className="empty-state" style={{ padding: '2rem', textAlign: 'center', color: '#999' }}>
+                        No ledger data recorded yet.
+                    </div>
+                ) : (
+                    ledgerData.map((item, index) => (
+                        <div className='ledger-table-row' key={index}>
+                           <span>{item.month} </span>
+                           <span>{item.order} </span>
+                           <span>{item.refunded} </span>
+                           <span>{item.deliverd} </span>
+                           <span className='paid-status'>PROCESSED</span>
+                           <span>{item.gross} </span>
+                           <span>{item.refunds} </span>
+                           <span style={{ fontWeight: 600 }}>{item.net} </span>
+                        </div>  
+                    ))
+                )}      
             </div>   
         </div>      
     </div>
