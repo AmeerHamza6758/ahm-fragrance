@@ -380,7 +380,7 @@ console.log(product,"pro");
     {/* Customer Reviews & Feedback */}
 <section className="w-full bg-[#faf8f5]  px-4 flex flex-col items-center justify-center">
   {/* Header Container */}
-  <div className="text-center mb-10 max-w-2xl">
+  <div className="text-center mb-6 max-w-2xl">
     <h2
       className="text-[#7e525c] font-normal leading-tight text-[28px] sm:text-[34px] md:text-[38px] mb-3"
       style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}
@@ -393,7 +393,7 @@ console.log(product,"pro");
   </div>
 
   {/* Form Container - Adjusted for better alignment and responsiveness */}
-  <div className="bg-white border border-[#e8dde0] rounded-2xl p-6 sm:p-10 shadow-sm w-full max-w-2xl mx-auto">
+  <div className="bg-white border border-[#e8dde0] rounded-2xl p-6 sm:p-8 shadow-sm w-full max-w-2xl mx-auto">
     {reviewSuccess ? (
       <div className="text-center py-8">
         <p
@@ -419,7 +419,7 @@ console.log(product,"pro");
       </div>
     ) : (
       <form
-        className="flex flex-col gap-8"
+        className="flex flex-col gap-6"
         onSubmit={(e) => {
           e.preventDefault();
           setReviewError("");
@@ -487,9 +487,9 @@ console.log(product,"pro");
             value={reviewText}
             onChange={(e) => setReviewText(e.target.value)}
             placeholder="Describe the notes, the longevity, and how it made you feel..."
-            rows={5}
+            rows={3}
             required
-            className="w-full border border-[#e8dde0] rounded-xl px-5 py-4 text-[15px] text-[#5a3a42] placeholder-[#c4a8b0] bg-[#fafafa] resize-none focus:outline-none focus:border-[#7e525c] focus:bg-white transition-all font-sans shadow-inner"
+            className="w-full border border-[#e8dde0] rounded-xl px-5 py-3 text-[15px] text-[#5a3a42] placeholder-[#c4a8b0] bg-[#fafafa] resize-none focus:outline-none focus:border-[#7e525c] focus:bg-white transition-all font-sans shadow-inner"
           />
         </div>
 
