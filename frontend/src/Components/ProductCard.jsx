@@ -122,14 +122,24 @@ export default function ProductCard({ product }) {
 
           {/* Price + Order */}
           <div className="flex items-center justify-between mt-2">
-            <div className="flex items-center gap-2">
-              <span className="text-[#1c1c19] text-sm font-semibold">
-                Rs. {price?.toLocaleString()}
-              </span>
-
-              {discountPercentage > 0 && (
-                <span className="text-[11px] text-green-600 font-medium">
-                  -{discountPercentage}%
+            <div className="flex flex-col gap-0.5">
+              {discountPercentage > 0 ? (
+                <>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[#a08a8a] text-[12px] font-medium line-through whitespace-nowrap">
+                      Rs. {price?.toLocaleString()}
+                    </span>
+                    <span className="text-[11px] text-green-600 font-medium whitespace-nowrap">
+                      -{discountPercentage}%
+                    </span>
+                  </div>
+                  <span className="text-[#1c1c19] text-sm font-semibold whitespace-nowrap">
+                    Rs. {(price - (price * discountPercentage) / 100).toLocaleString()}
+                  </span>
+                </>
+              ) : (
+                <span className="text-[#1c1c19] text-sm font-semibold whitespace-nowrap">
+                  Rs. {price?.toLocaleString()}
                 </span>
               )}
             </div>

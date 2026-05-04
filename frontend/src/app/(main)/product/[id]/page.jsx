@@ -177,15 +177,25 @@ console.log(product,"pro");
               {/* <p className="product-description">{product.description}</p> */}
 
               <div className="price-section">
-                <span className="price">
-                  Rs. {displayPrice?.toLocaleString()}
-                  {displayDiscount > 0 && (
-                    <span className="product-discount">
-                      
-                      -{displayDiscount}%
+                {displayDiscount > 0 ? (
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-3">
+                      <span className="text-[#a08a8a] text-lg font-medium line-through whitespace-nowrap">
+                        Rs. {displayPrice?.toLocaleString()}
+                      </span>
+                      <span className="product-discount whitespace-nowrap">
+                        -{displayDiscount}%
+                      </span>
+                    </div>
+                    <span className="price whitespace-nowrap">
+                      Rs. {(displayPrice - (displayPrice * displayDiscount) / 100).toLocaleString()}
                     </span>
-                  )}
-                </span>
+                  </div>
+                ) : (
+                  <span className="price whitespace-nowrap">
+                    Rs. {displayPrice?.toLocaleString()}
+                  </span>
+                )}
               </div>
 
               {/* Size Selection (static for now) */}
