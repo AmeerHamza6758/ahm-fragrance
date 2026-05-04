@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -26,8 +26,18 @@ export default function ProductDetails() {
   const { data: product, isLoading, isError } = useProduct(productId);
 
   const [quantity, setQuantity] = useState(1);
-  const [selectedSize, setSelectedSize] = useState("50ml");
+  const [selectedSize, setSelectedSize] = useState("");
   const [activeTab, setActiveTab] = useState("description");
+
+  // Update selected size when product data is loaded
+  useEffect(() => {
+    if (product?.variants?.length > 0) {
+      setSelectedSize(product.variants[0].size);
+    } else if (product?.price) {
+      // If no variants, but has a base price (fallback)
+      setSelectedSize("Default"); 
+    }
+  }, [product]);
   const [reviewRating, setReviewRating] = useState(4);
   const [reviewHover, setReviewHover] = useState(0);
   const [reviewText, setReviewText] = useState("");
@@ -82,9 +92,11 @@ export default function ProductDetails() {
     : product.discountPercentage;
 
   // Robust image URL logic
+  const firstImage = Array.isArray(product?.image_id) ? product.image_id[0] : product?.image_id;
   let imageUrl = "/Images/best-1.svg";
-  if (product?.image_id?.path) {
-    imageUrl = buildProductImageUrl(product.image_id.path);
+  
+  if (firstImage?.path) {
+    imageUrl = buildProductImageUrl(firstImage.path);
   } else if (product?.image) {
     imageUrl = product.image;
   }
@@ -145,19 +157,36 @@ console.log(product,"pro");
 
   {/* Thumbnails Row */}
   <div className="flex flex-row justify-center gap-3 relative w-[90%] rounded-lg!">
-  {[1, 2].map((_, index) => (
-  <div 
-    key={index} 
-    className="relative aspect-square bg-[#faf8f5] !rounded-xl overflow-hidden transition-colors h-[30%] w-[30%]"
-  >
-    <Image
-      src={imageUrl}
-      alt={`${product.name} thumb ${index}`}
-      fill
-      className="object-contain p-2 detail-img"
-    />
-  </div>
-))}
+  {Array.isArray(product?.image_id) && product.image_id.length > 1 ? (
+    product.image_id.map((img, index) => (
+      <div 
+        key={img._id || index} 
+        className="relative aspect-square bg-[#faf8f5] !rounded-xl overflow-hidden transition-colors h-[30%] w-[30%] cursor-pointer hover:border-[#7e525c] border-2 border-transparent"
+      >
+        <Image
+          src={buildProductImageUrl(img.path)}
+          alt={`${product.name} thumb ${index}`}
+          fill
+          className="object-contain p-2 detail-img"
+        />
+      </div>
+    ))
+  ) : (
+    // Fallback if only one image or none
+    [1, 2].map((_, index) => (
+      <div 
+        key={index} 
+        className="relative aspect-square bg-[#faf8f5] !rounded-xl overflow-hidden transition-colors h-[30%] w-[30%]"
+      >
+        <Image
+          src={imageUrl}
+          alt={`${product.name} thumb ${index}`}
+          fill
+          className="object-contain p-2 detail-img"
+        />
+      </div>
+    ))
+  )}
   
   
 </div>
@@ -198,24 +227,23 @@ console.log(product,"pro");
                 )}
               </div>
 
-              {/* Size Selection (static for now) */}
-              <div className="size-selection">
-                <label>CHOOSE SIZE</label>
-                <div className="size-options">
-                  <button
-                    className={`size-btn ${selectedSize === "50ml" ? "active" : ""}`}
-                    onClick={() => setSelectedSize("50ml")}
-                  >
-                    50ml
-                  </button>
-                  <button
-                    className={`size-btn ${selectedSize === "100ml" ? "active" : ""}`}
-                    onClick={() => setSelectedSize("100ml")}
-                  >
-                    100ml
-                  </button>
+              {/* Size Selection (dynamic from database) */}
+              {product.variants?.length > 0 && (
+                <div className="size-selection">
+                  <label>CHOOSE SIZE</label>
+                  <div className="size-options">
+                    {product.variants.map((v) => (
+                      <button
+                        key={v.size}
+                        className={`size-btn ${selectedSize === v.size ? "active" : ""}`}
+                        onClick={() => setSelectedSize(v.size)}
+                      >
+                        {v.size}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Quantity Selection */}
               <div className="quantity-section">
