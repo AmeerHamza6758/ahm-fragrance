@@ -5,7 +5,7 @@ import { Heart, Menu, ShoppingCart, User, X } from "lucide-react";
 import Link from "next/link";
 import { queryClient, useFavorites, useGetCart } from "@/lib/api";
 import { useEffect, useState } from "react";
-import logo from "@/public/Icons/logo.png"
+import logo from "@/public/golden logo.png"
 import Image from "next/image";
 export default function Header() {
   const pathname = usePathname();
@@ -68,13 +68,13 @@ export default function Header() {
   return (
     <>
       <header className="header">
-        <Link href="/" className="logo">
+        <Link href="/" className="logo flex items-center justify-center">
           <Image
             src={logo}
             alt="logo"
-            width={140}
-            height={140}
-            className="object-fit"
+            width={90}
+            height={90}
+            className="object-contain"
           />
         </Link>
 

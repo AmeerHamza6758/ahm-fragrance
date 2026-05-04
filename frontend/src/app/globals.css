@@ -79,11 +79,11 @@
 /* ////////////////////////////////////////header////////////////////////////////////////////////// */
 .header {
   width: 100%;
-  height: 80px;
+  height: 110px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 24px 48px;
+  padding: 0 48px;
   background: rgba(253, 249, 245, 0.8);
   backdrop-filter: blur(24px);
   position: sticky;
@@ -190,8 +190,8 @@
 
 @media (max-width: 1024px) {
   .header {
-    padding: 20px 28px;
-    height: 76px;
+    padding: 0 28px;
+    height: 106px;
   }
 
   .logo {
@@ -212,8 +212,8 @@
 }
 @media (max-width: 768px) {
   .header {
-    height: 78px;
-    padding: 18px 24px;
+    height: 108px;
+    padding: 0 24px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -286,8 +286,8 @@
 }
 @media (max-width: 480px) {
   .header {
-    height: 72px;
-    padding: 14px 16px;
+    height: 102px;
+    padding: 0 16px;
     display: flex;
     align-items: center;
     justify-content: space-between;

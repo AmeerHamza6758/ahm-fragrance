@@ -20,7 +20,7 @@ function Topbar() {
 
   return (
     <header className="admin-topbar">
-      <img src="/image/logo-primary.png" alt="Logo" width={80} height={70} />
+      <img src="/white-logo.png" alt="Logo" width={110} height={50} style={{ objectFit: 'contain' }} />
       <div className="ahm-admin">
         <h4>Admin</h4>
         <div className="profile-wrapper" onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
