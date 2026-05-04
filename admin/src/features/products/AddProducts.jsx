@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LuImagePlus } from "react-icons/lu";
 import { MdOutlineFileUpload } from "react-icons/md";
+import { IoAddCircleOutline, IoTrashOutline } from "react-icons/io5";
 import "../../styles/admin.css";
 import { categoryApi, tagApi, imageApi } from "../../services/endpoints";
 import { useAddProduct } from "../../services/hooks/products";
@@ -19,7 +20,26 @@ function AddProducts() {
   const [tagId, setTagId] = useState("");
   const [price, setPrice] = useState("");
   const [discountPercentage, setDiscountPercentage] = useState("0");
-  const [volume, setVolume] = useState("");
+
+  // Variants state
+  const [variants, setVariants] = useState([
+    { size: "", price: "", discountPercentage: "0" }
+  ]);
+
+  const handleVariantChange = (index, field, value) => {
+    const updated = [...variants];
+    updated[index][field] = value;
+    setVariants(updated);
+  };
+
+  const addVariant = () => {
+    setVariants([...variants, { size: "", price: "", discountPercentage: "0" }]);
+  };
+
+  const removeVariant = (index) => {
+    if (variants.length <= 1) return;
+    setVariants(variants.filter((_, i) => i !== index));
+  };
 
   // Image states
   const [images, setImages] = useState([
@@ -81,7 +101,16 @@ function AddProducts() {
 
       const finalImageIds = imageIds.filter(id => id);
 
-      // 2. Prepare payload
+      // 2. Prepare variants
+      const validVariants = variants
+        .filter(v => v.size.trim() !== "")
+        .map(v => ({
+          size: v.size.includes("ml") ? v.size.trim() : `${v.size.trim()}ml`,
+          price: Number(v.price) || 0,
+          discountPercentage: Number(v.discountPercentage) || 0,
+        }));
+
+      // 3. Prepare payload
       const payload = {
         name: productName.trim(),
         price: Number(price),
@@ -90,17 +119,8 @@ function AddProducts() {
         category_id: categoryId || null,
         tag_id: tagId || null,
         image_id: finalImageIds,
+        variants: validVariants,
       };
-
-      if (volume) {
-        payload.variants = [
-          {
-            size: `${volume}ml`,
-            price: Number(price),
-            discountPercentage: Number(discountPercentage) || 0,
-          },
-        ];
-      }
 
       // 3. Add product
       addProductMutation.mutate(payload, {
@@ -254,20 +274,6 @@ function AddProducts() {
 
             <div className="input-fields-row">
               <div className="form-group">
-                <label>Volume (ML)</label>
-                <div className="input-with-unit">
-                  <input
-                    type="number"
-                    placeholder="100"
-                    className="styled-input"
-                    value={volume}
-                    onChange={(e) => setVolume(e.target.value)}
-                  />
-                  <span className="unit-tag">ML</span>
-                </div>
-              </div>
-
-              <div className="form-group">
                 <label>Price (PKR)</label>
                 <div className="input-with-unit">
                   <input
@@ -281,9 +287,7 @@ function AddProducts() {
                   <span className="unit-tag">PKR</span>
                 </div>
               </div>
-            </div>
 
-            <div className="input-fields-row">
               <div className="form-group">
                 <label>Discount (%)</label>
                 <div className="input-with-unit">
@@ -298,6 +302,79 @@ function AddProducts() {
                   />
                   <span className="unit-tag">%</span>
                 </div>
+              </div>
+            </div>
+
+            {/* Variants Section */}
+            <div className="variants-section">
+              <div className="variants-header">
+                <label className="variants-label">Product Variants</label>
+                <button type="button" className="add-variant-btn" onClick={addVariant}>
+                  <IoAddCircleOutline size={18} />
+                  Add Variant
+                </button>
+              </div>
+
+              <div className="variants-list">
+                {variants.map((variant, index) => (
+                  <div key={index} className="variant-card">
+                    <div className="variant-card-header">
+                      <span className="variant-number">Variant {index + 1}</span>
+                      {variants.length > 1 && (
+                        <button
+                          type="button"
+                          className="remove-variant-btn"
+                          onClick={() => removeVariant(index)}
+                        >
+                          <IoTrashOutline size={16} />
+                        </button>
+                      )}
+                    </div>
+                    <div className="variant-fields-row">
+                      <div className="form-group">
+                        <label>Size</label>
+                        <div className="input-with-unit">
+                          <input
+                            type="text"
+                            placeholder="50ml"
+                            className="styled-input"
+                            value={variant.size}
+                            onChange={(e) => handleVariantChange(index, 'size', e.target.value)}
+                          />
+                          <span className="unit-tag">ML</span>
+                        </div>
+                      </div>
+                      <div className="form-group">
+                        <label>Price</label>
+                        <div className="input-with-unit">
+                          <input
+                            type="number"
+                            placeholder="5000"
+                            className="styled-input"
+                            value={variant.price}
+                            onChange={(e) => handleVariantChange(index, 'price', e.target.value)}
+                          />
+                          <span className="unit-tag">PKR</span>
+                        </div>
+                      </div>
+                      <div className="form-group">
+                        <label>Discount</label>
+                        <div className="input-with-unit">
+                          <input
+                            type="number"
+                            placeholder="0"
+                            className="styled-input"
+                            min="0"
+                            max="100"
+                            value={variant.discountPercentage}
+                            onChange={(e) => handleVariantChange(index, 'discountPercentage', e.target.value)}
+                          />
+                          <span className="unit-tag">%</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 
