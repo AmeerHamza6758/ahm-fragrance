@@ -3,7 +3,6 @@
  * React Query mutations for signIn, signUp, OTP verification, and password reset
  */
 
-import { useMutation } from "@tanstack/react-query";
 import {
   signIn,
   signUp,
@@ -12,6 +11,8 @@ import {
   sendPasswordResetOtp,
   verifyPasswordResetOtp,
   resetPassword,
+  getProfile,
+  updateProfile,
   SignInPayload,
   SignUpPayload,
   VerifyEmailOtpPayload,
@@ -20,8 +21,11 @@ import {
   VerifyPasswordResetOtpPayload,
   VerifyPasswordResetOtpResult,
   ResetPasswordPayload,
+  UpdateProfilePayload,
+  UserResponse,
   AuthResult,
 } from "../endpoints/auth";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const useSignIn = () => {
   return useMutation<AuthResult, Error, SignInPayload>({
@@ -62,5 +66,23 @@ export const useVerifyPasswordResetOtp = () => {
 export const useResetPassword = () => {
   return useMutation({
     mutationFn: (payload: ResetPasswordPayload) => resetPassword(payload),
+  });
+};
+
+export const useGetProfile = (id: string) => {
+  return useQuery<UserResponse, Error>({
+    queryKey: ["profile", id],
+    queryFn: () => getProfile(id),
+    enabled: !!id,
+  });
+};
+
+export const useUpdateProfile = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: UpdateProfilePayload) => updateProfile(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["profile"] });
+    },
   });
 };

@@ -13,6 +13,7 @@ const safeParse = (value, fallback = null) => {
 };
 
 const emptyProfile = () => ({
+  id: "",
   name: "",
   phone: "",
   email: "",
@@ -23,6 +24,7 @@ const emptyProfile = () => ({
 });
 
 const mapCheckoutProfile = (raw = {}) => ({
+  id: raw.id || "",
   name: raw.name || "",
   phone: raw.phone || "",
   email: raw.email || "",
@@ -33,6 +35,7 @@ const mapCheckoutProfile = (raw = {}) => ({
 });
 
 const mapUserToCheckoutProfile = (user = {}) => ({
+  id: user._id || user.id || "",
   name: user.userName || "",
   phone: user.phone || "",
   email: user.email || "",

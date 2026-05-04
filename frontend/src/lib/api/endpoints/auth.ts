@@ -61,6 +61,34 @@ export interface ResetPasswordPayload {
   newPassword: string;
 }
 
+export interface UpdateProfilePayload {
+  userName?: string;
+  phone?: string;
+  gender?: string;
+  dateOfBirth?: string;
+  address?: {
+    street?: string;
+    city?: string;
+    province?: string;
+    postalCode?: string;
+  };
+}
+
+export interface UserResponse {
+  success: boolean;
+  data: AuthUser & {
+    phone?: string;
+    gender?: string;
+    dateOfBirth?: string;
+    address?: {
+      street?: string;
+      city?: string;
+      province?: string;
+      postalCode?: string;
+    };
+  };
+}
+
 // ─── Endpoints ────────────────────────────────────────────────────────────────
 
 /**
@@ -132,5 +160,21 @@ export const verifyPasswordResetOtp = async (
  */
 export const resetPassword = async (payload: ResetPasswordPayload) => {
   const { data } = await apiClient.post("/api/auth/reset-password", payload);
+  return data;
+};
+
+/**
+ * GET /api/auth/getUserById — Get profile by ID
+ */
+export const getProfile = async (id: string): Promise<UserResponse> => {
+  const { data } = await apiClient.get<UserResponse>(`/api/auth/getUserById?id=${id}`);
+  return data;
+};
+
+/**
+ * PUT /api/auth/update-profile — Update current user profile
+ */
+export const updateProfile = async (payload: UpdateProfilePayload) => {
+  const { data } = await apiClient.put("/api/auth/update-profile", payload);
   return data;
 };

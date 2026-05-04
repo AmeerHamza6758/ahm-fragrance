@@ -128,7 +128,7 @@ export default function Header() {
               <div className="absolute right-0 top-full mt-1 z-50 min-w-[150px] rounded-xl border border-border bg-white shadow-lg py-2
                opacity-0 invisible translate-y-1 transition-all duration-150 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0">
                 <Link
-                  href="/"
+                  href="/profile"
                   className="block px-4 py-2 text-sm font-manrope text-foreground hover:bg-background"
                 >
                   Profile
