@@ -6,6 +6,17 @@ const Stock = require('../models/stock.model');
 const generateOrderNumber = require('../utils/generateOrderNumber');
 const checkDuplicateOrder = require('../utils/checkDuplicateOrder');
 
+const normalizeSize = (size) => String(size || '50ml').trim().toLowerCase();
+
+const getVariantForSize = (product, size) => {
+  const normalizedSize = normalizeSize(size);
+  return (
+    product?.variants?.find(
+      (variant) => normalizeSize(variant?.size) === normalizedSize,
+    ) || null
+  );
+};
+
 
 const getCheckoutSummary = async (req, res) => {
   try {
@@ -44,13 +55,16 @@ const getCheckoutSummary = async (req, res) => {
         });
       }
       
-      const itemTotal = product.price * item.quantity;
+      const selectedVariant = getVariantForSize(product, item.size || '50ml');
+      const currentPrice = selectedVariant?.price ?? 0;
+      const itemTotal = currentPrice * item.quantity;
       subtotal += itemTotal;
       
       items.push({
         productId: product._id,
         name: product.name,
-        price: product.price,
+        price: currentPrice,
+        size: item.size || '50ml',
         quantity: item.quantity,
         image: product.images?.[0] || '',
         total: itemTotal
@@ -181,13 +195,16 @@ const createOrder = async (req, res) => {
         });
       }
       
-      const itemTotal = product.price * item.quantity;
+      const selectedVariant = getVariantForSize(product, item.size || '50ml');
+      const currentPrice = selectedVariant?.price ?? 0;
+      const itemTotal = currentPrice * item.quantity;
       subtotal += itemTotal;
       
       orderProducts.push({
         productId: product._id,
         name: product.name,
-        price: product.price,
+        price: currentPrice,
+        size: item.size || '50ml',
         quantity: item.quantity,
         total: itemTotal
       });

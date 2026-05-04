@@ -47,7 +47,7 @@ function ViewProduct() {
 
   const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
   const imageUrl = product?.image_id?.[0]?.path
-    ? `${BASE_URL}/${product.image_id[0].path}`
+    ? `${BASE_URL}/${product.image_id[0].path.replace(/\\/g, '/')}`
     : "/image/placeholder.png";
 
   return (
@@ -77,7 +77,7 @@ function ViewProduct() {
             <div className="thumbnail-strip">
               {product.image_id.map((img, idx) => (
                 <div key={idx} className={`thumb-box ${idx === 0 ? 'active' : ''}`}>
-                  <img src={`${BASE_URL}/${img.path}`} alt={`View ${idx}`} />
+                  <img src={`${BASE_URL}/${img.path.replace(/\\/g, '/')}`} alt={`View ${idx}`} />
                 </div>
               ))}
             </div>

@@ -64,6 +64,7 @@ export default function CheckoutPage() {
           ? item.productId._id
           : (item.productId ?? item._id),
       quantity: Number(item.quantity ?? 1),
+      size: item.size || "50ml",
     }));
 
     const payload = {
@@ -212,7 +213,7 @@ export default function CheckoutPage() {
                     ))
                   : cartItems.map((item, idx) => {
                       const name = item.productId?.name ?? item.name ?? "Product";
-                      const price = item.price ?? item.productId?.price ?? 0;
+                      const price = item.price ?? item.productId?.variants?.[0]?.price ?? 0;
                       const qty = item.quantity ?? 1;
                       const imageRaw =
                         item.productId?.image_id?.path ??

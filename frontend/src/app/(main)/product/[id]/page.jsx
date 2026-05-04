@@ -34,6 +34,14 @@ export default function ProductDetails() {
   const [reviewSuccess, setReviewSuccess] = useState(false);
   const [reviewError, setReviewError] = useState("");
   const { data: wishlistProducts = [] } = useFavorites();
+
+  // Set initial size when product loads
+  useMemo(() => {
+    if (product?.variants?.length > 0 && !selectedSize) {
+      setSelectedSize(product.variants[0].size);
+    }
+  }, [product]);
+
   const { mutate: toggleFavorite, isPending: isTogglingFavorite } =
     useToggleFavorite();
   const isWishlisted = useMemo(
@@ -75,16 +83,17 @@ export default function ProductDetails() {
   const selectedVariant = product.variants?.find(
     (v) => v.size === selectedSize,
   );
-  // Use variant price if available, else fallback to product.price
-  const displayPrice = selectedVariant ? selectedVariant.price : product.price;
+  // Use variant price if available, else fallback to first variant or 0
+  const displayPrice = selectedVariant ? selectedVariant.price : (product.variants?.[0]?.price || 0);
   const displayDiscount = selectedVariant
     ? selectedVariant.discountPercentage
-    : product.discountPercentage;
+    : (product.variants?.[0]?.discountPercentage || 0);
 
   // Robust image URL logic
   let imageUrl = "/Images/best-1.svg";
-  if (product?.image_id?.path) {
-    imageUrl = buildProductImageUrl(product.image_id.path);
+  const firstImagePath = product?.image_id?.[0]?.path || product?.image_id?.path;
+  if (firstImagePath) {
+    imageUrl = buildProductImageUrl(firstImagePath);
   } else if (product?.image) {
     imageUrl = product.image;
   }
@@ -145,22 +154,37 @@ console.log(product,"pro");
 
   {/* Thumbnails Row */}
   <div className="flex flex-row justify-center gap-3 relative w-[90%] rounded-lg!">
-  {[1, 2].map((_, index) => (
-  <div 
-    key={index} 
-    className="relative aspect-square bg-[#faf8f5] !rounded-xl overflow-hidden transition-colors h-[30%] w-[30%]"
-  >
-    <Image
-      src={imageUrl}
-      alt={`${product.name} thumb ${index}`}
-      fill
-      className="object-contain p-2 detail-img"
-    />
+    {Array.isArray(product.image_id) && product.image_id.length > 1 ? (
+      product.image_id.map((img, index) => (
+        <div 
+          key={index} 
+          className="relative aspect-square bg-[#faf8f5] !rounded-xl overflow-hidden transition-colors h-[80px] w-[80px] cursor-pointer hover:border-primary border border-transparent"
+        >
+          <Image
+            src={buildProductImageUrl(img.path)}
+            alt={`${product.name} thumb ${index}`}
+            fill
+            className="object-contain p-2 detail-img"
+          />
+        </div>
+      ))
+    ) : (
+      /* Fallback static placeholders if no dynamic thumbnails */
+      [1, 2].map((_, index) => (
+        <div 
+          key={index} 
+          className="relative aspect-square bg-[#faf8f5] !rounded-xl overflow-hidden transition-colors h-[80px] w-[80px]"
+        >
+          <Image
+            src={imageUrl}
+            alt={`${product.name} thumb ${index}`}
+            fill
+            className="object-contain p-2 detail-img"
+          />
+        </div>
+      ))
+    )}
   </div>
-))}
-  
-  
-</div>
 </div>
 
             {/* Product Details */}
@@ -202,18 +226,15 @@ console.log(product,"pro");
               <div className="size-selection">
                 <label>CHOOSE SIZE</label>
                 <div className="size-options">
-                  <button
-                    className={`size-btn ${selectedSize === "50ml" ? "active" : ""}`}
-                    onClick={() => setSelectedSize("50ml")}
-                  >
-                    50ml
-                  </button>
-                  <button
-                    className={`size-btn ${selectedSize === "100ml" ? "active" : ""}`}
-                    onClick={() => setSelectedSize("100ml")}
-                  >
-                    100ml
-                  </button>
+                  {product.variants?.map((v) => (
+                    <button
+                      key={v.size}
+                      className={`size-btn ${selectedSize === v.size ? "active" : ""}`}
+                      onClick={() => setSelectedSize(v.size)}
+                    >
+                      {v.size}
+                    </button>
+                  ))}
                 </div>
               </div>
 

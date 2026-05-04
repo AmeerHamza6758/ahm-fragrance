@@ -8,7 +8,7 @@ import { RiDeleteBin6Line } from "react-icons/ri";
 import Pagination from "../../components/Pagination";
 import StatCard from "../../components/StatCard";
 import { useGetProducts, useDeleteProduct, useGetProductStats } from "../../services/hooks/products";
-import { confirmationPopup } from "../../utils/alert-service";
+import { confirmationPopup, errorToaster, successToaster } from "../../utils/alert-service";
 
 function ProductsPage() {
   const navigate = useNavigate();
@@ -39,7 +39,15 @@ function ProductsPage() {
   const handleDelete = async (id) => {
     const result = await confirmationPopup("Are you sure you want to delete this product?");
     if (result.isConfirmed) {
-      deleteMutation.mutate(id);
+      deleteMutation.mutate(id, {
+        onSuccess: () => {
+          successToaster("Fragrance removed from the collection");
+        },
+        onError: (err) => {
+          const errMsg = err.response?.data?.message || "Failed to remove fragrance";
+          errorToaster(errMsg);
+        }
+      });
     }
   };
 
@@ -211,7 +219,7 @@ function ProductsPage() {
               {/* Product */}
               <div className="product-cell">
                 <img 
-                  src={item.image_id?.[0]?.path ? `${BASE_URL}/${item.image_id[0].path}` : "/image/placeholder.png"} 
+                  src={item.image_id?.[0]?.path ? `${BASE_URL}/${item.image_id[0].path.replace(/\\/g, '/')}` : "/image/placeholder.png"} 
                   alt={item.name} 
                 />
                 <span>{item.name}</span>
@@ -222,7 +230,7 @@ function ProductsPage() {
                   Active
                 </span>
               </div>
-              <span>PKR {item.price}</span>
+              <span>PKR {item.variants?.[0]?.price || "N/A"}</span>
               <span>{item.category_id?.name || "Uncategorized"}</span>
 
               <div>

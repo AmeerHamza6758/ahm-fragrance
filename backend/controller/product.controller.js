@@ -323,27 +323,70 @@ const Tag = require('../models/tag.model');
 const Images = require('../models/images.model');
 const mongoose = require('mongoose');
 
+const formatError = (err) => {
+    if (err.name === 'ValidationError') {
+        return Object.values(err.errors).map(val => val.message).join(', ');
+    }
+    if (err.code === 11000) {
+        return 'A fragrance with this name already exists';
+    }
+    return err.message;
+};
+
+const getBaseUrl = () => {
+    return (process.env.API_BASE_URL || 'http://localhost:4000').replace(/\/+$/, "");
+};
+
+const formatProductWithImages = (product) => {
+    if (!product) return product;
+    const baseUrl = getBaseUrl();
+    const p = product.toObject ? product.toObject({ virtuals: true }) : product;
+    
+    if (p.image_id && Array.isArray(p.image_id)) {
+        p.image_id = p.image_id.map(img => {
+            if (img && img.path) {
+                const normalizedPath = img.path.replace(/\\/g, "/").replace(/^publics?\//, "");
+                return {
+                    ...img,
+                    url: `${baseUrl}/${normalizedPath}`
+                };
+            }
+            return img;
+        });
+    }
+    return p;
+};
+
 const productController = {
     addProduct: async (req, res) => {
         try {
-            const { name, price, discountPrice, description, category_id, tag_id, image_id, variants } = req.body;
+            const { name, description, category_id, tag_id, image_id, variants } = req.body;
 
             const product = new Product({
                 name,
-                price,
-                discountPrice,
                 description,
                 category_id,
                 tag_id,
-                // ✅ FIX: ensure image_id is always array
                 image_id: Array.isArray(image_id) ? image_id : [image_id],
                 variants
             });
 
             await product.save();
-            res.status(201).json({ status: 1, data: product, message: 'Product added successfully' });
+            const populatedProduct = await Product.findById(product._id)
+                .populate('category_id')
+                .populate('tag_id')
+                .populate({
+                    path: 'image_id',
+                    model: 'images'
+                });
+
+            res.status(201).json({ 
+                status: 1, 
+                data: formatProductWithImages(populatedProduct), 
+                message: 'Product added successfully' 
+            });
         } catch (err) {
-            res.status(400).json({ status: 0, data: err.message, message: 'Error in product creation' });
+            res.status(400).json({ status: 0, message: formatError(err) });
         }
     },
 
@@ -379,7 +422,7 @@ const productController = {
     updateProduct: async (req, res) => {
         try {
             const { id } = req.query;
-            const { price, discountPercentage, variants, image_id, ...rest } = req.body;
+            const { variants, image_id, ...rest } = req.body;
 
             if (!id) {
                 return res.status(400).json({ message: 'Product ID is required' });
@@ -390,9 +433,6 @@ const productController = {
             if (!product) {
                 return res.status(404).json({ message: 'Product not found' });
             }
-
-            const finalPrice = price ?? product.price;
-            const finalDiscount = discountPercentage ?? product.discountPercentage ?? 0;
 
             let updatedVariants = product.variants;
 
@@ -411,8 +451,6 @@ const productController = {
 
             const updateData = {
                 ...rest,
-                price: finalPrice,
-                discountPercentage: finalDiscount,
                 variants: updatedVariants
             };
 
@@ -430,7 +468,7 @@ const productController = {
             res.json(updatedProduct);
 
         } catch (error) {
-            res.status(500).json({ error: error.message });
+            res.status(400).json({ status: 0, message: formatError(error) });
         }
     },
 
@@ -494,7 +532,7 @@ const productController = {
             }
 
             if (price) {
-                sortOption.price = price === 'asc' ? 1 : -1;
+                sortOption['variants.0.price'] = price === 'asc' ? 1 : -1;
             }
 
             if (Object.keys(sortOption).length === 0) {
@@ -522,9 +560,10 @@ const productController = {
             }
 
             const products = await productsQuery;
+            const formattedProducts = products.map(p => formatProductWithImages(p));
 
             if (!shouldPaginate) {
-                return res.json(products);
+                return res.json(formattedProducts);
             }
 
             const totalItems = await Product.countDocuments(query);
@@ -532,7 +571,7 @@ const productController = {
 
             return res.json({
                 status: 1,
-                data: products,
+                data: formattedProducts,
                 pagination: {
                     page: parsedPage,
                     limit: parsedLimit,

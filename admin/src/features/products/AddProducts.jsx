@@ -7,6 +7,7 @@ import "../../styles/admin.css";
 import { categoryApi, tagApi, imageApi } from "../../services/endpoints";
 import { useAddProduct } from "../../services/hooks/products";
 import { IoArrowBack } from 'react-icons/io5';
+import { errorToaster, successToaster } from "../../utils/alert-service";
 
 function AddProducts() {
   const navigate = useNavigate();
@@ -18,8 +19,7 @@ function AddProducts() {
   const [description, setDescription] = useState("");
   const [categoryId, setCategoryId] = useState("");
   const [tagId, setTagId] = useState("");
-  const [price, setPrice] = useState("");
-  const [discountPercentage, setDiscountPercentage] = useState("0");
+
 
   // Variants state
   const [variants, setVariants] = useState([
@@ -85,7 +85,30 @@ function AddProducts() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!productName.trim() || !price) return;
+    
+    // 1. Client-side validation
+    if (!productName.trim()) {
+      errorToaster("Product name is required");
+      return;
+    }
+    if (!categoryId) {
+      errorToaster("Please select an essence category");
+      return;
+    }
+    if (!tagId) {
+      errorToaster("Please select a collection tag");
+      return;
+    }
+    if (!images[0].file) {
+      errorToaster("Primary vision image is required");
+      return;
+    }
+
+    const invalidVariant = variants.find(v => !v.size.trim() || !v.price || Number(v.price) <= 0);
+    if (invalidVariant) {
+      errorToaster("Each variant must have a valid size and price (greater than 0)");
+      return;
+    }
 
     try {
       // 1. Upload images first
@@ -105,7 +128,7 @@ function AddProducts() {
       const validVariants = variants
         .filter(v => v.size.trim() !== "")
         .map(v => ({
-          size: v.size.includes("ml") ? v.size.trim() : `${v.size.trim()}ml`,
+          size: v.size.toLowerCase().includes("ml") ? v.size.trim() : `${v.size.trim()}ml`,
           price: Number(v.price) || 0,
           discountPercentage: Number(v.discountPercentage) || 0,
         }));
@@ -113,23 +136,27 @@ function AddProducts() {
       // 3. Prepare payload
       const payload = {
         name: productName.trim(),
-        price: Number(price),
-        discountPercentage: Number(discountPercentage) || 0,
         description: description.trim(),
-        category_id: categoryId || null,
-        tag_id: tagId || null,
+        category_id: categoryId,
+        tag_id: tagId,
         image_id: finalImageIds,
         variants: validVariants,
       };
 
-      // 3. Add product
+      // 4. Add product
       addProductMutation.mutate(payload, {
         onSuccess: () => {
+          successToaster("New fragrance added to the collection");
           navigate("/products");
+        },
+        onError: (err) => {
+          const errMsg = err.response?.data?.message || err.response?.data?.data || "Failed to compose fragrance";
+          errorToaster(errMsg);
         }
       });
     } catch (err) {
       console.error("Failed to add product:", err);
+      errorToaster("An unexpected error occurred during creation");
     }
   };
 
@@ -271,41 +298,8 @@ function AddProducts() {
                 </select>
               </div>
             </div>
-
-            <div className="input-fields-row">
-              <div className="form-group">
-                <label>Price (PKR)</label>
-                <div className="input-with-unit">
-                  <input
-                    type="number"
-                    placeholder="8900"
-                    className="styled-input"
-                    required
-                    value={price}
-                    onChange={(e) => setPrice(e.target.value)}
-                  />
-                  <span className="unit-tag">PKR</span>
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label>Discount (%)</label>
-                <div className="input-with-unit">
-                  <input
-                    type="number"
-                    placeholder="0"
-                    className="styled-input"
-                    min="0"
-                    max="100"
-                    value={discountPercentage}
-                    onChange={(e) => setDiscountPercentage(e.target.value)}
-                  />
-                  <span className="unit-tag">%</span>
-                </div>
-              </div>
-            </div>
-
             {/* Variants Section */}
+
             <div className="variants-section">
               <div className="variants-header">
                 <label className="variants-label">Product Variants</label>

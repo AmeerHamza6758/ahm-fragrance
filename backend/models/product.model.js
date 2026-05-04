@@ -6,21 +6,11 @@ const productSchema = new mongoose.Schema({
     required: [true, 'Name is required'],
     trim: true
   },
-  price: {
-    type: Number,
-    required: true
-  },
-  discountPercentage: {
-    type: Number,
-    default: 0,
-    min: 0,
-    max: 100
-  },
-
   description: {
     type: String,
     default: ""
   },
+
 
   // ✅ NEW FIELD
   variants: [
@@ -56,7 +46,7 @@ const productSchema = new mongoose.Schema({
 
   image_id: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Image',
+    ref: 'images',
   }],
 
   tag_id: {
@@ -71,7 +61,11 @@ const productSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 productSchema.virtual('currentPrice').get(function () {
-  return this.price - (this.price * this.discountPercentage / 100);
+  if (this.variants && this.variants.length > 0) {
+    const variant = this.variants[0];
+    return variant.price - (variant.price * variant.discountPercentage / 100);
+  }
+  return 0;
 });
 
 // Ensure virtual fields are included in JSON output

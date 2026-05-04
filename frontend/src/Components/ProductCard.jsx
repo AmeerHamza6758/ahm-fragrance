@@ -13,8 +13,6 @@ export default function ProductCard({ product }) {
     _id,
     id,
     name,
-    price,
-    discountPercentage = 0,
     description,
     notes,
     image,
@@ -22,7 +20,12 @@ export default function ProductCard({ product }) {
     category,
     image_id,
     tag_id,
+    variants,
   } = product;
+
+  const displayPrice = variants?.[0]?.price || product.price;
+  const displayDiscount = variants?.[0]?.discountPercentage || product.discountPercentage || 0;
+
 
   const productId = _id || id;
   const { data: wishlistProducts = [] } = useFavorites();
@@ -40,8 +43,9 @@ export default function ProductCard({ product }) {
   );
 
   // Build image URL from API or use local fallback
-  const imageUrl = image_id?.path
-    ? buildProductImageUrl(image_id.path)
+  const firstImagePath = image_id?.[0]?.path || (image_id?.path); // Handle both array and single object (for safety)
+  const imageUrl = firstImagePath
+    ? buildProductImageUrl(firstImagePath)
     : image || "/Images/best-1.svg";
 
   const displayNotes = notes || description || "";
@@ -123,23 +127,23 @@ export default function ProductCard({ product }) {
           {/* Price + Order */}
           <div className="flex items-center justify-between mt-2">
             <div className="flex flex-col gap-0.5">
-              {discountPercentage > 0 ? (
+              {displayDiscount > 0 ? (
                 <>
                   <div className="flex items-center gap-2">
                     <span className="text-[#a08a8a] text-[12px] font-medium line-through whitespace-nowrap">
-                      Rs. {price?.toLocaleString()}
+                      Rs. {displayPrice?.toLocaleString()}
                     </span>
                     <span className="text-[11px] text-green-600 font-medium whitespace-nowrap">
-                      -{discountPercentage}%
+                      -{displayDiscount}%
                     </span>
                   </div>
                   <span className="text-[#1c1c19] text-sm font-semibold whitespace-nowrap">
-                    Rs. {(price - (price * discountPercentage) / 100).toLocaleString()}
+                    Rs. {(displayPrice - (displayPrice * displayDiscount) / 100).toLocaleString()}
                   </span>
                 </>
               ) : (
                 <span className="text-[#1c1c19] text-sm font-semibold whitespace-nowrap">
-                  Rs. {price?.toLocaleString()}
+                  Rs. {displayPrice?.toLocaleString()}
                 </span>
               )}
             </div>

@@ -16,9 +16,6 @@ const getVariantForSize = (product, size) => {
 
 const addToCart = async (req, res) => {
   try {
-    console.log('Full req.user:', req.user);
-    console.log('req.user._id:', req.user?._id);
-    console.log('req.user.id:', req.user?.id);
     const userId = req.user.userId;
 
     const { productId, quantity = 1, size = '50ml' } = req.body;
@@ -97,7 +94,7 @@ const addToCart = async (req, res) => {
           product: {
             id: product._id,
             name: product.name,
-            price: getVariantForSize(product, normalizedSize)?.price ?? product.price,
+            price: getVariantForSize(product, normalizedSize)?.price ?? product.variants?.[0]?.price ?? 0,
             image: product.images?.[0] || ''
           }
         }
@@ -124,7 +121,7 @@ const addToCart = async (req, res) => {
         product: {
           id: product._id,
           name: product.name,
-          price: getVariantForSize(product, normalizedSize)?.price ?? product.price,
+          price: getVariantForSize(product, normalizedSize)?.price ?? product.variants?.[0]?.price ?? 0,
           image: product.images?.[0] || ''
         }
       }
@@ -196,7 +193,7 @@ const getCart = async (req, res) => {
       // Use latest price with selected variant when available
       const selectedSize = item.size || '50ml';
       const selectedVariant = getVariantForSize(product, selectedSize);
-      const currentPrice = selectedVariant?.price ?? product.price;
+      const currentPrice = selectedVariant?.price ?? product.variants?.[0]?.price ?? 0;
       const itemTotal = currentPrice * item.quantity;
       subtotal += itemTotal;
 
@@ -257,23 +254,7 @@ const updateCartItem = async (req, res) => {
     const productId = req.params.productId;
     const { quantity } = req.body;
 
-    console.log('========== UPDATE CART ITEM DEBUG ==========');
-    console.log('1. Request params:', req.params);
-    console.log('2. Request body:', req.body);
-    console.log('3. userId from token:', userId);
-    console.log('4. productId from params:', productId);
-    console.log('5. productId type:', typeof productId);
-    console.log('6. quantity:', quantity);
-    console.log('7. quantity type:', typeof quantity);
-
     const allUserCartItems = await Cart.find({ customerId: userId });
-    console.log('8. Total cart items for user:', allUserCartItems.length);
-    console.log('9. All cart items details:', allUserCartItems.map(item => ({
-      _id: item._id.toString(),
-      customerId: item.customerId.toString(),
-      productId: item.productId.toString(),
-      quantity: item.quantity
-    })));
 
 
 
@@ -281,15 +262,13 @@ const updateCartItem = async (req, res) => {
       customerId: userId,
       productId: productId
     });
-    console.log('10. Search with string productId result:', cartItemWithString ? 'Found' : 'Not found');
 
     // Try with ObjectId conversion
     let productObjectId;
     try {
       productObjectId = new mongoose.Types.ObjectId(productId);
-      console.log('11. Converted to ObjectId:', productObjectId);
     } catch (err) {
-      console.log('11. Failed to convert to ObjectId:', err.message);
+      // Ignore
     }
 
 
@@ -297,7 +276,6 @@ const updateCartItem = async (req, res) => {
       customerId: userId,
       productId: productObjectId
     });
-    console.log('12. Search with ObjectId productId result:', cartItemWithObjectId ? 'Found' : 'Not found');
 
 
 
@@ -329,51 +307,20 @@ const updateCartItem = async (req, res) => {
     if (!cartItem) {
       return res.status(404).json({
         success: false,
-        message: 'Product not found in your cart',
-        debug: {
-          userId: userId,
-          productId: productId,
-          productIdAsObjectId: productObjectId?.toString(),
-          totalItemsInCart: allUserCartItems.length,
-          cartItemIds: allUserCartItems.map(item => item.productId.toString())
-        }
+        message: 'Product not found in your cart'
       });
     }
-
-    console.log('13. Found cart item:', {
-      _id: cartItem._id,
-      customerId: cartItem.customerId,
-      productId: cartItem.productId?._id || cartItem.productId,
-      currentQuantity: cartItem.quantity
-    });
 
     const product = cartItem.productId;
 
     if (!product || !product.isActive) {
       return res.status(400).json({
         success: false,
-        message: 'Product is no longer available. Please remove from cart.',
-        debug: {
-          productExists: !!product,
-          isActive: product?.isActive
-        }
+        message: 'Product is no longer available. Please remove from cart.'
       });
     }
 
-    console.log('14. Product details:', {
-      id: product._id,
-      name: product.name,
-      maxPerOrder: product.maxPerOrder,
-      price: product.price
-    });
-
-
     const stock = await Stock.findOne({ productId: product._id });
-    console.log('15. Stock info:', {
-      found: !!stock,
-      availableQuantity: stock?.quantity || 0,
-      requestedQuantity: quantity
-    });
 
     if (!stock || stock.quantity < quantity) {
       return res.status(400).json({
@@ -390,15 +337,9 @@ const updateCartItem = async (req, res) => {
     cartItem.quantity = quantity;
     await cartItem.save();
 
-    console.log('16. Cart updated successfully:', {
-      productName: product.name,
-      oldQuantity: oldQuantity,
-      newQuantity: quantity
-    });
-
     const updatedCart = await Cart.findById(cartItem._id).populate('productId');
     const selectedVariant = getVariantForSize(product, cartItem.size || '50ml');
-    const unitPrice = selectedVariant?.price ?? product.price;
+    const unitPrice = selectedVariant?.price ?? product.variants?.[0]?.price ?? 0;
     const itemTotal = unitPrice * quantity;
 
     return res.status(200).json({
@@ -416,25 +357,16 @@ const updateCartItem = async (req, res) => {
         debug: {
           oldQuantity,
           newQuantity: quantity,
-          pricePerUnit: product.price
+          pricePerUnit: product.variants?.[0]?.price || 0
         }
       }
     });
 
   } catch (error) {
-    console.error('========== UPDATE CART ITEM ERROR ==========');
-    console.error('Error message:', error.message);
-    console.error('Error stack:', error.stack);
-
     return res.status(500).json({
       success: false,
       message: 'Failed to update cart',
-      error: error.message,
-      debug: {
-        userId: req.user?.userId,
-        productId: req.params?.productId,
-        body: req.body
-      }
+      error: error.message
     });
   }
 };

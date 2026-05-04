@@ -16,8 +16,9 @@ import ProductCard from "@/src/Components/ProductCard";
 const getProductId = (product) => product?._id || product?.id;
 
 const getProductImage = (product) => {
-  if (product?.image_id?.path) {
-    return buildProductImageUrl(product.image_id.path);
+  const firstPath = product?.image_id?.[0]?.path || product?.image_id?.path;
+  if (firstPath) {
+    return buildProductImageUrl(firstPath);
   }
   if (product?.image) {
     return product.image;
@@ -206,7 +207,7 @@ export default function WishlistPage() {
 
                       <div className="flex items-center gap-2">
                         <span className="text-[#1c1c19] text-sm font-semibold">
-                          Rs. {product.price?.toLocaleString()}
+                          Rs. {getProductPrice(product).toLocaleString()}
                         </span>
 
                         {product.discountPercentage > 0 && (

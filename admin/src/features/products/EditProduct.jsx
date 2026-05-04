@@ -2,11 +2,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { LuImagePlus } from "react-icons/lu";
 import { MdOutlineFileUpload } from "react-icons/md";
-import { IoArrowBack } from "react-icons/io5";
+import { IoArrowBack, IoAddCircleOutline, IoTrashOutline } from "react-icons/io5";
 import "../../styles/admin.css";
 import { categoryApi, tagApi, imageApi } from "../../services/endpoints";
 import { useGetProductById, useUpdateProduct } from "../../services/hooks/products";
 import Loader from "../../components/Loader";
+import { errorToaster, successToaster } from "../../utils/alert-service";
 
 function EditProduct() {
   const { id } = useParams();
@@ -19,9 +20,26 @@ function EditProduct() {
   const [description, setDescription] = useState("");
   const [categoryId, setCategoryId] = useState("");
   const [tagId, setTagId] = useState("");
-  const [price, setPrice] = useState("");
-  const [discountPercentage, setDiscountPercentage] = useState("0");
-  const [volume, setVolume] = useState("");
+
+  // Variants state
+  const [variants, setVariants] = useState([
+    { size: "", price: "", discountPercentage: "0" }
+  ]);
+
+  const handleVariantChange = (index, field, value) => {
+    const updated = [...variants];
+    updated[index][field] = value;
+    setVariants(updated);
+  };
+
+  const addVariant = () => {
+    setVariants([...variants, { size: "", price: "", discountPercentage: "0" }]);
+  };
+
+  const removeVariant = (index) => {
+    if (variants.length <= 1) return;
+    setVariants(variants.filter((_, i) => i !== index));
+  };
 
   // Image states
   const [images, setImages] = useState([
@@ -46,11 +64,15 @@ function EditProduct() {
       setDescription(p.description || "");
       setCategoryId(p.category_id?._id || p.category_id || "");
       setTagId(p.tag_id?._id || p.tag_id || "");
-      setPrice(p.price || "");
-      setDiscountPercentage(p.discountPercentage || "0");
       
-      if (p.variants?.[0]?.size) {
-        setVolume(p.variants[0].size.replace("ml", ""));
+      if (p.variants && Array.isArray(p.variants) && p.variants.length > 0) {
+        setVariants(p.variants.map(v => ({
+          size: v.size || "",
+          price: v.price || "",
+          discountPercentage: v.discountPercentage || "0"
+        })));
+      } else {
+        setVariants([{ size: "", price: "", discountPercentage: "0" }]);
       }
 
       // Set existing images
@@ -99,7 +121,33 @@ function EditProduct() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!productName.trim() || !price) return;
+    
+    // 1. Client-side validation
+    if (!productName.trim()) {
+      errorToaster("Product name is required");
+      return;
+    }
+    if (!categoryId) {
+      errorToaster("Please select an essence category");
+      return;
+    }
+    if (!tagId) {
+      errorToaster("Please select a collection tag");
+      return;
+    }
+    
+    // Check if at least one image exists (either new or existing)
+    const hasImage = images.some(img => img.file || img.existingId);
+    if (!hasImage) {
+      errorToaster("At least one product image is required");
+      return;
+    }
+
+    const invalidVariant = variants.find(v => !v.size.trim() || !v.price || Number(v.price) <= 0);
+    if (invalidVariant) {
+      errorToaster("Each variant must have a valid size and price (greater than 0)");
+      return;
+    }
 
     try {
       // 1. Upload new images first
@@ -113,38 +161,41 @@ function EditProduct() {
         })
       );
 
-      // Filter out nulls
       const finalImageIds = imageIds.filter(id => id);
 
-      // 2. Prepare payload
+      // 2. Prepare variants
+      const validVariants = variants
+        .filter(v => v.size.trim() !== "")
+        .map(v => ({
+          size: v.size.toLowerCase().includes("ml") ? v.size.trim() : `${v.size.trim()}ml`,
+          price: Number(v.price) || 0,
+          discountPercentage: Number(v.discountPercentage) || 0,
+        }));
+
+      // 3. Prepare payload
       const payload = {
         name: productName.trim(),
-        price: Number(price),
-        discountPercentage: Number(discountPercentage) || 0,
         description: description.trim(),
-        category_id: categoryId || null,
-        tag_id: tagId || null,
+        category_id: categoryId,
+        tag_id: tagId,
         image_id: finalImageIds,
+        variants: validVariants
       };
 
-      if (volume) {
-        payload.variants = [
-          {
-            size: `${volume}ml`,
-            price: Number(price),
-            discountPercentage: Number(discountPercentage) || 0,
-          },
-        ];
-      }
-
-      // 3. Update product
+      // 4. Update product
       updateMutation.mutate({ id, data: payload }, {
         onSuccess: () => {
+          successToaster("Fragrance essence refined successfully");
           navigate("/products");
+        },
+        onError: (err) => {
+          const errMsg = err.response?.data?.message || err.response?.data?.data || "Failed to refine essence";
+          errorToaster(errMsg);
         }
       });
     } catch (err) {
       console.error("Failed to update product:", err);
+      errorToaster("An unexpected error occurred during update");
     }
   };
 
@@ -290,52 +341,76 @@ function EditProduct() {
               </div>
             </div>
 
-            <div className="input-fields-row">
-              <div className="form-group">
-                <label>Volume (ML)</label>
-                <div className="input-with-unit">
-                    <input
-                      type="number"
-                      placeholder="100"
-                      className="styled-input"
-                      value={volume}
-                      onChange={(e) => setVolume(e.target.value)}
-                    />
-                    <span className="unit-tag">ML</span>
-                </div>
+            {/* Variants Section */}
+            <div className="variants-section">
+              <div className="variants-header">
+                <label className="variants-label">Product Variants</label>
+                <button type="button" className="add-variant-btn" onClick={addVariant}>
+                  <IoAddCircleOutline size={18} />
+                  Add Variant
+                </button>
               </div>
 
-              <div className="form-group">
-                <label>Price (PKR)</label>
-                <div className="input-with-unit">
-                    <input
-                      type="number"
-                      placeholder="8900"
-                      className="styled-input"
-                      required
-                      value={price}
-                      onChange={(e) => setPrice(e.target.value)}
-                    />
-                    <span className="unit-tag">PKR</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="input-fields-row">
-              <div className="form-group">
-                <label>Discount (%)</label>
-                <div className="input-with-unit">
-                    <input
-                      type="number"
-                      placeholder="0"
-                      className="styled-input"
-                      min="0"
-                      max="100"
-                      value={discountPercentage}
-                      onChange={(e) => setDiscountPercentage(e.target.value)}
-                    />
-                    <span className="unit-tag">%</span>
-                </div>
+              <div className="variants-list">
+                {variants.map((variant, index) => (
+                  <div key={index} className="variant-card">
+                    <div className="variant-card-header">
+                      <span className="variant-number">Variant {index + 1}</span>
+                      {variants.length > 1 && (
+                        <button
+                          type="button"
+                          className="remove-variant-btn"
+                          onClick={() => removeVariant(index)}
+                        >
+                          <IoTrashOutline size={16} />
+                        </button>
+                      )}
+                    </div>
+                    <div className="variant-fields-row">
+                      <div className="form-group">
+                        <label>Size</label>
+                        <div className="input-with-unit">
+                          <input
+                            type="text"
+                            placeholder="50ml"
+                            className="styled-input"
+                            value={variant.size}
+                            onChange={(e) => handleVariantChange(index, 'size', e.target.value)}
+                          />
+                          <span className="unit-tag">ML</span>
+                        </div>
+                      </div>
+                      <div className="form-group">
+                        <label>Price</label>
+                        <div className="input-with-unit">
+                          <input
+                            type="number"
+                            placeholder="5000"
+                            className="styled-input"
+                            value={variant.price}
+                            onChange={(e) => handleVariantChange(index, 'price', e.target.value)}
+                          />
+                          <span className="unit-tag">PKR</span>
+                        </div>
+                      </div>
+                      <div className="form-group">
+                        <label>Discount</label>
+                        <div className="input-with-unit">
+                          <input
+                            type="number"
+                            placeholder="0"
+                            className="styled-input"
+                            min="0"
+                            max="100"
+                            value={variant.discountPercentage}
+                            onChange={(e) => handleVariantChange(index, 'discountPercentage', e.target.value)}
+                          />
+                          <span className="unit-tag">%</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 
@@ -357,3 +432,4 @@ function EditProduct() {
 }
 
 export default EditProduct;
+
