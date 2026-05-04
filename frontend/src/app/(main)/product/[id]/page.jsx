@@ -386,50 +386,53 @@ console.log(product,"pro");
     {/* Customer Reviews & Feedback */}
 <section className="w-full bg-[#faf8f5]  px-4 flex flex-col items-center justify-center">
   {/* Header Container */}
-  <div className="text-center mb-6 max-w-2xl">
+  <div className="text-center mb-4 max-w-md">
     <h2
-      className="text-[#7e525c] font-normal leading-tight text-[28px] sm:text-[34px] md:text-[38px] mb-3"
+      className="text-[#7e525c] font-normal leading-tight text-[22px] sm:text-[26px] md:text-[28px] mb-2"
       style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}
     >
       Customer Reviews &amp; Feedback
     </h2>
-    <p className="text-[#b0909a] text-[14px] font-sans tracking-wide">
+    <p className="text-[#b0909a] text-[12px] font-sans tracking-wide">
       Share your experience with {product.name}
     </p>
   </div>
 
-  {/* Form Container - Adjusted for better alignment and responsiveness */}
-  <div className="bg-white border border-[#e8dde0] rounded-2xl p-6 sm:p-8 shadow-sm w-full max-w-2xl mx-auto">
+  {/* Form Container - Even more compact */}
+  <div className="bg-white/80 backdrop-blur-sm border border-[#e8dde0] rounded-3xl p-4 sm:p-5 shadow-sm w-full max-w-md mx-auto transition-all hover:shadow-md">
     {hasAlreadyReviewed ? (
-      <div className="text-center py-8">
-        <div className="flex justify-center mb-4">
-          <Star className="text-[#FFD700]" fill="#FFD700" size={32} />
+      <div className="text-center py-3 flex flex-col items-center">
+        <div className="bg-[#fff9f0] w-10 h-10 rounded-full flex items-center justify-center mb-2">
+          <Star className="text-[#FFD700]" fill="#FFD700" size={20} />
         </div>
-        <p
-          className="text-[#7e525c] text-xl font-semibold mb-2"
+        <h3
+          className="text-[#7e525c] text-base font-semibold mb-0.5"
           style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}
         >
-          You&apos;ve already shared your thoughts!
-        </p>
-        <p className="text-[#b0909a] text-sm">
-          Thank you for your valuable feedback on this fragrance.
+          Feedback Received
+        </h3>
+        <p className="text-[#b0909a] text-[10px] leading-relaxed max-w-[180px]">
+          Thank you for sharing your experience.
         </p>
       </div>
     ) : reviewSuccess ? (
-      <div className="text-center py-8">
+      <div className="text-center py-4">
+        <div className="bg-green-50 w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-2">
+          <Star className="text-green-500" fill="currentColor" size={20} />
+        </div>
         <p
-          className="text-[#7e525c] text-xl font-semibold mb-2"
+          className="text-[#7e525c] text-base font-semibold mb-0.5"
           style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}
         >
-          Thank you for your feedback!
+          Message Received
         </p>
-        <p className="text-[#b0909a] text-sm">
-          Your review has been submitted successfully.
+        <p className="text-[#b0909a] text-[10px]">
+          Redirecting back to collection...
         </p>
       </div>
     ) : (
       <form
-        className="flex flex-col gap-6"
+        className="flex flex-col gap-3"
         onSubmit={(e) => {
           e.preventDefault();
           setReviewError("");
@@ -459,69 +462,46 @@ console.log(product,"pro");
           );
         }}
       >
-        {/* Star Rating Section */}
-        <div className="flex flex-col items-center">
-          <p className="text-[11px] tracking-[0.2em] text-[#b0909a] font-bold font-sans uppercase mb-4 text-center">
-            Your Rating
-          </p>
-          <div className="flex justify-center gap-3">
+        <div className="flex flex-col items-center gap-0.5">
+          <h4 className="text-[#7e525c] text-[10px] font-semibold uppercase tracking-wider mb-1">Share Your Experience</h4>
+          <div className="flex gap-1.5">
             {[1, 2, 3, 4, 5].map((star) => (
-              <button
+              <Star
                 key={star}
-                type="button"
-                onClick={() => setReviewRating(star)}
+                className={`cursor-pointer transition-all hover:scale-110 ${
+                  (reviewHover || reviewRating) >= star
+                    ? "text-[#FFD700] fill-[#FFD700]"
+                    : "text-gray-300"
+                }`}
+                size={20}
                 onMouseEnter={() => setReviewHover(star)}
                 onMouseLeave={() => setReviewHover(0)}
-                className="focus:outline-none transition-transform hover:scale-110 active:scale-95"
-                aria-label={`Rate ${star} star${star > 1 ? "s" : ""}`}
-              >
-                <svg
-                  width="32"
-                  height="32"
-                  viewBox="0 0 24 24"
-                  fill={
-                    (reviewHover || reviewRating) >= star
-                      ? "#FFD700"
-                      : "none"
-                  }
-                  stroke="#FFD700"
-                  strokeWidth="1.5"
-                  className="transition-colors duration-200"
-                >
-                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                </svg>
-              </button>
+                onClick={() => setReviewRating(star)}
+              />
             ))}
           </div>
         </div>
 
-        {/* Review Text Area Section */}
-        <div className="flex flex-col">
-          <p className="text-[11px] tracking-[0.2em] text-[#b0909a] font-bold font-sans uppercase mb-3">
-            Write Your Review
-          </p>
+        <div className="relative">
           <textarea
+            placeholder="Describe your scent journey..."
+            className="w-full bg-[#fdf9f5] border border-[#e8dde0] rounded-xl p-2.5 text-[11px] text-[#4e4543] focus:outline-none focus:ring-1 focus:ring-[#7e525c] transition-all min-h-[70px] resize-none"
             value={reviewText}
             onChange={(e) => setReviewText(e.target.value)}
-            placeholder="Describe the notes, the longevity, and how it made you feel..."
-            rows={3}
-            required
-            className="w-full border border-[#e8dde0] rounded-xl px-5 py-3 text-[15px] text-[#5a3a42] placeholder-[#c4a8b0] bg-[#fafafa] resize-none focus:outline-none focus:border-[#7e525c] focus:bg-white transition-all font-sans shadow-inner"
           />
-        </div>
-
         {reviewError && (
-          <p className="text-red-500 text-sm text-center font-medium">{reviewError}</p>
+          <p className="text-red-500 text-[10px] text-center font-medium mt-1">{reviewError}</p>
         )}
+        </div>
 
         {/* Submit Button */}
         <div className="flex justify-center">
           <button
             type="submit"
             disabled={isSubmittingReview || !reviewText.trim()}
-            className="bg-[#6a4450] text-white text-[15px] font-bold font-sans tracking-widest px-12 py-4 rounded-full hover:bg-[#4d313a] shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none"
+            className="w-full bg-[#7e525c] text-white py-2 rounded-full text-[10px] font-bold tracking-[2px] uppercase hover:bg-[#6a4450] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm active:scale-95"
           >
-            {isSubmittingReview ? "Submitting..." : "SUBMIT FEEDBACK"}
+            {isSubmittingReview ? "Submitting..." : "Submit Review"}
           </button>
         </div>
       </form>
