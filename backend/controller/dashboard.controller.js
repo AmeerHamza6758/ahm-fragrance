@@ -58,7 +58,7 @@ const dashboardController = {
 
       const formattedRevenue = [
         { name: 'Revenue', value: revenueData.find(d => d._id === 'delivered')?.totalAmount || 0 },
-        { name: 'Refunded', value: revenueData.filter(d => ['refunded', 'returned', 'payment refunded'].includes(d._id)).reduce((acc, curr) => acc + curr.value, 0) }
+        { name: 'Refunded', value: revenueData.filter(d => ['refunded', 'returned', 'payment refunded'].includes(d._id)).reduce((acc, curr) => acc + curr.totalAmount, 0) }
       ];
 
       const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];

@@ -10,7 +10,8 @@ const formatError = (err) => {
         return Object.values(err.errors).map(val => val.message).join(', ');
     }
     if (err.code === 11000) {
-        return 'A fragrance with this name already exists';
+        const field = Object.keys(err.keyValue || {})[0] || 'field';
+        return `A fragrance with this ${field} already exists or there is an inventory conflict.`;
     }
     return err.message;
 };
@@ -80,16 +81,16 @@ const productController = {
                             }]
                         });
                     });
-                    
+
                     const results = await Promise.allSettled(stockPromises);
                     const failures = results.filter(r => r.status === 'rejected');
-                    
+
                     if (failures.length > 0) {
                         console.error(`[Stock Sync] Failed to create ${failures.length} stock entries:`, failures.map(f => f.reason));
                     } else {
                         console.log(`[Stock Sync] Successfully created all stock entries for ${product.name}`);
                     }
-                    
+
                     product.stockSync = {
                         total: stockPromises.length,
                         success: results.filter(r => r.status === 'fulfilled').length,
@@ -168,6 +169,7 @@ const productController = {
             let updatedVariants = product.variants;
             if (variants && Array.isArray(variants)) {
                 updatedVariants = variants.map(v => ({
+                    _id: v._id,
                     size: v.size,
                     price: v.price ?? 0,
                     discountPercentage: v.discountPercentage ?? 0,
@@ -193,51 +195,56 @@ const productController = {
                 });
 
             // ✅ Sync stock entries for updated variants
-            if (updatedProduct.variants && updatedProduct.variants.length > 0) {
-                for (const v of updatedProduct.variants) {
-                    const existingStock = await Stock.findOne({ productId: id, variantId: v._id });
-                    
-                    if (existingStock) {
-                        // Only update if quantity is different or size changed
-                        if (existingStock.quantity !== v.stock || existingStock.variantSize !== v.size) {
-                            const previousQuantity = existingStock.quantity;
-                            existingStock.quantity = v.stock || 0;
-                            existingStock.variantSize = v.size;
-                            
-                            // Add to history if quantity changed
-                            if (previousQuantity !== v.stock) {
-                                existingStock.stockHistory.push({
-                                    previousQuantity,
-                                    newQuantity: v.stock || 0,
-                                    reason: 'Product update via admin',
-                                    changedAt: new Date()
-                                });
+            try {
+                if (updatedProduct.variants && updatedProduct.variants.length > 0) {
+                    for (const v of updatedProduct.variants) {
+                        const existingStock = await Stock.findOne({ productId: id, variantId: v._id });
+
+                        if (existingStock) {
+                            if (existingStock.quantity !== v.stock || existingStock.variantSize !== v.size) {
+                                const previousQuantity = existingStock.quantity;
+                                existingStock.quantity = v.stock || 0;
+                                existingStock.variantSize = v.size;
+
+                                if (previousQuantity !== v.stock) {
+                                    existingStock.stockHistory.push({
+                                        previousQuantity,
+                                        newQuantity: v.stock || 0,
+                                        reason: 'Product update via admin',
+                                        changedAt: new Date()
+                                    });
+                                }
+                                await existingStock.save();
                             }
-                            await existingStock.save();
+                        } else {
+                            await Stock.create({
+                                productId: id,
+                                variantId: v._id,
+                                variantSize: v.size,
+                                quantity: v.stock || 0,
+                                lowStockThreshold: 10,
+                                stockHistory: [{
+                                    previousQuantity: 0,
+                                    newQuantity: v.stock || 0,
+                                    reason: 'New variant stock creation',
+                                    changedAt: new Date()
+                                }]
+                            });
                         }
-                    } else {
-                        // Create new stock entry for new variant
-                        await Stock.create({
-                            productId: id,
-                            variantId: v._id,
-                            variantSize: v.size,
-                            quantity: v.stock || 0,
-                            lowStockThreshold: 10,
-                            stockHistory: [{
-                                previousQuantity: 0,
-                                newQuantity: v.stock || 0,
-                                reason: 'New variant stock creation',
-                                changedAt: new Date()
-                            }]
-                        });
                     }
                 }
+            } catch (stockSyncError) {
+                console.error("[Stock Sync Error during Update]:", stockSyncError);
+                // We don't fail the whole request here since the product itself was updated
             }
 
 
+            console.log(updatedProduct);
             res.json({ status: 1, data: formatProductWithImages(updatedProduct) });
         } catch (error) {
+            console.log("[Update Product Error]: ", error);
             res.status(400).json({ status: 0, message: formatError(error) });
+
         }
     },
 
