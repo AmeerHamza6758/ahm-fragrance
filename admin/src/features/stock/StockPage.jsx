@@ -118,14 +118,14 @@ function StockPage() {
       {/* Table */}
       <div className="catalog-table">
         <div className="catalog-table-header stock-registry-grid-layout">
-          <span>Product & Category</span>
-          <span className="text-center">Inventory</span>
-          <span className="text-center">Reserved</span>
-          <span className="text-center">Threshold</span>
-          <span className="text-center">Stock Value</span>
-          <span>Last Restock</span>
-          <span className="text-center">Status</span>
-          <span className="text-center">Actions</span>
+          <div className="header-cell">Product & Category</div>
+          <div className="text-center">Inventory</div>
+          <div className="text-center">Reserved</div>
+          <div className="text-center">Threshold</div>
+          <div className="text-center">Stock Value</div>
+          <div className="header-cell">Last Restock</div>
+          <div className="text-center">Status</div>
+          <div className="text-center">Actions</div>
         </div>
 
         {isLoading ? (
@@ -181,9 +181,11 @@ function StockPage() {
                    <span className="stock-value">Rs. {stockValue.toLocaleString()}</span>
                 </div>
 
-                <span>{formatDate(stock.lastRestockedAt)}</span>
+                <div className="restock-cell">
+                  {formatDate(stock.lastRestockedAt)}
+                </div>
 
-                <div className="status-cell justify-center">
+                <div className="status-cell text-center">
                   <span className={`status-badge ${isOut ? 'status-inactive' : isLow ? 'status-pending' : 'status-active'}`}>
                     {isOut ? 'Out of Stock' : isLow ? 'Low Stock' : 'In Stock'}
                   </span>
