@@ -262,7 +262,7 @@ const getStock = async (req, res) => {
 
     const dataPipeline = [
       ...basePipeline,
-      { $sort: { quantity: 1, 'productId.name': 1 } },
+      { $sort: { _id: -1 } },
       { $skip: skip },
       { $limit: pLimit }
     ];

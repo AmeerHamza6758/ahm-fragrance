@@ -2,6 +2,7 @@ const Product = require('../models/product.model');
 const Category = require('../models/category.model');
 const Tag = require('../models/tag.model');
 const Images = require('../models/images.model');
+const Stock = require('../models/stock.model');
 const mongoose = require('mongoose');
 
 const formatError = (err) => {
@@ -58,6 +59,48 @@ const productController = {
             });
 
             await product.save();
+            console.log("[Debug] Product variants after save:", JSON.stringify(product.variants, null, 2));
+
+            // ✅ Create initial stock entries for each variant
+            if (product.variants && product.variants.length > 0) {
+                console.log(`[Stock Sync] Creating initial stock entries for ${product.variants.length} variants of product: ${product.name}`);
+                try {
+                    const stockPromises = product.variants.map(v => {
+                        return Stock.create({
+                            productId: product._id,
+                            variantId: v._id,
+                            variantSize: v.size,
+                            quantity: v.stock || 0,
+                            lowStockThreshold: 10,
+                            stockHistory: [{
+                                previousQuantity: 0,
+                                newQuantity: v.stock || 0,
+                                reason: 'Initial stock creation',
+                                changedAt: new Date()
+                            }]
+                        });
+                    });
+                    
+                    const results = await Promise.allSettled(stockPromises);
+                    const failures = results.filter(r => r.status === 'rejected');
+                    
+                    if (failures.length > 0) {
+                        console.error(`[Stock Sync] Failed to create ${failures.length} stock entries:`, failures.map(f => f.reason));
+                    } else {
+                        console.log(`[Stock Sync] Successfully created all stock entries for ${product.name}`);
+                    }
+                    
+                    product.stockSync = {
+                        total: stockPromises.length,
+                        success: results.filter(r => r.status === 'fulfilled').length,
+                        failures: failures.length
+                    };
+                } catch (stockErr) {
+                    console.error("[Stock Sync Critical Error]", stockErr);
+                    product.stockSync = { error: stockErr.message };
+                }
+            }
+
             const populatedProduct = await Product.findById(product._id)
                 .populate('category_id')
                 .populate('tag_id')
@@ -66,12 +109,16 @@ const productController = {
                     model: 'images'
                 });
 
+            const formatted = formatProductWithImages(populatedProduct);
+            if (product.stockSync) formatted.stockSync = product.stockSync;
+
             res.status(201).json({
                 status: 1,
-                data: formatProductWithImages(populatedProduct),
+                data: formatted,
                 message: 'Product added successfully'
             });
         } catch (err) {
+            console.error("[AddProduct Error]", err);
             res.status(400).json({ status: 0, message: formatError(err) });
         }
     },
@@ -144,6 +191,49 @@ const productController = {
                     path: 'image_id',
                     model: 'images'
                 });
+
+            // ✅ Sync stock entries for updated variants
+            if (updatedProduct.variants && updatedProduct.variants.length > 0) {
+                for (const v of updatedProduct.variants) {
+                    const existingStock = await Stock.findOne({ productId: id, variantId: v._id });
+                    
+                    if (existingStock) {
+                        // Only update if quantity is different or size changed
+                        if (existingStock.quantity !== v.stock || existingStock.variantSize !== v.size) {
+                            const previousQuantity = existingStock.quantity;
+                            existingStock.quantity = v.stock || 0;
+                            existingStock.variantSize = v.size;
+                            
+                            // Add to history if quantity changed
+                            if (previousQuantity !== v.stock) {
+                                existingStock.stockHistory.push({
+                                    previousQuantity,
+                                    newQuantity: v.stock || 0,
+                                    reason: 'Product update via admin',
+                                    changedAt: new Date()
+                                });
+                            }
+                            await existingStock.save();
+                        }
+                    } else {
+                        // Create new stock entry for new variant
+                        await Stock.create({
+                            productId: id,
+                            variantId: v._id,
+                            variantSize: v.size,
+                            quantity: v.stock || 0,
+                            lowStockThreshold: 10,
+                            stockHistory: [{
+                                previousQuantity: 0,
+                                newQuantity: v.stock || 0,
+                                reason: 'New variant stock creation',
+                                changedAt: new Date()
+                            }]
+                        });
+                    }
+                }
+            }
+
 
             res.json({ status: 1, data: formatProductWithImages(updatedProduct) });
         } catch (error) {
