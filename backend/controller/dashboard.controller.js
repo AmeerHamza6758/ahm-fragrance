@@ -8,7 +8,7 @@ const dashboardController = {
     try {
       // 1. Sales vs Returns (Count of items in delivered vs refunded orders)
       const salesVsReturns = await Order.aggregate([
-        { $match: { orderStatus: { $in: ['delivered', 'refunded'] } } },
+        { $match: { orderStatus: { $in: ['delivered', 'refunded', 'returned', 'payment refunded'] } } },
         {
           $group: {
             _id: '$orderStatus',
@@ -27,7 +27,7 @@ const dashboardController = {
 
       // 2. Revenue vs Refunded (Sum of totalAmount)
       const revenueData = await Order.aggregate([
-        { $match: { orderStatus: { $in: ['delivered', 'refunded'] } } },
+        { $match: { orderStatus: { $in: ['delivered', 'refunded', 'returned', 'payment refunded'] } } },
         {
           $group: {
             _id: '$orderStatus',
@@ -53,12 +53,12 @@ const dashboardController = {
       // Format data for recharts
       const formattedSales = [
         { name: 'Sales', count: salesVsReturns.find(d => d._id === 'delivered')?.totalItems || 0 },
-        { name: 'Returns', count: salesVsReturns.find(d => d._id === 'refunded')?.totalItems || 0 }
+        { name: 'Returns', count: salesVsReturns.filter(d => ['refunded', 'returned', 'payment refunded'].includes(d._id)).reduce((acc, curr) => acc + curr.totalItems, 0) }
       ];
 
       const formattedRevenue = [
         { name: 'Revenue', value: revenueData.find(d => d._id === 'delivered')?.totalAmount || 0 },
-        { name: 'Refunded', value: revenueData.find(d => d._id === 'refunded')?.totalAmount || 0 }
+        { name: 'Refunded', value: revenueData.filter(d => ['refunded', 'returned', 'payment refunded'].includes(d._id)).reduce((acc, curr) => acc + curr.value, 0) }
       ];
 
       const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -96,7 +96,7 @@ const dashboardController = {
             },
             totalOrders: { $sum: 1 },
             refundedOrders: { 
-              $sum: { $cond: [{ $eq: ['$orderStatus', 'refunded'] }, 1, 0] } 
+              $sum: { $cond: [{ $in: ['$orderStatus', ['refunded', 'returned', 'payment refunded']] }, 1, 0] } 
             },
             deliveredOrders: { 
               $sum: { $cond: [{ $eq: ['$orderStatus', 'delivered'] }, 1, 0] } 
@@ -105,7 +105,7 @@ const dashboardController = {
               $sum: { $cond: [{ $eq: ['$orderStatus', 'delivered'] }, '$totalAmount', 0] } 
             },
             refundsAmount: { 
-              $sum: { $cond: [{ $eq: ['$orderStatus', 'refunded'] }, '$totalAmount', 0] } 
+              $sum: { $cond: [{ $in: ['$orderStatus', ['refunded', 'returned', 'payment refunded']] }, '$totalAmount', 0] } 
             }
           }
         },
