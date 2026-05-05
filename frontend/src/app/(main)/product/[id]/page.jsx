@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useParams } from "next/navigation";
 import { Heart, Star, Minus, Plus , Package } from "lucide-react";
-import { successToaster } from "@/utils/alert-service";
+import { successToaster, errorToaster } from "@/utils/alert-service";
 import {
   useFavorites,
   useProduct,
@@ -14,11 +14,17 @@ import {
   useAddToCart,
   useAddRatingReview,
   useCheckReviewStatus,
+  useGetAllReviews,
   queryClient,
 } from "@/lib/api";
 import ProductCard from "@/Components/ProductCard";
 import { buildProductImageUrl } from "@/lib/utils/imageUrl";
 import Loader from "@/Components/Loader/Loader";
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Autoplay, Pagination } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/pagination';
+import 'swiper/css/autoplay';
 
 export default function ProductDetails() {
   const params = useParams();
@@ -37,7 +43,7 @@ export default function ProductDetails() {
 
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState("");
-  const [activeTab, setActiveTab] = useState("description");
+  const [activeTab, setActiveTab] = useState("reviews");
   const [activeImageIndex, setActiveImageIndex] = useState(0);
 
   const [reviewRating, setReviewRating] = useState(4);
@@ -45,7 +51,15 @@ export default function ProductDetails() {
   const [reviewText, setReviewText] = useState("");
   const [reviewSuccess, setReviewSuccess] = useState(false);
   const [reviewError, setReviewError] = useState("");
+
   const { data: reviewData } = useCheckReviewStatus(productId);
+  const { data: allReviewsRes } = useGetAllReviews();
+  
+  const productReviews = useMemo(() => {
+    const raw = Array.isArray(allReviewsRes) ? allReviewsRes : (allReviewsRes?.data ?? []);
+    return raw.filter(rev => rev.productName === product?.name);
+  }, [allReviewsRes, product?.name]);
+
   const hasAlreadyReviewed = reviewData?.hasReviewed;
 
 
@@ -94,10 +108,20 @@ export default function ProductDetails() {
       window.location.href = "/auth/login";
       return;
     }
+    
     addToCartApi({
-      productId: product._id,
+      productId: product._id || productId,
       quantity,
       size: selectedSize,
+    }, {
+      onSuccess: () => {
+        successToaster("Fragrance added to your bag successfully!");
+      },
+      onError: (err) => {
+        const errMsg = err?.response?.data?.message || "Failed to add to bag. Please try again.";
+        errorToaster(errMsg);
+        console.error("Add to cart error:", err);
+      }
     });
   };
 
@@ -118,32 +142,31 @@ export default function ProductDetails() {
   return (
     <div className="pt-4 pb-10 sm:pt-10 sm:pb-16 flex flex-col gap-10 font-sans bg-[#faf8f5]">
       <main className="max-w-7xl mx-auto px-4 w-full">
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
-          
+        <section className="grid grid-cols-1 md:grid-cols-[1fr_1.8fr] gap-8 items-start">
           <div className="flex flex-col gap-6">
-            <div className="relative aspect-square w-full bg-white rounded-3xl overflow-hidden shadow-sm border border-[#e8dde0]">
+            <div className="relative w-full h-[320px] md:h-[380px] bg-white rounded-3xl overflow-hidden shadow-sm border border-[#e8dde0]">
               <Image
                 src={mainImageUrl}
                 alt={product.name}
                 fill
-                className="object-contain p-8"
+                className="object-contain p-4"
                 priority
                 unoptimized
               />
             </div>
             
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-3 gap-3">
               {images.map((img, index) => (
                 <div 
                   key={img._id || index}
                   onClick={() => setActiveImageIndex(index)}
-                  className={`relative aspect-square bg-white rounded-2xl overflow-hidden cursor-pointer border-2 transition-all ${activeImageIndex === index ? "border-[#7e525c] shadow-md" : "border-transparent hover:border-[#b0909a]"}`}
+                  className={`relative h-[80px] md:h-[100px] bg-white rounded-2xl overflow-hidden cursor-pointer border-2 transition-all ${activeImageIndex === index ? "border-[#7e525c] shadow-md" : "border-transparent hover:border-[#b0909a]"}`}
                 >
                   <Image
                     src={img.url || buildProductImageUrl(img.path)}
                     alt={`${product.name} thumbnail ${index + 1}`}
                     fill
-                    className="object-contain p-3"
+                    className="object-contain p-2"
                     unoptimized
                   />
                 </div>
@@ -151,39 +174,37 @@ export default function ProductDetails() {
             </div>
           </div>
 
-          <div className="flex flex-col gap-8">
-            <div className="flex flex-col gap-2">
-              <h1 className="text-4xl md:text-5xl text-[#5a3a42] font-serif capitalize">{product.name}</h1>
-              <div className="flex items-center gap-4">
+          <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-1">
+              <h1 className="text-3xl md:text-4xl text-[#5a3a42] font-serif capitalize">{product.name}</h1>
+              <div className="flex items-center gap-3">
                 {renderStars(product.rating || 4.5)}
-                <span className="text-[#b0909a] text-sm">(Verified Feedback)</span>
+                <span className="text-[#b0909a] text-xs font-medium tracking-wider uppercase">Verified Collection</span>
               </div>
             </div>
 
-            <p className="text-[#7e525c] text-lg leading-relaxed">{product.description}</p>
+            <p className="text-muted text-base leading-relaxed opacity-90">{product.description}</p>
 
-            <div className="flex flex-col gap-1">
+            <div className="flex items-baseline gap-3">
               {displayDiscount > 0 ? (
                 <>
-                  <div className="flex items-center gap-3">
-                    <span className="text-[#a08a8a] text-xl line-through">Rs. {displayPrice.toLocaleString()}</span>
-                    <span className="bg-[#e8dde0] text-[#7e525c] text-xs font-bold px-2 py-1 rounded">-{displayDiscount}% OFF</span>
-                  </div>
-                  <span className="text-4xl font-bold text-[#1c1c19]">Rs. {(displayPrice * (1 - displayDiscount / 100)).toLocaleString()}</span>
+                  <span className="text-3xl font-bold text-[#1c1c19]">Rs. {(displayPrice * (1 - displayDiscount / 100)).toLocaleString()}</span>
+                  <span className="text-[#a08a8a] text-lg line-through">Rs. {displayPrice.toLocaleString()}</span>
+                  <span className="text-[#7e525c] text-[10px] font-bold uppercase tracking-widest bg-[#e8dde0] px-2 py-0.5 rounded">-{displayDiscount}%</span>
                 </>
               ) : (
-                <span className="text-4xl font-bold text-[#1c1c19]">Rs. {displayPrice.toLocaleString()}</span>
+                <span className="text-3xl font-bold text-[#1c1c19]">Rs. {displayPrice.toLocaleString()}</span>
               )}
             </div>
 
-            <div className="flex flex-col gap-4">
-              <span className="text-xs font-bold tracking-widest text-[#b0909a] uppercase">Choose Size</span>
-              <div className="flex flex-wrap gap-3">
+            <div className="flex flex-col gap-3">
+              <span className="text-[10px] font-bold tracking-widest text-[#b0909a] uppercase">Choose Size</span>
+              <div className="flex flex-wrap gap-2">
                 {product.variants?.map((v) => (
                   <button
                     key={v.size}
                     onClick={() => setSelectedSize(v.size)}
-                    className={`px-6 py-3 rounded-full border-2 transition-all font-medium ${selectedSize === v.size ? "bg-[#7e525c] border-[#7e525c] text-white shadow-lg" : "border-[#e8dde0] text-[#7e525c] hover:border-[#7e525c]"}`}
+                    className={`px-5 py-2.5 rounded-full border-2 transition-all text-sm font-medium ${selectedSize === v.size ? "bg-[#7e525c] border-[#7e525c] text-white shadow-md" : "border-[#e8dde0] text-[#7e525c] hover:border-[#7e525c]"}`}
                   >
                     {v.size}
                   </button>
@@ -191,32 +212,32 @@ export default function ProductDetails() {
               </div>
             </div>
 
-            <div className="flex flex-col gap-4">
-              <span className="text-xs font-bold tracking-widest text-[#b0909a] uppercase">Quantity</span>
+            <div className="flex flex-col gap-3">
+              <span className="text-[10px] font-bold tracking-widest text-[#b0909a] uppercase">Quantity</span>
               <div className="flex items-center gap-6">
-                <div className="flex items-center border-2 border-[#e8dde0] rounded-full px-4 py-2 bg-white">
-                  <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="p-1 hover:text-[#7e525c] transition-colors"><Minus size={18} /></button>
-                  <span className="w-12 text-center font-bold text-lg">{quantity}</span>
-                  <button onClick={() => setQuantity(quantity + 1)} className="p-1 hover:text-[#7e525c] transition-colors"><Plus size={18} /></button>
+                <div className="flex items-center border-2 border-[#e8dde0] rounded-full px-3 py-1.5 bg-white scale-90 origin-left">
+                  <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="p-1 hover:text-[#7e525c] transition-colors"><Minus size={16} /></button>
+                  <span className="w-10 text-center font-bold text-base">{quantity}</span>
+                  <button onClick={() => setQuantity(quantity + 1)} className="p-1 hover:text-[#7e525c] transition-colors"><Plus size={16} /></button>
                 </div>
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 mt-4">
+            <div className="flex flex-col sm:flex-row gap-3 mt-2">
               <button
                 onClick={handleAddToCart}
                 disabled={isAddingToCart}
-                className="flex-1 bg-[#6a4450] text-white py-5 rounded-full font-bold tracking-widest hover:bg-[#4d313a] transition-all shadow-xl disabled:opacity-50"
+                className="w-full sm:w-[240px] bg-[#6a4450] text-white py-4 rounded-full text-xs font-bold tracking-widest hover:bg-[#4d313a] transition-all shadow-lg disabled:opacity-50"
               >
                 {isAddingToCart ? "ADDING TO BAG..." : "ORDER NOW (COD)"}
               </button>
               <button
                 onClick={handleWishlistToggle}
                 disabled={isTogglingFavorite}
-                className={`px-8 py-5 rounded-full border-2 transition-all flex items-center justify-center gap-2 ${isWishlisted ? "bg-[#7e525c] border-[#7e525c] text-white" : "border-[#e8dde0] text-[#7e525c] hover:bg-[#fdf9f5]"}`}
+                className={`w-full sm:w-[200px] py-4 rounded-full border-2 transition-all flex items-center justify-center gap-2 ${isWishlisted ? "bg-[#7e525c] border-[#7e525c] text-white" : "border-[#e8dde0] text-[#7e525c] hover:bg-[#fdf9f5]"}`}
               >
-                <Heart size={20} fill={isWishlisted ? "white" : "none"} />
-                <span className="hidden sm:inline font-bold">{isWishlisted ? "WISHLISTED" : "ADD TO WISHLIST"}</span>
+                <Heart size={18} fill={isWishlisted ? "white" : "none"} />
+                <span className="text-[10px] font-bold tracking-widest uppercase">{isWishlisted ? "WISHLISTED" : "ADD TO WISHLIST"}</span>
               </button>
             </div>
 
@@ -234,153 +255,155 @@ export default function ProductDetails() {
               ))}
             </div>
 
-            <div className="flex items-center gap-3 bg-[#fdf9f5] border border-[#e8dde0] p-4 rounded-2xl w-fit">
-              <Package className="text-[#7e525c]" size={20} />
-              <span className="text-sm font-medium text-[#7e525c]">Delivery estimate: 3-5 Working Days</span>
+            <div className="flex items-center gap-3 bg-[#fdf9f5] border border-[#e8dde0] p-3 rounded-2xl w-fit">
+              <Package className="text-[#7e525c]" size={18} />
+              <span className="text-[11px] font-medium text-[#7e525c]">Delivery estimate: 3-5 Working Days</span>
             </div>
           </div>
         </section>
 
-        <section className="mt-20 border-t border-[#e8dde0] pt-12">
+        <section className="mt-14 border-t border-[#e8dde0] pt-10">
           <div className="flex gap-8 border-b border-[#e8dde0] mb-8 overflow-x-auto no-scrollbar">
-            {["description", "usage", "returns"].map((tab) => (
+            {["reviews", "usage", "returns"].map((tab) => (
               <button
                 key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`pb-4 text-sm font-bold tracking-widest uppercase transition-all whitespace-nowrap ${activeTab === tab ? "text-[#7e525c] border-b-2 border-[#7e525c]" : "text-[#b0909a] hover:text-[#7e525c]"}`}
+                onClick={() => {
+                  setActiveTab(tab);
+                  if (tab === 'reviews') {
+                    // Scroll to tabs section if needed, or just let them see it
+                  }
+                }}
+                className={`pb-4 text-sm font-bold tracking-[0.2em] uppercase transition-all whitespace-nowrap ${activeTab === tab ? "text-[#7e525c] border-b-2 border-[#7e525c]" : "text-[#b0909a] hover:text-[#7e525c]"}`}
               >
-                {tab}
+                {tab} {tab === 'reviews' && `(${productReviews.length})`}
               </button>
             ))}
           </div>
-          <div className="max-w-3xl leading-relaxed text-[#7e525c]">
-            {activeTab === "description" && <div><h3 className="text-2xl font-serif mb-4">The Scent Narrative</h3><p>{product.description}</p></div>}
+          <div className="max-w-4xl leading-relaxed text-[#7e525c]">
+            {activeTab === "reviews" && (
+              <div className="flex flex-col gap-14">
+                {/* Review Form Component - Centered */}
+                <div className="flex justify-center w-full">
+                  <div className="bg-white border border-[#e8dde0] rounded-3xl p-6 shadow-sm w-full max-w-lg">
+                    <h4 className="text-xl font-serif mb-4 text-center">Share Your Experience</h4>
+                    {hasAlreadyReviewed ? (
+                      <div className="flex items-center gap-3 text-green-600 bg-green-50 p-4 rounded-xl border border-green-100">
+                        <Star fill="currentColor" size={20} />
+                        <span className="text-sm font-medium">Thank you! You have already shared your feedback for this fragrance.</span>
+                      </div>
+                    ) : (
+                      <form
+                        className="flex flex-col gap-4"
+                        onSubmit={(e) => {
+                          e.preventDefault();
+                          setReviewError("");
+                          submitReview(
+                            {
+                              productId: product._id,
+                              rating: reviewRating,
+                              review: reviewText,
+                            },
+                            {
+                              onSuccess: () => {
+                                setReviewSuccess(true);
+                                queryClient.invalidateQueries({ queryKey: ["review-status", productId] });
+                                queryClient.invalidateQueries({ queryKey: ["all-reviews"] });
+                                successToaster("Thank you! Your review has been submitted successfully.");
+                                setReviewText("");
+                              },
+                              onError: (err) => {
+                                setReviewError(
+                                  err?.response?.data?.message ??
+                                    err?.response?.data?.error ??
+                                    "Failed to submit review. Please try again."
+                                );
+                              },
+                            }
+                          );
+                        }}
+                      >
+                        <div className="flex justify-center gap-2">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <Star
+                              key={star}
+                              className={`cursor-pointer transition-all ${
+                                (reviewHover || reviewRating) >= star
+                                  ? "text-[#FFD700] fill-[#FFD700]"
+                                  : "text-gray-200"
+                              }`}
+                              size={24}
+                              onMouseEnter={() => setReviewHover(star)}
+                              onMouseLeave={() => setReviewHover(0)}
+                              onClick={() => setReviewRating(star)}
+                            />
+                          ))}
+                        </div>
+                        <textarea
+                          value={reviewText}
+                          onChange={(e) => setReviewText(e.target.value)}
+                          placeholder="Write your olfactory journey..."
+                          rows={3}
+                          required
+                          className="w-full border border-[#e8dde0] rounded-2xl px-4 py-3 bg-[#fafafa] focus:outline-none focus:border-[#7e525c] text-sm transition-all"
+                        />
+                        {reviewError && <p className="text-red-500 text-xs text-center">{reviewError}</p>}
+                        <button type="submit" disabled={isSubmittingReview || !reviewText.trim()} className="bg-[#6a4450] text-white py-3 rounded-full text-xs font-bold tracking-widest hover:bg-[#4d313a] transition-all disabled:opacity-50">
+                          {isSubmittingReview ? "SUBMITTING..." : "POST REVIEW"}
+                        </button>
+                      </form>
+                    )}
+                  </div>
+                </div>
+
+                {/* Reviews Slider */}
+                <div className="flex flex-col gap-6">
+                  <h4 className="text-xl font-serif text-center">Community Feedback</h4>
+                  {productReviews.length === 0 ? (
+                    <p className="text-[#b0909a] italic text-center">No reviews yet for this masterpiece. Be the first to share your experience.</p>
+                  ) : (
+                    <div className="w-full px-4">
+                      <Swiper
+                        modules={[Autoplay, Pagination]}
+                        spaceBetween={20}
+                        slidesPerView={1}
+                        pagination={{ clickable: true }}
+                        autoplay={{ delay: 3000, disableOnInteraction: false }}
+                        breakpoints={{
+                          640: { slidesPerView: 2 },
+                          1024: { slidesPerView: 3 },
+                        }}
+                        className="pb-12"
+                      >
+                        {productReviews.map((rev, i) => (
+                          <SwiperSlide key={i}>
+                            <div className="bg-white p-6 rounded-2xl border border-[#e8dde0]/60 shadow-sm flex flex-col gap-3 h-full">
+                              <div className="flex justify-between items-start">
+                                <div>
+                                  <p className="font-bold text-sm text-[#5a3a42]">{rev.userName}</p>
+                                  <div className="flex gap-0.5 mt-1">
+                                    {[...Array(5)].map((_, si) => (
+                                      <Star key={si} size={12} fill={si < rev.rating ? "#FFD700" : "none"} stroke={si < rev.rating ? "#FFD700" : "#D1D5DB"} />
+                                    ))}
+                                  </div>
+                                </div>
+                                <span className="text-[10px] text-[#b0909a]">{new Date(rev.submittedAt).toLocaleDateString()}</span>
+                              </div>
+                              <p className="text-sm text-[#7e525c] opacity-80 leading-relaxed italic">"{rev.reviewText}"</p>
+                            </div>
+                          </SwiperSlide>
+                        ))}
+                      </Swiper>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
             {activeTab === "usage" && <div><h3 className="text-2xl font-serif mb-4">Usage & Care</h3><ul className="list-disc pl-5 flex flex-col gap-2"><li>External use only, avoid direct eye contact.</li><li>Keep away from children and direct heat.</li><li>If irritation occurs, discontinue use immediately.</li></ul></div>}
             {activeTab === "returns" && <div><h3 className="text-2xl font-serif mb-4">Returns & Refunds Policy</h3><p>We offer a 7-day return policy. If you're not completely satisfied, items can be returned within 7 days for a full refund or exchange.</p></div>}
           </div>
         </section>
       </main>
 
-    {/* Customer Reviews & Feedback */}
-<section className="w-full bg-[#faf8f5]  px-4 flex flex-col items-center justify-center">
-  {/* Header Container */}
-  <div className="text-center mb-4 max-w-md">
-    <h2
-      className="text-[#7e525c] font-normal leading-tight text-[22px] sm:text-[26px] md:text-[28px] mb-2"
-      style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}
-    >
-      Customer Reviews &amp; Feedback
-    </h2>
-    <p className="text-[#b0909a] text-[12px] font-sans tracking-wide">
-      Share your experience with {product.name}
-    </p>
-  </div>
-
-  {/* Form Container - Even more compact */}
-  <div className="bg-white/80 backdrop-blur-sm border border-[#e8dde0] rounded-3xl p-4 sm:p-5 shadow-sm w-full max-w-md mx-auto transition-all hover:shadow-md">
-    {hasAlreadyReviewed ? (
-      <div className="text-center py-3 flex flex-col items-center">
-        <div className="bg-[#fff9f0] w-10 h-10 rounded-full flex items-center justify-center mb-2">
-          <Star className="text-[#FFD700]" fill="#FFD700" size={20} />
-        </div>
-        <h3
-          className="text-[#7e525c] text-base font-semibold mb-0.5"
-          style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}
-        >
-          Feedback Received
-        </h3>
-        <p className="text-[#b0909a] text-[10px] leading-relaxed max-w-[180px]">
-          Thank you for sharing your experience.
-        </p>
-      </div>
-    ) : reviewSuccess ? (
-      <div className="text-center py-4">
-        <div className="bg-green-50 w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-2">
-          <Star className="text-green-500" fill="currentColor" size={20} />
-        </div>
-        <p
-          className="text-[#7e525c] text-base font-semibold mb-0.5"
-          style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}
-        >
-          Message Received
-        </p>
-        <p className="text-[#b0909a] text-[10px]">
-          Redirecting back to collection...
-        </p>
-      </div>
-    ) : (
-      <form
-        className="flex flex-col gap-3"
-        onSubmit={(e) => {
-          e.preventDefault();
-          setReviewError("");
-          submitReview(
-            {
-              productId: product._id,
-              rating: reviewRating,
-              review: reviewText,
-            },
-            {
-              onSuccess: () => {
-                setReviewSuccess(true);
-                queryClient.invalidateQueries({ queryKey: ["review-status", productId] });
-                successToaster("Thank you! Your review has been submitted successfully.");
-                setTimeout(() => {
-                  router.back();
-                }, 2000);
-              },
-              onError: (err) => {
-                setReviewError(
-                  err?.response?.data?.message ??
-                    err?.response?.data?.error ??
-                    "Failed to submit review. Please try again."
-                );
-              },
-            }
-          );
-        }}
-      >
-        <div className="flex flex-col items-center gap-0.5">
-          <h4 className="text-[#7e525c] text-[10px] font-semibold uppercase tracking-wider mb-1">Share Your Experience</h4>
-          <div className="flex gap-1.5">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <Star
-                key={star}
-                className={`cursor-pointer transition-all hover:scale-110 ${
-                  (reviewHover || reviewRating) >= star
-                    ? "text-[#FFD700] fill-[#FFD700]"
-                    : "text-gray-300"
-                }`}
-                size={20}
-                onMouseEnter={() => setReviewHover(star)}
-                onMouseLeave={() => setReviewHover(0)}
-                onClick={() => setReviewRating(star)}
-              />
-            ))}
-          </div>
-        </div>
-
-              <div className="flex flex-col gap-3">
-                <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-[#b0909a]">Your Review</span>
-                <textarea
-                  value={reviewText}
-                  onChange={(e) => setReviewText(e.target.value)}
-                  placeholder="Tell us about the longevity, sillage and overall vibe..."
-                  rows={4}
-                  required
-                  className="w-full border border-[#e8dde0] rounded-2xl px-6 py-4 bg-[#fafafa] focus:outline-none focus:border-[#7e525c] transition-all"
-                />
-              </div>
-
-              {reviewError && <p className="text-red-500 text-sm text-center">{reviewError}</p>}
-              
-              <button type="submit" disabled={isSubmittingReview || !reviewText.trim()} className="bg-[#6a4450] text-white py-4 rounded-full font-bold tracking-widest hover:bg-[#4d313a] transition-all disabled:opacity-50">
-                {isSubmittingReview ? "SUBMITTING..." : "SUBMIT REVIEW"}
-              </button>
-            </form>
-          )}
-        </div>
-      </section>
 
       <section className="max-w-7xl mx-auto px-4 w-full py-10">
         <div className="flex justify-between items-end mb-12">

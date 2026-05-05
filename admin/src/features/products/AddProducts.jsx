@@ -23,7 +23,7 @@ function AddProducts() {
 
   // Variants state
   const [variants, setVariants] = useState([
-    { size: "", price: "", discountPercentage: "0" }
+    { size: "", price: "", discountPercentage: "0", stock: "0" }
   ]);
 
   const handleVariantChange = (index, field, value) => {
@@ -33,7 +33,7 @@ function AddProducts() {
   };
 
   const addVariant = () => {
-    setVariants([...variants, { size: "", price: "", discountPercentage: "0" }]);
+    setVariants([...variants, { size: "", price: "", discountPercentage: "0", stock: "0" }]);
   };
 
   const removeVariant = (index) => {
@@ -131,6 +131,7 @@ function AddProducts() {
           size: v.size.toLowerCase().includes("ml") ? v.size.trim() : `${v.size.trim()}ml`,
           price: Number(v.price) || 0,
           discountPercentage: Number(v.discountPercentage) || 0,
+          stock: Number(v.stock) || 0,
         }));
 
       // 3. Prepare payload
@@ -364,6 +365,20 @@ function AddProducts() {
                             onChange={(e) => handleVariantChange(index, 'discountPercentage', e.target.value)}
                           />
                           <span className="unit-tag">%</span>
+                        </div>
+                      </div>
+                      <div className="form-group">
+                        <label>Stock</label>
+                        <div className="input-with-unit">
+                          <input
+                            type="number"
+                            placeholder="100"
+                            className="styled-input"
+                            min="0"
+                            value={variant.stock}
+                            onChange={(e) => handleVariantChange(index, 'stock', e.target.value)}
+                          />
+                          <span className="unit-tag">UNIT</span>
                         </div>
                       </div>
                     </div>

@@ -22,7 +22,7 @@ const formatProductWithImages = (product) => {
     if (!product) return product;
     const baseUrl = getBaseUrl();
     const p = product.toObject ? product.toObject({ virtuals: true }) : product;
-    
+
     if (p.image_id && Array.isArray(p.image_id)) {
         p.image_id = p.image_id.map(img => {
             if (img && img.path) {
@@ -49,7 +49,12 @@ const productController = {
                 category_id,
                 tag_id,
                 image_id: Array.isArray(image_id) ? image_id : (image_id ? [image_id] : []),
-                variants
+                variants: variants.map(v => ({
+                    size: v.size,
+                    price: v.price ?? 0,
+                    discountPercentage: v.discountPercentage ?? 0,
+                    stock: v.stock ?? 0
+                }))
             });
 
             await product.save();
@@ -61,10 +66,10 @@ const productController = {
                     model: 'images'
                 });
 
-            res.status(201).json({ 
-                status: 1, 
-                data: formatProductWithImages(populatedProduct), 
-                message: 'Product added successfully' 
+            res.status(201).json({
+                status: 1,
+                data: formatProductWithImages(populatedProduct),
+                message: 'Product added successfully'
             });
         } catch (err) {
             res.status(400).json({ status: 0, message: formatError(err) });
@@ -118,7 +123,8 @@ const productController = {
                 updatedVariants = variants.map(v => ({
                     size: v.size,
                     price: v.price ?? 0,
-                    discountPercentage: v.discountPercentage ?? 0
+                    discountPercentage: v.discountPercentage ?? 0,
+                    stock: v.stock ?? 0
                 }));
             }
 

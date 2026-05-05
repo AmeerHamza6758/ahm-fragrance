@@ -132,10 +132,6 @@ function ViewProduct() {
                   </span>
                 </div>
               </div>
-              <div className="spec-item">
-                <label>Available Stock</label>
-                <div className="spec-value">{stockCount} Units</div>
-              </div>
             </div>
           </div>
 
@@ -146,7 +142,8 @@ function ViewProduct() {
                 <span>Volume</span>
                 <span>Base Price</span>
                 <span>Discount</span>
-                <span>Current Price</span>
+                <span>Final Price</span>
+                <span>Stock</span>
               </div>
               {product.variants && product.variants.length > 0 ? (
                 product.variants.map((v, idx) => (
@@ -154,7 +151,8 @@ function ViewProduct() {
                     <span className="v-size-label">{v.size}</span>
                     <span>PKR {v.price?.toLocaleString()}</span>
                     <span className="v-discount">-{v.discountPercentage}%</span>
-                    <span className="v-final">PKR {(v.price - (v.price * (v.discountPercentage || 0) / 100)).toLocaleString()}</span>
+                    <span className="">PKR {(v.price - (v.price * (v.discountPercentage || 0) / 100)).toLocaleString()}</span>
+                    <span className="v-final">{v.stock || 0} Units</span>
                   </div>
                 ))
               ) : (

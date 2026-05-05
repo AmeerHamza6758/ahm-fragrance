@@ -27,13 +27,14 @@ function AuthHeader() {
           <ArrowLeft size={24} color="#7e525c" />
         </button>
         <Link href="/" className="logo">
-          <Image
+          {/* <Image
             src={logo}
             alt="logo"
             width={100}
             height={80}
             className="object-fit"
-          />
+          /> */}
+          AHM FRAGRANCES
         </Link>
       </div>
     </header>

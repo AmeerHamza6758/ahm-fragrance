@@ -24,7 +24,7 @@ function EditProduct() {
 
   // Variants state
   const [variants, setVariants] = useState([
-    { size: "", price: "", discountPercentage: "0" }
+    { size: "", price: "", discountPercentage: "0", stock: "0" }
   ]);
 
   const handleVariantChange = (index, field, value) => {
@@ -34,7 +34,7 @@ function EditProduct() {
   };
 
   const addVariant = () => {
-    setVariants([...variants, { size: "", price: "", discountPercentage: "0" }]);
+    setVariants([...variants, { size: "", price: "", discountPercentage: "0", stock: "0" }]);
   };
 
   const removeVariant = (index) => {
@@ -69,10 +69,11 @@ function EditProduct() {
         setVariants(p.variants.map(v => ({
           size: v.size || "",
           price: v.price || "",
-          discountPercentage: v.discountPercentage || "0"
+          discountPercentage: v.discountPercentage || "0",
+          stock: v.stock || "0"
         })));
       } else {
-        setVariants([{ size: "", price: "", discountPercentage: "0" }]);
+        setVariants([{ size: "", price: "", discountPercentage: "0", stock: "0" }]);
       }
 
       // Set existing images
@@ -170,6 +171,7 @@ function EditProduct() {
           size: v.size.toLowerCase().includes("ml") ? v.size.trim() : `${v.size.trim()}ml`,
           price: Number(v.price) || 0,
           discountPercentage: Number(v.discountPercentage) || 0,
+          stock: Number(v.stock) || 0,
         }));
 
       // 3. Prepare payload
@@ -406,6 +408,20 @@ function EditProduct() {
                             onChange={(e) => handleVariantChange(index, 'discountPercentage', e.target.value)}
                           />
                           <span className="unit-tag">%</span>
+                        </div>
+                      </div>
+                      <div className="form-group">
+                        <label>Stock</label>
+                        <div className="input-with-unit">
+                          <input
+                            type="number"
+                            placeholder="100"
+                            className="styled-input"
+                            min="0"
+                            value={variant.stock}
+                            onChange={(e) => handleVariantChange(index, 'stock', e.target.value)}
+                          />
+                          <span className="unit-tag">UNIT</span>
                         </div>
                       </div>
                     </div>

@@ -2452,6 +2452,31 @@ p.product-price {
   color: rgb(var(--color-surface));
 }
 
+/* Collection dropdown custom scrollbar */
+.collection-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #7e525c #f2e9e7;
+}
+
+.collection-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.collection-scrollbar::-webkit-scrollbar-track {
+  background: #f2e9e7;
+  border-radius: 9999px;
+}
+
+.collection-scrollbar::-webkit-scrollbar-thumb {
+  background: #7e525c;
+  border-radius: 9999px;
+  border: 1px solid #f2e9e7;
+}
+
+.collection-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #6a434d;
+}
+
 /* Products Grid */
 .products-grid-section {
   width: 100%;

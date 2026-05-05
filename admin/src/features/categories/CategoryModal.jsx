@@ -64,7 +64,7 @@ function CategoryModal({ show, onClose, onSuccess, editingCat }) {
             <input 
               value={catName} 
               onChange={(e) => setCatName(e.target.value)} 
-              placeholder="e.g. Woody, Floral, Oriental..." 
+              placeholder="women, men..." 
               className="admin-input-styled" 
               autoFocus
             />
@@ -74,7 +74,7 @@ function CategoryModal({ show, onClose, onSuccess, editingCat }) {
             <textarea 
               value={catDesc} 
               onChange={(e) => setCatDesc(e.target.value)} 
-              placeholder="Describe the unique olfactory profile of this family..." 
+              placeholder="Describe the category of use of this product..." 
               rows={4} 
               className="admin-textarea-styled" 
             />

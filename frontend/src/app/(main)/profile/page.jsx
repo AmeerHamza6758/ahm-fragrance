@@ -85,15 +85,6 @@ export default function ProfilePage() {
     });
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("ahm_checkout_profile");
-    router.push("/");
-    setTimeout(() => {
-        window.location.reload();
-    }, 100);
-  };
-
   if (isLoading || !userId) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[70vh] gap-4">
@@ -106,43 +97,6 @@ export default function ProfilePage() {
   return (
     <div className="bg-[#fdfbf9] min-h-screen">
         <main className="max-w-7xl mx-auto px-4 py-8 sm:py-12 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-                {/* Sidebar */}
-                <div className="lg:col-span-1 space-y-6">
-                <div className="bg-white rounded-[32px] shadow-sm p-8 text-center border border-[#f2eae6] relative overflow-hidden group">
-                    <div className="absolute top-0 left-0 w-full h-1 bg-[#7e525c]" />
-                    <div className="w-24 h-24 bg-[#f8f4f1] rounded-full mx-auto flex items-center justify-center mb-4 transition-transform duration-500 group-hover:scale-110">
-                    <User size={48} color="#7e525c" />
-                    </div>
-                    <h2 className="text-xl font-bold text-[#7e525c] font-noto mb-1">
-                    {profileResponse?.data?.userName}
-                    </h2>
-                    <p className="text-sm text-[#a08a8a]">{profileResponse?.data?.email}</p>
-                </div>
-
-                <div className="bg-white rounded-[32px] shadow-sm overflow-hidden border border-[#f2eae6]">
-                    <nav className="flex flex-col">
-                    <button className="flex items-center justify-between px-6 py-4 bg-[#f8f4f1] text-[#7e525c] font-semibold border-l-4 border-[#7e525c]">
-                        <div className="flex items-center gap-3">
-                        <Settings size={20} />
-                        <span className="font-manrope">Profile Settings</span>
-                        </div>
-                        <ChevronRight size={18} />
-                    </button>
-                    <button 
-                        onClick={handleLogout}
-                        className="flex items-center justify-between px-6 py-4 text-[#4E4543] hover:bg-red-50 hover:text-red-500 transition-all duration-300 group"
-                    >
-                        <div className="flex items-center gap-3">
-                        <LogOut size={20} className="group-hover:rotate-12 transition-transform" />
-                        <span className="font-manrope">Sign Out</span>
-                        </div>
-                    </button>
-                    </nav>
-                </div>
-                </div>
-
-                {/* Content Area */}
                 <div className="lg:col-span-3">
                 <div className="bg-white rounded-[32px] shadow-sm p-6 sm:p-10 border border-[#f2eae6]">
                     <div className="flex items-center justify-between mb-10 pb-6 border-b border-[#f2eae6]">
@@ -292,7 +246,6 @@ export default function ProfilePage() {
                     </form>
                 </div>
                 </div>
-            </div>
         </main>
     </div>
   );
