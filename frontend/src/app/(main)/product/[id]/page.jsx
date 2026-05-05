@@ -3,8 +3,9 @@
 import { useMemo, useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useParams } from "next/navigation";
-import { Heart, Star, Minus, Plus, Package } from "lucide-react";
+import { useRouter, useParams } from "next/navigation";
+import { Heart, Star, Minus, Plus , Package } from "lucide-react";
+import { successToaster } from "@/utils/alert-service";
 import {
   useFavorites,
   useProduct,
@@ -12,13 +13,16 @@ import {
   useToggleFavorite,
   useAddToCart,
   useAddRatingReview,
+  useCheckReviewStatus,
   queryClient,
 } from "@/lib/api";
 import ProductCard from "@/Components/ProductCard";
 import { buildProductImageUrl } from "@/lib/utils/imageUrl";
+import Loader from "@/Components/Loader/Loader";
 
 export default function ProductDetails() {
   const params = useParams();
+  const router = useRouter();
   const productId = Array.isArray(params?.id) ? params.id[0] : (params?.id || "");
   
   const { data: productResponse, isLoading, isError } = useProduct(productId);
@@ -41,6 +45,9 @@ export default function ProductDetails() {
   const [reviewText, setReviewText] = useState("");
   const [reviewSuccess, setReviewSuccess] = useState(false);
   const [reviewError, setReviewError] = useState("");
+  const { data: reviewData } = useCheckReviewStatus(productId);
+  const hasAlreadyReviewed = reviewData?.hasReviewed;
+
 
   useEffect(() => {
     if (product?.variants?.length > 0) {
@@ -58,7 +65,7 @@ export default function ProductDetails() {
     [wishlistProducts, productId],
   );
 
-  if (isLoading) return <div className="py-32 text-center text-lg font-sans">Loading fragrance details...</div>;
+  if (isLoading) return <Loader fullScreen={true} size="xl" />;
   if (isError || !product) return <div className="py-32 text-center text-red-500 font-sans">Fragrance not found.</div>;
 
   const selectedVariant = product.variants?.find((v) => v.size === selectedSize) || product.variants?.[0];
@@ -254,36 +261,104 @@ export default function ProductDetails() {
         </section>
       </main>
 
-      <section className="bg-white py-20 border-y border-[#e8dde0]">
-        <div className="max-w-3xl mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl text-[#7e525c] font-serif mb-2">Customer Feedback</h2>
-            <p className="text-[#b0909a]">Share your experience with {product.name}</p>
-          </div>
+    {/* Customer Reviews & Feedback */}
+<section className="w-full bg-[#faf8f5]  px-4 flex flex-col items-center justify-center">
+  {/* Header Container */}
+  <div className="text-center mb-4 max-w-md">
+    <h2
+      className="text-[#7e525c] font-normal leading-tight text-[22px] sm:text-[26px] md:text-[28px] mb-2"
+      style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}
+    >
+      Customer Reviews &amp; Feedback
+    </h2>
+    <p className="text-[#b0909a] text-[12px] font-sans tracking-wide">
+      Share your experience with {product.name}
+    </p>
+  </div>
 
-          {reviewSuccess ? (
-            <div className="text-center py-12 bg-[#fdf9f5] rounded-3xl border border-[#e8dde0]">
-              <p className="text-[#7e525c] text-2xl font-serif mb-4">Thank you for your feedback!</p>
-              <button onClick={() => setReviewSuccess(false)} className="text-[#7e525c] font-bold underline">Write another review</button>
-            </div>
-          ) : (
-            <form onSubmit={(e) => {
-              e.preventDefault();
-              submitReview({ productId: product._id, rating: reviewRating, review: reviewText }, {
-                onSuccess: () => setReviewSuccess(true),
-                onError: (err) => setReviewError(err?.response?.data?.message || "Failed to submit review.")
-              });
-            }} className="flex flex-col gap-8 bg-white p-8 rounded-3xl border border-[#e8dde0] shadow-sm">
-              <div className="flex flex-col items-center gap-4">
-                <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-[#b0909a]">Your Rating</span>
-                <div className="flex gap-2">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <button key={star} type="button" onClick={() => setReviewRating(star)} onMouseEnter={() => setReviewHover(star)} onMouseLeave={() => setReviewHover(0)}>
-                      <Star size={32} fill={(reviewHover || reviewRating) >= star ? "#FFD700" : "none"} stroke="#FFD700" strokeWidth={1.5} className="transition-all hover:scale-110" />
-                    </button>
-                  ))}
-                </div>
-              </div>
+  {/* Form Container - Even more compact */}
+  <div className="bg-white/80 backdrop-blur-sm border border-[#e8dde0] rounded-3xl p-4 sm:p-5 shadow-sm w-full max-w-md mx-auto transition-all hover:shadow-md">
+    {hasAlreadyReviewed ? (
+      <div className="text-center py-3 flex flex-col items-center">
+        <div className="bg-[#fff9f0] w-10 h-10 rounded-full flex items-center justify-center mb-2">
+          <Star className="text-[#FFD700]" fill="#FFD700" size={20} />
+        </div>
+        <h3
+          className="text-[#7e525c] text-base font-semibold mb-0.5"
+          style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}
+        >
+          Feedback Received
+        </h3>
+        <p className="text-[#b0909a] text-[10px] leading-relaxed max-w-[180px]">
+          Thank you for sharing your experience.
+        </p>
+      </div>
+    ) : reviewSuccess ? (
+      <div className="text-center py-4">
+        <div className="bg-green-50 w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-2">
+          <Star className="text-green-500" fill="currentColor" size={20} />
+        </div>
+        <p
+          className="text-[#7e525c] text-base font-semibold mb-0.5"
+          style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}
+        >
+          Message Received
+        </p>
+        <p className="text-[#b0909a] text-[10px]">
+          Redirecting back to collection...
+        </p>
+      </div>
+    ) : (
+      <form
+        className="flex flex-col gap-3"
+        onSubmit={(e) => {
+          e.preventDefault();
+          setReviewError("");
+          submitReview(
+            {
+              productId: product._id,
+              rating: reviewRating,
+              review: reviewText,
+            },
+            {
+              onSuccess: () => {
+                setReviewSuccess(true);
+                queryClient.invalidateQueries({ queryKey: ["review-status", productId] });
+                successToaster("Thank you! Your review has been submitted successfully.");
+                setTimeout(() => {
+                  router.back();
+                }, 2000);
+              },
+              onError: (err) => {
+                setReviewError(
+                  err?.response?.data?.message ??
+                    err?.response?.data?.error ??
+                    "Failed to submit review. Please try again."
+                );
+              },
+            }
+          );
+        }}
+      >
+        <div className="flex flex-col items-center gap-0.5">
+          <h4 className="text-[#7e525c] text-[10px] font-semibold uppercase tracking-wider mb-1">Share Your Experience</h4>
+          <div className="flex gap-1.5">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <Star
+                key={star}
+                className={`cursor-pointer transition-all hover:scale-110 ${
+                  (reviewHover || reviewRating) >= star
+                    ? "text-[#FFD700] fill-[#FFD700]"
+                    : "text-gray-300"
+                }`}
+                size={20}
+                onMouseEnter={() => setReviewHover(star)}
+                onMouseLeave={() => setReviewHover(0)}
+                onClick={() => setReviewRating(star)}
+              />
+            ))}
+          </div>
+        </div>
 
               <div className="flex flex-col gap-3">
                 <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-[#b0909a]">Your Review</span>
@@ -314,7 +389,7 @@ export default function ProductDetails() {
         </div>
 
         {recLoading ? (
-          <div className="flex justify-center py-20"><div className="w-10 h-10 border-4 border-[#7e525c] border-t-transparent rounded-full animate-spin" /></div>
+          <Loader />
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {allProducts.filter(p => p._id !== productId).slice(0, 4).map(rec => <ProductCard key={rec._id} product={rec} />)}

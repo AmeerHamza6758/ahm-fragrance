@@ -12,6 +12,7 @@ import {
 } from "@/lib/api";
 import { buildProductImageUrl } from "@/lib/utils/imageUrl";
 import ProductCard from "@/src/Components/ProductCard";
+import Loader from "@/Components/Loader/Loader";
 
 const getProductId = (product) => product?._id || product?.id;
 
@@ -112,9 +113,7 @@ export default function WishlistPage() {
       {/* Products Grid */}
       <div className="mx-auto max-w-7xl px-10 pb-24 lg:px-8 md:px-6 sm:px-5">
         {wishlistLoading || recLoading ? (
-          <div className="py-16 flex justify-center">
-            <div className="w-9 h-9 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-          </div>
+          <Loader />
         ) : wishlistError ? (
           <div className="py-16 text-center text-primary">
             Failed to load wishlist.
@@ -161,9 +160,7 @@ export default function WishlistPage() {
 
         {/* Recommendations */}
         {recLoading ? (
-          <div className="py-10 flex justify-center">
-            <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-          </div>
+          <Loader />
         ) : recommendedProducts.length === 0 ? (
           <div className="py-10 text-center text-primary">
             No recommendations found.

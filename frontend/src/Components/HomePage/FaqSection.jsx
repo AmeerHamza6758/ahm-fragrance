@@ -47,14 +47,14 @@ export default function FaqSection() {
   return (
     <section className="faq-section">
       <div className="faq-box">
-        <div className="faq-list">
+        <div className="faq-list ">
           {loading ? (
             <p className="text-center py-8 text-gray-500">Loading FAQs...</p>
           ) : faqs.length > 0 ? (
             faqs.map((faq, idx) => (
               <div key={faq._id}>
                 <div
-                  className="flex items-start justify-between w-full cursor-pointer py-1"
+                  className=" flex items-start justify-between w-full cursor-pointer py-1"
                   onClick={() => toggleFaq(faq._id)}
                   role="button"
                   tabIndex={0}

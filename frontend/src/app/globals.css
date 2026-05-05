@@ -1865,8 +1865,10 @@ p.product-price {
 
 .faq-box {
   width: 768px;
+  padding: 10px 20px;
+  border-radius: 20px;
   max-width: 100%;
-  background: rgb(var(--color-bg-alt));
+  background: white;
   display: flex;
   flex-direction: column;
   gap: 64px;

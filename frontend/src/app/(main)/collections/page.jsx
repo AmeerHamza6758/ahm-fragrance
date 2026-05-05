@@ -5,6 +5,7 @@ import Image from "next/image";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useInfiniteProducts } from "@/lib/api";
 import {  useEffect, useRef } from "react";
+import Loader from "@/Components/Loader/Loader";
 const img_1 = "/Images/colection_img_1.jpg";
 const img_2 = "/Images/collection_img_2.jpg";
 const img_3 = "/Images/colection_img_3.jpg";
@@ -199,11 +200,7 @@ useEffect(() => {
 
       {/* Products Grid */}
       <section className="w-full px-4 sm:px-6 lg:px-8 py-8">
-        {isLoading && (
-          <div className="flex justify-center items-center py-20">
-            <div className="w-10 h-10 border-4 border-[#7E525C] border-t-transparent rounded-full animate-spin" />
-          </div>
-        )}
+        {isLoading && <Loader size="lg" />}
 
         {isError && (
           <div className="text-center py-20 text-red-500 font-serif">

@@ -1,6 +1,7 @@
 "use client";
 import { useProducts } from "@/lib/api/hooks/useProducts";
 import ProductCard from "@/Components/ProductCard";
+import Loader from "@/Components/Loader/Loader";
 
 export default function BestSellers() {
   // Fetch top-rated products
@@ -18,9 +19,7 @@ console.log(products," your products");
       </div>
 
       {isLoading ? (
-        <div className="w-full max-w-[1184px] mx-auto flex justify-center items-center py-12">
-          <div className="w-9 h-9 border-4 border-[#7e525c] border-t-transparent rounded-full animate-spin" />
-        </div>
+        <Loader />
       ) : isError ? (
       /*  ERROR MESSAGE  */
       <div className="w-full text-center py-10">

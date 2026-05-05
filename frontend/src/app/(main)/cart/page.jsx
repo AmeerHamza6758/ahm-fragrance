@@ -10,6 +10,7 @@ import auth_icon from "/public/Icons/product-details-authentic-icon.svg";
 import { useGetCart, useRemoveFromCart } from "@/lib/api";
 import { buildProductImageUrl } from "@/lib/utils/imageUrl";
 import { Handbag } from 'lucide-react';
+import Loader from "@/Components/Loader/Loader";
 
 
 export default function CartPage() {
@@ -60,9 +61,7 @@ const total = subtotal + deliveryCharges - discount;
           {/* Left Side: Cart Items List */}
           <div className="flex-1 space-y-6">
             {cartLoading ? (
-              <div className="flex justify-center py-10">
-                <div className="w-8 h-8 border-4 border-[#7e525c] border-t-transparent rounded-full animate-spin" />
-              </div>
+              <Loader />
             ) : cartItems.length === 0 ? (
              <div className="bg-[#F9F6F2] rounded-[32px] p-20 flex flex-col items-center justify-center text-center">
   <p className="text-[#7E525C] font-serif text-xl mb-10">

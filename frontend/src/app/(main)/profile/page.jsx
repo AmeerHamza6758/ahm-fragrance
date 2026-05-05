@@ -6,6 +6,7 @@ import { useGetProfile, useUpdateProfile } from "@/lib/api/hooks/useAuth";
 import { getStoredCheckoutProfile, persistAuthSession } from "@/lib/store/userProfileStore";
 import { successToaster, errorToaster } from "@/utils/alert-service";
 import { User, MapPin, Phone, Mail, Calendar, Settings, ChevronRight, LogOut, Loader2 } from "lucide-react";
+import Loader from "@/Components/Loader/Loader";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -96,7 +97,7 @@ export default function ProfilePage() {
   if (isLoading || !userId) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[70vh] gap-4">
-        <Loader2 className="w-12 h-12 text-[#7e525c] animate-spin" />
+        <Loader />
         <p className="text-[#a08a8a] font-medium animate-pulse">Gathering your botanical essence...</p>
       </div>
     );

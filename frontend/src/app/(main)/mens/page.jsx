@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import ProductCard from "@/Components/ProductCard";
 import { useInfiniteProducts } from "@/lib/api";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import Loader from "@/Components/Loader/Loader";
 
 const categories = [
   { id: "all", label: "All Collection" },
@@ -238,11 +239,7 @@ export default function MensPage() {
 
       {/* Products Grid */}
       <section className="w-full px-4 sm:px-6 lg:px-8 xl:px-10 2xl:px-12 pt-5">
-        {isLoading && (
-          <div className="flex justify-center items-center py-24">
-            <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-          </div>
-        )}
+        {isLoading && <Loader size="lg" />}
 
         {isError && (
           <div className="text-center py-20 text-error text-sm">
