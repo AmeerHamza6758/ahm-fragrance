@@ -109,7 +109,7 @@ export default function ProductCard({ product }) {
         </Link>
 
         {displayNotes && (
-          <p className="text-secondary text-sm tracking-wider">
+          <p className="text-secondary text-sm tracking-wider line-clamp-2">
             {displayNotes}
           </p>
         )}
