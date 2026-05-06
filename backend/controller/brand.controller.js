@@ -7,7 +7,7 @@ const brandController = {
             const { brandName, country, address, description
             } = req.body;
 
-            console.log("Request body:", req.body);
+
 
 
 
@@ -66,7 +66,7 @@ const brandController = {
                 { brandName, description, address, country },
                 { new: true }
             );
-            console.log(brand)
+
 
 
             if (!brand) return res.status(404).json({ message: 'Brand not found' });

@@ -7,7 +7,7 @@ export default function BestSellers() {
   // Fetch top-rated products
   const { data: products = [], isLoading, isError } = useProducts({ rating: "desc" });
   const visibleProducts = products.slice(0, 8);
-console.log(products," your products");
+
 
   return (
     <section className="best-sellers pb-10!">

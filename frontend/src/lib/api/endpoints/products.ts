@@ -104,11 +104,11 @@ export const getProducts = async (filters?: ProductFilters): Promise<Product[]> 
     const query = buildProductsQuery(filters);
     const url = `/api/product/getProducts${query ? `?${query}` : ""}`;
 
-    console.log("[API] Fetching products from:", url);
+
     
     const { data } = await apiClient.get<Product[]>(url);
     
-    console.log("[API] Products response:", data);
+
     
     // Handle different response formats
     if (Array.isArray(data)) return data;

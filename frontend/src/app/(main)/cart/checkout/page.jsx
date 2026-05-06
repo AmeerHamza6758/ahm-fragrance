@@ -91,7 +91,7 @@ export default function CheckoutPage() {
       province: form.province,
     });
 
-    console.log("[Order Payload]", JSON.stringify(payload, null, 2));
+
 
     placeOrder(payload, {
       onSuccess: (res) => {

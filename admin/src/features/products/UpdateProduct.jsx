@@ -8,9 +8,6 @@ import { useGetProductById, useUpdateProduct } from '../../services/hooks/produc
 
 function UpdateProduct() {
   const { id } = useParams();
-  (id, "parameters");
-
-  console.log(id, "parameters");
 
   const { data: product, isLoading } = useGetProductById(id);
   const { mutate: updateProduct } = useUpdateProduct();
@@ -42,7 +39,7 @@ function UpdateProduct() {
   const handleSubmit = (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
-    console.log("Form Entries:", Object.fromEntries(formData.entries()));
+
 
     // Update API call
     updateProduct({ id, data: formData });

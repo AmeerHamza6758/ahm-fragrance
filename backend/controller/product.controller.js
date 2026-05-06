@@ -68,11 +68,11 @@ const productController = {
 
             // ✅ Create initial stock entries for each variant
             if (savedProduct.variants && savedProduct.variants.length > 0) {
-                console.log(`[Stock Sync] Syncing ${savedProduct.variants.length} variants for: ${savedProduct.name}`);
+
 
                 for (const v of savedProduct.variants) {
                     try {
-                        console.log(`[Stock Sync] Creating entry for Variant: ${v.size} | ID: ${v._id} | ProductID: ${savedProduct._id}`);
+
 
                         await Stock.create({
                             productId: savedProduct._id,
@@ -87,7 +87,7 @@ const productController = {
                                 changedAt: new Date()
                             }]
                         });
-                        console.log(`[Stock Sync] ✅ Successfully created stock for ${v.size}`);
+
                     } catch (variantErr) {
                         console.error(`[Stock Sync] ❌ Failed for variant ${v.size}:`, variantErr.message);
                         // If it's a duplicate key error, we log it clearly
@@ -234,10 +234,10 @@ const productController = {
             }
 
 
-            console.log(updatedProduct);
+
             res.json({ status: 1, data: formatProductWithImages(updatedProduct) });
         } catch (error) {
-            console.log("[Update Product Error]: ", error);
+
             res.status(400).json({ status: 0, message: formatError(error) });
 
         }

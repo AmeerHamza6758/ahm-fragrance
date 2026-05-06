@@ -189,8 +189,7 @@ const addRatingReview = async (req, res) => {
   rating: parseFloat(averageRating.toFixed(1))
 }, { new: true });
 
-        console.log('Updated rating in product:', updatedProduct.rating);
-        console.log('Product name:', updatedProduct.name);
+
         
     // await Product.findByIdAndUpdate(productId, {
     //   rating: parseFloat(averageRating.toFixed(1))

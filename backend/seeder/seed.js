@@ -17,7 +17,7 @@ const shouldReset = process.argv.includes("--reset");
 
 async function connectDB() {
   await mongoose.connect(MONGO_URI);
-  console.log(`Connected to MongoDB: ${mongoose.connection.host}`);
+
 }
 
 async function clearSeededCollections() {
@@ -228,11 +228,7 @@ async function runSeeder() {
   try {
     await connectDB();
 
-    console.log(
-      shouldReset
-        ? "Reset mode enabled. Clearing existing records..."
-        : "Preparing seed collections..."
-    );
+
     await clearSeededCollections();
 
     const users = await seedUsers();
@@ -240,15 +236,13 @@ async function runSeeder() {
     await seedFaqs();
     await seedReviews(users, products);
 
-    console.log("Seeding completed successfully.");
-    console.log("Demo login: demo@ahm.com / password@123");
-    console.log("Admin login: admin@ahm.com / password@123");
+
   } catch (error) {
     console.error("Seeder failed:", error.message);
     process.exitCode = 1;
   } finally {
     await mongoose.connection.close();
-    console.log("MongoDB connection closed.");
+
   }
 }
 
