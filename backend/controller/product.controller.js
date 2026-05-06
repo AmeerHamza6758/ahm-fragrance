@@ -52,6 +52,7 @@ const productController = {
                 tag_id,
                 image_id: Array.isArray(image_id) ? image_id : (image_id ? [image_id] : []),
                 variants: variants.map(v => ({
+                    _id: new mongoose.Types.ObjectId(),
                     size: v.size,
                     price: v.price ?? 0,
                     discountPercentage: v.discountPercentage ?? 0,
@@ -60,15 +61,21 @@ const productController = {
             });
 
             await product.save();
-            console.log("[Debug] Product variants after save:", JSON.stringify(product.variants, null, 2));
+            
+            // ✅ Re-fetch product to ensure we have canonical IDs from the database
+            const savedProduct = await Product.findById(product._id);
+            if (!savedProduct) throw new Error("Failed to retrieve product after save");
 
             // ✅ Create initial stock entries for each variant
-            if (product.variants && product.variants.length > 0) {
-                console.log(`[Stock Sync] Creating initial stock entries for ${product.variants.length} variants of product: ${product.name}`);
-                try {
-                    const stockPromises = product.variants.map(v => {
-                        return Stock.create({
-                            productId: product._id,
+            if (savedProduct.variants && savedProduct.variants.length > 0) {
+                console.log(`[Stock Sync] Syncing ${savedProduct.variants.length} variants for: ${savedProduct.name}`);
+                
+                for (const v of savedProduct.variants) {
+                    try {
+                        console.log(`[Stock Sync] Creating entry for Variant: ${v.size} | ID: ${v._id} | ProductID: ${savedProduct._id}`);
+                        
+                        await Stock.create({
+                            productId: savedProduct._id,
                             variantId: v._id,
                             variantSize: v.size,
                             quantity: v.stock || 0,
@@ -80,29 +87,18 @@ const productController = {
                                 changedAt: new Date()
                             }]
                         });
-                    });
-
-                    const results = await Promise.allSettled(stockPromises);
-                    const failures = results.filter(r => r.status === 'rejected');
-
-                    if (failures.length > 0) {
-                        console.error(`[Stock Sync] Failed to create ${failures.length} stock entries:`, failures.map(f => f.reason));
-                    } else {
-                        console.log(`[Stock Sync] Successfully created all stock entries for ${product.name}`);
+                        console.log(`[Stock Sync] ✅ Successfully created stock for ${v.size}`);
+                    } catch (variantErr) {
+                        console.error(`[Stock Sync] ❌ Failed for variant ${v.size}:`, variantErr.message);
+                        // If it's a duplicate key error, we log it clearly
+                        if (variantErr.code === 11000) {
+                            console.error(`[Stock Sync] Duplicate Key Error: ${JSON.stringify(variantErr.keyValue)}`);
+                        }
                     }
-
-                    product.stockSync = {
-                        total: stockPromises.length,
-                        success: results.filter(r => r.status === 'fulfilled').length,
-                        failures: failures.length
-                    };
-                } catch (stockErr) {
-                    console.error("[Stock Sync Critical Error]", stockErr);
-                    product.stockSync = { error: stockErr.message };
                 }
             }
 
-            const populatedProduct = await Product.findById(product._id)
+            const populatedProduct = await Product.findById(savedProduct._id)
                 .populate('category_id')
                 .populate('tag_id')
                 .populate({
@@ -111,7 +107,6 @@ const productController = {
                 });
 
             const formatted = formatProductWithImages(populatedProduct);
-            if (product.stockSync) formatted.stockSync = product.stockSync;
 
             res.status(201).json({
                 status: 1,
@@ -169,7 +164,7 @@ const productController = {
             let updatedVariants = product.variants;
             if (variants && Array.isArray(variants)) {
                 updatedVariants = variants.map(v => ({
-                    _id: v._id,
+                    _id: v._id || new mongoose.Types.ObjectId(),
                     size: v.size,
                     price: v.price ?? 0,
                     discountPercentage: v.discountPercentage ?? 0,
