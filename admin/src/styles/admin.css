@@ -3427,6 +3427,7 @@ input[type=number] {
 }
 
 .profile-input {
+  width: 100%;
   padding: 16px 20px;
   border-radius: 14px;
   border: 1px solid #EBE7E4;
@@ -3441,6 +3442,13 @@ input[type=number] {
   border-color: #7E525C;
   background: white;
   box-shadow: 0 0 0 4px rgba(126, 82, 92, 0.05);
+}
+
+.field-error {
+  font-size: 12px;
+  font-weight: 700;
+  color: #c0392b;
+  margin-left: 2px;
 }
 
 .profile-save-btn {

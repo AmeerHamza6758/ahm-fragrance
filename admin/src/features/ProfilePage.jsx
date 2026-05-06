@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useUpdateProfile, useUpdatePassword } from '../services/hooks/auth';
-import { FiUser, FiLock } from 'react-icons/fi';
+import { FiUser, FiLock, FiEye, FiEyeOff } from 'react-icons/fi';
 import { IoMdSave } from 'react-icons/io';
 import "../styles/admin.css";
 
@@ -20,6 +20,10 @@ function ProfilePage() {
     confirmPassword: ""
   });
 
+  const [pwdErrors, setPwdErrors] = useState({});
+  const [showNew, setShowNew] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+
   const updateProfileMutation = useUpdateProfile();
   const updatePasswordMutation = useUpdatePassword();
 
@@ -30,10 +34,27 @@ function ProfilePage() {
 
   const handlePasswordSubmit = (e) => {
     e.preventDefault();
-    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      alert("New passwords do not match.");
+    const nextErrors = {};
+    if (!passwordForm.oldPassword) nextErrors.oldPassword = "Current password is required.";
+    if (!passwordForm.newPassword) nextErrors.newPassword = "New password is required.";
+    if (passwordForm.newPassword && passwordForm.newPassword.length < 6) {
+      nextErrors.newPassword = "New password must be at least 6 characters.";
+    }
+    if (!passwordForm.confirmPassword) nextErrors.confirmPassword = "Please confirm your new password.";
+    if (
+      passwordForm.newPassword &&
+      passwordForm.confirmPassword &&
+      passwordForm.newPassword !== passwordForm.confirmPassword
+    ) {
+      nextErrors.confirmPassword = "New passwords do not match.";
+    }
+
+    if (Object.keys(nextErrors).length) {
+      setPwdErrors(nextErrors);
       return;
     }
+
+    setPwdErrors({});
     updatePasswordMutation.mutate({
       oldPassword: passwordForm.oldPassword,
       newPassword: passwordForm.newPassword
@@ -91,36 +112,98 @@ function ProfilePage() {
           <form className="profile-form" onSubmit={handlePasswordSubmit}>
             <div className="profile-field-group">
               <label>Current Secret Key</label>
-              <input 
-                type="password" 
-                className="profile-input" 
-                placeholder="Confirm current password"
-                value={passwordForm.oldPassword}
-                onChange={(e) => setPasswordForm({...passwordForm, oldPassword: e.target.value})}
-                required
-              />
+              <div style={{ position: "relative", width: "100%" }}>
+                <input 
+                  type="password"
+                  className="profile-input" 
+                  placeholder="Confirm current password"
+                  value={passwordForm.oldPassword}
+                  onChange={(e) => {
+                    setPasswordForm({ ...passwordForm, oldPassword: e.target.value });
+                    setPwdErrors((p) => ({ ...p, oldPassword: "" }));
+                  }}
+                  
+                  style={{ paddingRight: 44 }}
+                />
+              </div>
+              {pwdErrors.oldPassword ? (
+                <div className="field-error">{pwdErrors.oldPassword}</div>
+              ) : null}
             </div>
             <div className="profile-field-group">
               <label>New Secret Key</label>
-              <input 
-                type="password" 
-                className="profile-input" 
-                placeholder="New password"
-                value={passwordForm.newPassword}
-                onChange={(e) => setPasswordForm({...passwordForm, newPassword: e.target.value})}
-                required
-              />
+              <div style={{ position: "relative", width: "100%" }}>
+                <input 
+                  type={showNew ? "text" : "password"} 
+                  className="profile-input" 
+                  placeholder="New password"
+                  value={passwordForm.newPassword}
+                  onChange={(e) => {
+                    const next = { ...passwordForm, newPassword: e.target.value };
+                    setPasswordForm(next);
+                    setPwdErrors((p) => ({ ...p, newPassword: "", confirmPassword: "" }));
+                  }}
+                  
+                  style={{ paddingRight: 44 }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowNew((p) => !p)}
+                  aria-label={showNew ? "Hide password" : "Show password"}
+                  style={{
+                    position: "absolute",
+                    right: 12,
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    background: "transparent",
+                    border: "none",
+                    cursor: "pointer",
+                    padding: 0,
+                  }}
+                >
+                  {showNew ? <FiEyeOff /> : <FiEye />}
+                </button>
+              </div>
+              {pwdErrors.newPassword ? (
+                <div className="field-error">{pwdErrors.newPassword}</div>
+              ) : null}
             </div>
             <div className="profile-field-group">
               <label>Confirm New Key</label>
-              <input 
-                type="password" 
-                className="profile-input" 
-                placeholder="Confirm new password"
-                value={passwordForm.confirmPassword}
-                onChange={(e) => setPasswordForm({...passwordForm, confirmPassword: e.target.value})}
-                required
-              />
+              <div style={{ position: "relative", width: "100%" }}>
+                <input 
+                  type={showConfirm ? "text" : "password"} 
+                  className="profile-input"
+                  placeholder="Confirm new password"
+                  value={passwordForm.confirmPassword}
+                  onChange={(e) => {
+                    setPasswordForm({ ...passwordForm, confirmPassword: e.target.value });
+                    setPwdErrors((p) => ({ ...p, confirmPassword: "" }));
+                  }}
+                  
+                  style={{ paddingRight: 44 }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirm((p) => !p)}
+                  aria-label={showConfirm ? "Hide password" : "Show password"}
+                  style={{
+                    position: "absolute",
+                    right: 12,
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    background: "transparent",
+                    border: "none",
+                    cursor: "pointer",
+                    padding: 0,
+                  }}
+                >
+                  {showConfirm ? <FiEyeOff /> : <FiEye />}
+                </button>
+              </div>
+              {pwdErrors.confirmPassword ? (
+                <div className="field-error">{pwdErrors.confirmPassword}</div>
+              ) : null}
             </div>
             
             <button 

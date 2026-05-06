@@ -10,7 +10,7 @@ const Product = mongoose.model('Product', productSchema);
 
 async function linkImage() {
     try {
-        await mongoose.connect(process.env.DB_URL || 'mongodb://localhost:27017/AHM_Fragrances');
+        await mongoose.connect(process.env.DB_URL || 'mongodb://localhost:27017/ahm-fragrance');
         console.log('Connected to DB');
 
         const imageId = '69f8e44e17fa8802cd0584a5'; // Existing image ID

@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useGetProfile, useUpdateProfile } from "@/lib/api/hooks/useAuth";
+import { useGetProfile, useUpdatePassword, useUpdateProfile } from "@/lib/api/hooks/useAuth";
 import { getStoredCheckoutProfile, persistAuthSession } from "@/lib/store/userProfileStore";
 import { successToaster, errorToaster } from "@/utils/alert-service";
-import { User, MapPin, Phone, Mail, Calendar, Settings, ChevronRight, LogOut, Loader2 } from "lucide-react";
+import { Calendar, Eye, EyeOff, Loader2, MapPin, Phone, Shield, User } from "lucide-react";
 import Loader from "@/Components/Loader/Loader";
 
 export default function ProfilePage() {
@@ -23,6 +23,7 @@ export default function ProfilePage() {
 
   const { data: profileResponse, isLoading } = useGetProfile(userId);
   const { mutate: updateProfile, isPending: isUpdating } = useUpdateProfile();
+  const { mutate: updatePassword, isPending: isUpdatingPassword } = useUpdatePassword();
 
   const [formData, setFormData] = useState({
     userName: "",

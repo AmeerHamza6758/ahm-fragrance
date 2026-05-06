@@ -1,227 +1,121 @@
 require("dotenv").config();
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
-
-// const Brand = require("../models/brand.model");
-const Category = require("../models/category.model");
-const Tag = require("../models/tag.model");
-const Product = require("../models/product.model");
-const Stock = require("../models/stock.model");
 const Faq = require("../models/faq.model");
 const User = require("../models/user.model");
-const RatingReview = require("../models/ratingReview.model");
 
-const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/AHM_Fragrances";
+const MONGO_URI =
+  process.env.DB_URL ||
+  "mongodb://localhost:27017/ahm-fragrance";
 
 const shouldReset = process.argv.includes("--reset");
 
 async function connectDB() {
   await mongoose.connect(MONGO_URI);
-
 }
 
 async function clearSeededCollections() {
-  await Promise.all([
-    RatingReview.deleteMany({}),
-    Stock.deleteMany({}),
-    Product.deleteMany({}),
-    Tag.deleteMany({}),
-    Category.deleteMany({}),
-    // Brand.deleteMany({}),
-    Faq.deleteMany({}),
-    User.deleteMany({ email: { $in: ["demo@ahm.com", "admin@ahm.com"] } }),
-  ]);
+  await Promise.all([Faq.deleteMany({}), User.deleteMany({ role: "admin" })]);
 }
 
 async function seedUsers() {
-  const passwordHash = await bcrypt.hash("password@123", 10);
+  const adminEmail = process.env.SEED_ADMIN_EMAIL || "admin@ahm.com";
+  const adminPassword =
+    process.env.SEED_ADMIN_PASSWORD ||
+    (process.env.NODE_ENV === "production" ? "" : "password@123");
 
-  const users = await User.insertMany([
-    {
-      userName: "Demo User",
-      email: "demo@ahm.com",
-      phone: "03001234567",
-      password: passwordHash,
-      gender: "male",
-      isEmailVerified: true,
-      role: "user",
-      isActive: true,
-    },
-    {
-      userName: "Admin User",
-      email: "admin@ahm.com",
-      phone: "03007654321",
-      password: passwordHash,
-      gender: "female",
-      isEmailVerified: true,
-      role: "admin",
-      isActive: true,
-    },
-  ]);
+  if (!adminPassword) {
+    throw new Error(
+      "Missing SEED_ADMIN_PASSWORD. Set it before running seeder in production.",
+    );
+  }
 
-  return users;
-}
+  const passwordHash = await bcrypt.hash(adminPassword, 10);
 
-async function seedCatalog() {
-  const [men, women, unisex] = await Category.insertMany([
-    { name: "men", description: "Fragrances curated for men." },
-    { name: "women", description: "Elegant scents for women." },
-    { name: "unisex", description: "Balanced fragrances for everyone." },
-  ]);
+  const adminDoc = {
+    userName: process.env.SEED_ADMIN_NAME || "Admin",
+    email: adminEmail,
+    phone: process.env.SEED_ADMIN_PHONE || "03007654321",
+    password: passwordHash,
+    gender: process.env.SEED_ADMIN_GENDER || "female",
+    isEmailVerified: true,
+    role: "admin",
+    isActive: true,
+  };
 
-  const [fresh, woody, floral, oriental] = await Tag.insertMany([
-    { name: "Fresh", description: "Clean and citrus-forward notes." },
-    { name: "Woody", description: "Warm woods and earthy tones." },
-    { name: "Floral", description: "Soft floral bouquet notes." },
-    { name: "Oriental", description: "Amber, spice, and resin notes." },
-  ]);
-
-  const [noirHouse, auraScents, velvetMist] = await Brand.insertMany([
-    {
-      brandName: "Noir House",
-      country: "France",
-      address: "Paris, France",
-      brandRating: 4.4,
-      description: "Modern niche fragrance house.",
-    },
-    {
-      brandName: "Aura Scents",
-      country: "Italy",
-      address: "Milan, Italy",
-      brandRating: 4.2,
-      description: "Designer-inspired signature perfumes.",
-    },
-    {
-      brandName: "Velvet Mist",
-      country: "UAE",
-      address: "Dubai, UAE",
-      brandRating: 4.6,
-      description: "Luxury oud and oriental blends.",
-    },
-  ]);
-
-  const products = await Product.insertMany([
-    {
-      name: "Noir Ocean",
-      price: 5500,
-      discountPercentage: 10,
-      description: "A fresh marine scent with a crisp woody dry down.",
-      variants: [
-        { size: "50ml", price: 5500, discountPercentage: 10 },
-        { size: "100ml", price: 9200, discountPercentage: 12 },
-      ],
-      brand_id: noirHouse._id,
-      category_id: men._id,
-      tag_id: fresh._id,
-      isActive: true,
-      rating: 4.5,
-    },
-    {
-      name: "Velvet Bloom",
-      price: 6200,
-      discountPercentage: 8,
-      description: "Floral and fruity profile with a smooth musky base.",
-      variants: [
-        { size: "50ml", price: 6200, discountPercentage: 8 },
-        { size: "100ml", price: 10200, discountPercentage: 10 },
-      ],
-      brand_id: auraScents._id,
-      category_id: women._id,
-      tag_id: floral._id,
-      isActive: true,
-      rating: 4.3,
-    },
-    {
-      name: "Oud Ember",
-      price: 7800,
-      discountPercentage: 15,
-      description: "Rich oud with amber and spice undertones.",
-      variants: [
-        { size: "50ml", price: 7800, discountPercentage: 15 },
-        { size: "100ml", price: 12900, discountPercentage: 18 },
-      ],
-      brand_id: velvetMist._id,
-      category_id: unisex._id,
-      tag_id: oriental._id,
-      isActive: true,
-      rating: 4.7,
-    },
-    {
-      name: "Cedar Trail",
-      price: 5100,
-      discountPercentage: 5,
-      description: "Dry cedarwood opening with aromatic herbs and musk.",
-      variants: [
-        { size: "50ml", price: 5100, discountPercentage: 5 },
-        { size: "100ml", price: 8600, discountPercentage: 7 },
-      ],
-      brand_id: noirHouse._id,
-      category_id: men._id,
-      tag_id: woody._id,
-      isActive: true,
-      rating: 4.1,
-    },
-  ]);
-
-  await Stock.insertMany(
-    products.map((product, index) => ({
-      productId: product._id,
-      quantity: 25 + index * 10,
-      reservedQuantity: 0,
-      lowStockThreshold: 8,
-      lastRestockedAt: new Date(),
-      stockHistory: [
-        {
-          previousQuantity: 0,
-          newQuantity: 25 + index * 10,
-          reason: "admin_restock",
-          changedAt: new Date(),
-        },
-      ],
-    }))
+  const admin = await User.findOneAndUpdate(
+    { email: adminEmail },
+    { $set: adminDoc, $setOnInsert: { createdAt: new Date() } },
+    { new: true, upsert: true },
   );
 
-  return products;
+  return [admin];
 }
 
 async function seedFaqs() {
-  await Faq.insertMany([
+  const faqs = [
     {
-      question: "How long does delivery take?",
-      answer: "Standard delivery takes 3-5 business days nationwide.",
+      question: "Are your perfumes original and authentic?",
+      answer:
+        "Yes. We only list authentic products and source from verified channels. If you ever receive a damaged or suspicious item, contact support within 7 days for a quick resolution.",
     },
     {
-      question: "Can I return a fragrance?",
-      answer: "Yes, returns are accepted within 7 days if the box is unopened.",
+      question: "How long does delivery take in Pakistan?",
+      answer:
+        "Most orders arrive in 3–5 working days. Delivery time can vary slightly by city and courier workload during sales.",
     },
     {
-      question: "Are these original perfumes?",
-      answer: "Yes, all listed products are sourced from verified suppliers.",
+      question: "Do you offer Cash on Delivery (COD)?",
+      answer:
+        "Yes, COD is available in most cities across Pakistan. If COD is unavailable for your area, you’ll see alternative payment options at checkout.",
     },
-  ]);
-}
+    {
+      question: "What is your return / exchange policy?",
+      answer:
+        "If your order arrives damaged or incorrect, we offer a hassle-free exchange/return within 7 days. Please keep the original packaging and share unboxing photos for faster processing.",
+    },
+    {
+      question: "How can I choose the right fragrance for me?",
+      answer:
+        "Start with your vibe: fresh & clean (day), woody & warm (evening), or sweet & floral (signature). Check the notes and concentration on the product page—if you need help, message us and we’ll recommend based on your preferences.",
+    },
+    {
+      question: "How long do AHM fragrances last?",
+      answer:
+        "Longevity depends on your skin type and environment, but most customers get all-day wear. For best results, apply on moisturized skin and pulse points (wrists, neck).",
+    },
+    {
+      question: "Can I send an order as a gift?",
+      answer:
+        "Absolutely. Add your recipient’s address at checkout. If you’d like a gift note, include it in the order notes and we’ll pack it with extra care.",
+    },
+    {
+      question: "How do I track my order?",
+      answer:
+        "Once dispatched, you’ll receive tracking details via SMS/email (where available). You can also contact support with your order number for an update.",
+    },
+    {
+      question: "What should I do if I entered the wrong address/phone?",
+      answer:
+        "Contact us as soon as possible with your order number. If the parcel hasn’t shipped yet, we’ll update the details immediately.",
+    },
+    {
+      question: "Are there any exclusive deals or sales?",
+      answer:
+        "Yes—limited-time discounts run throughout the year. Join our newsletter and follow our socials to get early access to drops and sale alerts.",
+    },
+  ];
 
-async function seedReviews(users, products) {
-  await RatingReview.insertMany([
-    {
-      userId: users[0]._id,
-      productId: products[0]._id,
-      rating: 5,
-      review: "Excellent fresh scent and long-lasting performance.",
-    },
-    {
-      userId: users[0]._id,
-      productId: products[1]._id,
-      rating: 4,
-      review: "Beautiful floral opening, perfect for daily wear.",
-    },
-    {
-      userId: users[1]._id,
-      productId: products[2]._id,
-      rating: 5,
-      review: "Strong oud profile, premium quality and projection.",
-    },
-  ]);
+  // Upsert by question to keep seeder idempotent
+  await Promise.all(
+    faqs.map((faq) =>
+      Faq.updateOne(
+        { question: faq.question },
+        { $set: faq },
+        { upsert: true },
+      ),
+    ),
+  );
 }
 
 async function runSeeder() {
@@ -229,12 +123,12 @@ async function runSeeder() {
     await connectDB();
 
 
-    await clearSeededCollections();
+    if (shouldReset) {
+      await clearSeededCollections();
+    }
 
-    const users = await seedUsers();
-    const products = await seedCatalog();
+    await seedUsers();
     await seedFaqs();
-    await seedReviews(users, products);
 
 
   } catch (error) {
