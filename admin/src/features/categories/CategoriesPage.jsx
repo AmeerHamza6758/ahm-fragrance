@@ -133,11 +133,11 @@ function CategoriesPage() {
 
         <div className="catalog-table">
           <div className="category-header-row">
-            <span>Name</span>
-            <span>Description</span>
-            <span>Products</span>
-            <span>Created At</span>
-            <span>Actions</span>
+            <div className="header-cell">Name</div>
+            <div className="header-cell">Description</div>
+            <div>Products</div>
+            <div>Created At</div>
+            <div className="text-center">Actions</div>
           </div>
 
           {catLoading ? (
@@ -149,11 +149,23 @@ function CategoriesPage() {
           ) : (
             allCategories.map((item) => (
               <div className="category-body-row" key={item._id}>
-                <div className="product-cell"><span className="user-name">{item.name}</span></div>
-                <div className="description-cell"><p className="description-text-small truncate-multi" title={item.description}>{item.description || "No description."}</p></div>
-                <div className="count-cell"><span className="status-badge status-active">{item.productCount || 0} Essence{item.productCount !== 1 ? 's' : ''}</span></div>
-                <div className="date-cell"><span>{formatDate(item.createdAt)}</span></div>
-                <div className="actions">
+                <div className="product-cell">
+                  <span className="user-name">{item.name}</span>
+                </div>
+                <div className="description-cell">
+                  <p className="description-text-small truncate-multi" style={{ margin: 0 }} title={item.description}>
+                    {item.description || "No description."}
+                  </p>
+                </div>
+                <div>
+                  <span className="status-badge status-active">
+                    {item.productCount || 0} Essence{item.productCount !== 1 ? 's' : ''}
+                  </span>
+                </div>
+                <div>
+                  {formatDate(item.createdAt)}
+                </div>
+                <div className="actions justify-center">
                   <FiEdit className="action-icon-btn edit" size={18} onClick={() => handleEditCategory(item)} title="Edit Category" />
                   <RiDeleteBin6Line className="action-icon-btn delete" size={18} onClick={() => handleDeleteCategory(item._id)} title="Delete Category" />
                 </div>
@@ -177,11 +189,11 @@ function CategoriesPage() {
 
         <div className="catalog-table">
           <div className="tag-header-row">
-            <span>Tag Name</span>
-            <span>Description</span>
-            <span>Usage</span>
-            <span>Created At</span>
-            <span>Actions</span>
+            <div className="header-cell">Tag Name</div>
+            <div className="header-cell">Description</div>
+            <div>Usage</div>
+            <div>Created At</div>
+            <div className="text-center">Actions</div>
           </div>
 
           {tagLoading ? (
@@ -191,11 +203,21 @@ function CategoriesPage() {
           ) : (
             allTags.map((item) => (
               <div className="tag-body-row" key={item._id}>
-                <div className="product-cell"><span className="user-name">{item.name}</span></div>
-                <div className="description-cell"><p className="description-text-small truncate-multi" title={item.description}>{item.description || "No description."}</p></div>
-                <div className="count-cell"><span className="status-badge status-active">Active</span></div>
-                <div className="date-cell"><span>{formatDate(item.createdAt)}</span></div>
-                <div className="actions">
+                <div className="product-cell">
+                  <span className="user-name">{item.name}</span>
+                </div>
+                <div className="description-cell">
+                  <p className="description-text-small truncate-multi" style={{ margin: 0 }} title={item.description}>
+                    {item.description || "No description."}
+                  </p>
+                </div>
+                <div>
+                  <span className="status-badge status-active">Active</span>
+                </div>
+                <div>
+                  {formatDate(item.createdAt)}
+                </div>
+                <div className="actions justify-center">
                   <FiEdit className="action-icon-btn edit" size={18} onClick={() => handleEditTag(item)} title="Edit Tag" />
                   <RiDeleteBin6Line className="action-icon-btn delete" size={18} onClick={() => handleDeleteTag(item._id)} title="Delete Tag" />
                 </div>

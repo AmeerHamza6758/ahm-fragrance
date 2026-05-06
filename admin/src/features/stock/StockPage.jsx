@@ -123,7 +123,7 @@ function StockPage() {
           <div className="text-center">ML</div>
           <div className="text-center">Threshold</div>
           <div className="text-center">Stock Value</div>
-          <div className="header-cell">Last Restock</div>
+          <div className="text-center">Last Restock</div>
           <div className="text-center">Status</div>
           <div className="text-center">Actions</div>
         </div>
@@ -178,7 +178,7 @@ function StockPage() {
                    <span className="stock-value">Rs. {stockValue.toLocaleString()}</span>
                 </div>
 
-                <div className="restock-cell">
+                <div className="justify-center">
                   {formatDate(stock.lastRestockedAt)}
                 </div>
 

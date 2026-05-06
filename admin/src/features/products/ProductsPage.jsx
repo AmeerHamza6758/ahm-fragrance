@@ -193,12 +193,12 @@ function ProductsPage() {
 
       {/* Table */}
       <div className="catalog-table">
-        <div className="catalog-table-header">
-          <span>Product</span>
-          <span>Status</span>
-          <span>Category</span>
-          <span>Tags</span>
-          <span>Actions</span>
+        <div className="catalog-table-header product-grid-layout">
+          <div>Product</div>
+          <div className="text-center">Status</div>
+          <div className="text-center">Category</div>
+          <div className="text-center">Tags</div>
+          <div className="text-center">Actions</div>
         </div>
 
         {isLoading ? (
@@ -214,7 +214,7 @@ function ProductsPage() {
           <div className="empty-state">No products found.</div>
         ) : (
           products.map((item) => (
-            <div className="catalog-row" key={item._id}>
+            <div className="catalog-row product-grid-layout" key={item._id}>
               {/* Product */}
               <div className="product-cell">
                 <img 
@@ -224,14 +224,14 @@ function ProductsPage() {
                 <span>{item.name}</span>
               </div>
 
-              <div className="status-cell">
+              <div className="status-cell justify-center">
                 <span className="status-badge status-active">
                   Active
                 </span>
               </div>
-              <span>{item.category_id?.name || "Uncategorized"}</span>
+              <div className="text-center">{item.category_id?.name || "Uncategorized"}</div>
 
-              <div>
+              <div className="justify-center">
                 <span 
                   className="tag-center" 
                   style={getTagStyle(item.tag_id?.name)}

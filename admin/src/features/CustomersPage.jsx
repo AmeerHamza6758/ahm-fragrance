@@ -101,13 +101,13 @@ function CustomersPage() {
           </div>
 
           <div className="catalog-table">
-            <div className="catalog-table-header">
-              <span>Identity</span>
-              <span>Contact</span>
-              <span>Gender</span>
-              <span>Join Date</span>
-              <span>Verification</span>
-              <span>Actions</span>
+            <div className="catalog-table-header customer-grid-layout">
+              <div className="header-cell">Identity</div>
+              <div className="header-cell">Contact</div>
+              <div className="text-center">Gender</div>
+              <div className="text-center">Join Date</div>
+              <div className="text-center">Verification</div>
+              <div className="text-center">Actions</div>
             </div>
 
             {usersLoading ? (
@@ -118,31 +118,33 @@ function CustomersPage() {
               <div className="empty-state">No customers found.</div>
             ) : (
               users.map((user) => (
-                <div className="catalog-row" key={user._id}>
+                <div className="catalog-row customer-grid-layout" key={user._id}>
                   <div className="product-cell">
                     <div className="user-info-stack">
-                      <span className="user-name">{user.userName}</span>
+                      <span className="user-name truncate" title={user.userName}>{user.userName}</span>
                       {user.isCircleMember && (
-                        <span className="mini-pill">Fragrance Circle</span>
+                        <div className="justify-start">
+                          <span className="mini-pill">Fragrance Circle</span>
+                        </div>
                       )}
                     </div>
                   </div>
 
                   <div className="contact-cell">
-                    <span className="user-email">{user.email}</span>
+                    <span className="user-email truncate" title={user.email}>{user.email}</span>
                     <span className="user-phone">{user.phone || "---"}</span>
                   </div>
 
-                  <span className="capitalize">{user.gender || "N/A"}</span>
-                  <span>{formatDate(user.createdAt)}</span>
+                  <div className="capitalize justify-center">{user.gender || "N/A"}</div>
+                  <div className="justify-center">{formatDate(user.createdAt)}</div>
 
-                  <div className="status-cell">
+                  <div className="justify-center">
                     <span className={`status-pill ${user.isEmailVerified ? "active" : "inactive"}`}>
                       {user.isEmailVerified ? "Verified" : "Pending"}
                     </span>
                   </div>
 
-                  <div className="actions">
+                  <div className="actions justify-center">
                     <GrView
                       className="action-icon-btn view"
                       size={18}
@@ -184,13 +186,13 @@ function CustomersPage() {
           </div>
 
           <div className="catalog-table">
-            <div className="catalog-table-header" style={{ gridTemplateColumns: "1.5fr 2fr 1.5fr 3fr 1.2fr 0.6fr" }}>
-              <span>Name</span>
-              <span>Email</span>
-              <span>Subject</span>
-              <span>Message Snippet</span>
-              <span>Received On</span>
-              <span>Actions</span>
+            <div className="catalog-table-header contact-grid-layout">
+              <div className="header-cell">Name</div>
+              <div className="header-cell">Email</div>
+              <div className="header-cell">Subject</div>
+              <div className="header-cell">Message Snippet</div>
+              <div className="text-center">Received On</div>
+              <div className="text-center">Actions</div>
             </div>
 
             {contactsLoading ? (
@@ -199,15 +201,17 @@ function CustomersPage() {
               <div className="empty-state">No new inquiries to display.</div>
             ) : (
               contacts.map((contact) => (
-                <div className="catalog-row" key={contact._id} style={{ gridTemplateColumns: "1.5fr 2fr 1.5fr 3fr 1.2fr 0.6fr" }}>
-                  <span style={{ fontWeight: "700", color: "#1A1716" }}>{contact.name}</span>
-                  <span className="truncate" style={{ fontSize: '13px' }}>{contact.email}</span>
-                  <span style={{ fontWeight: '500' }}>{contact.subject || "No Subject"}</span>
-                  <span className="description-text-small truncate-multi" title={contact.message}>
-                    {contact.message}
-                  </span>
-                  <span>{formatDate(contact.createdAt)}</span>
-                  <div className="actions">
+                <div className="catalog-row contact-grid-layout" key={contact._id}>
+                  <div style={{ fontWeight: "700", color: "#1A1716" }}>{contact.name}</div>
+                  <div className="truncate" style={{ fontSize: '13px' }}>{contact.email}</div>
+                  <div style={{ fontWeight: '500' }}>{contact.subject || "No Subject"}</div>
+                  <div className="description-cell">
+                    <p className="description-text-small truncate-multi" style={{ margin: 0 }} title={contact.message}>
+                      {contact.message}
+                    </p>
+                  </div>
+                  <div className="justify-center">{formatDate(contact.createdAt)}</div>
+                  <div className="actions justify-center">
                     <RiDeleteBin6Line
                       className="action-icon-btn delete"
                       size={18}
@@ -243,10 +247,10 @@ function CustomersPage() {
           </div>
 
           <div className="catalog-table">
-            <div className="catalog-table-header" style={{ gridTemplateColumns: "1fr 1fr 0.5fr" }}>
-              <span>Subscriber Email</span>
-              <span>Joining Date</span>
-              <span>Actions</span>
+            <div className="catalog-table-header circle-grid-layout">
+              <div className="header-cell">Subscriber Email</div>
+              <div className="text-center">Joining Date</div>
+              <div className="text-center">Actions</div>
             </div>
 
             {circleLoading ? (
@@ -255,10 +259,10 @@ function CustomersPage() {
               <div className="empty-state">Your circle is currently empty.</div>
             ) : (
               circleMembers.map((member) => (
-                <div className="catalog-row" key={member._id} style={{ gridTemplateColumns: "1fr 1fr 0.5fr" }}>
-                  <span style={{ fontWeight: 700, color: "#1A1716" }}>{member.email}</span>
-                  <span>{formatDate(member.subscribedAt)}</span>
-                  <div className="actions">
+                <div className="catalog-row circle-grid-layout" key={member._id}>
+                  <div style={{ fontWeight: 700, color: "#1A1716" }}>{member.email}</div>
+                  <div className="justify-center">{formatDate(member.subscribedAt)}</div>
+                  <div className="actions justify-center">
                     <RiDeleteBin6Line
                       className="action-icon-btn delete"
                       size={18}

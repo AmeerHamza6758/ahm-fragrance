@@ -127,13 +127,13 @@ function OrdersPage() {
       {/* Table */}
       <div className="catalog-table">
         <div className="catalog-table-header order-grid-layout">
-          <span>Order Reference</span>
-          <span>Placed On</span>
-          <span>Customer</span>
-          <span>Grand Total</span>
-          <span className="text-center">Order Status</span>
-          <span className="text-center">Payment</span>
-          <span className="text-center">Actions</span>
+          <div>Order Reference</div>
+          <div className="text-center">Placed On</div>
+          <div>Customer</div>
+          <div className="text-center">Grand Total</div>
+          <div className="text-center">Order Status</div>
+          <div className="text-center">Payment</div>
+          <div className="text-center">Actions</div>
         </div>
 
         {isLoading ? (
@@ -153,16 +153,16 @@ function OrdersPage() {
               </div>
 
               {/* Date */}
-              <span>{formatDate(order.placedAt)}</span>
+              <div className="text-center">{formatDate(order.placedAt)}</div>
 
               {/* Customer */}
               <div className="customer-cell-order">
-                <span className="user-name">{order.customerInfo?.name || "Guest"}</span>
-                <span className="user-email">{order.customerInfo?.email}</span>
+                <span className="user-name truncate" title={order.customerInfo?.name || "Guest"}>{order.customerInfo?.name || "Guest"}</span>
+                <span className="user-email truncate" title={order.customerInfo?.email}>{order.customerInfo?.email}</span>
               </div>
 
               {/* Total */}
-              <span className="order-total-price">PKR {order.totalAmount?.toLocaleString()}</span>
+              <div className="order-total-price text-center">PKR {order.totalAmount?.toLocaleString()}</div>
 
               {/* Order Status */}
               <div className="status-cell justify-center">
