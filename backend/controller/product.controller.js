@@ -61,7 +61,7 @@ const productController = {
             });
 
             await product.save();
-            
+
             // ✅ Re-fetch product to ensure we have canonical IDs from the database
             const savedProduct = await Product.findById(product._id);
             if (!savedProduct) throw new Error("Failed to retrieve product after save");
@@ -69,11 +69,11 @@ const productController = {
             // ✅ Create initial stock entries for each variant
             if (savedProduct.variants && savedProduct.variants.length > 0) {
                 console.log(`[Stock Sync] Syncing ${savedProduct.variants.length} variants for: ${savedProduct.name}`);
-                
+
                 for (const v of savedProduct.variants) {
                     try {
                         console.log(`[Stock Sync] Creating entry for Variant: ${v.size} | ID: ${v._id} | ProductID: ${savedProduct._id}`);
-                        
+
                         await Stock.create({
                             productId: savedProduct._id,
                             variantId: v._id,
@@ -245,8 +245,18 @@ const productController = {
 
     deleteProduct: async (req, res) => {
         try {
-            const product = await Product.findByIdAndDelete(req.params.id);
+            const product = await Product.findById(req.params.id);
             if (!product) return res.status(404).json({ message: 'Product not found' });
+
+            // Delete associated images from the images collection
+            if (product.image_id && product.image_id.length > 0) {
+                await Images.imageModel.deleteMany({ _id: { $in: product.image_id } });
+            }
+
+            // Delete associated stock entries to maintain data integrity
+            await Stock.deleteMany({ productId: req.params.id });
+
+            await Product.findByIdAndDelete(req.params.id);
             res.json({ message: 'Product deleted successfully' });
         } catch (err) {
             res.status(400).json({ error: err.message });
