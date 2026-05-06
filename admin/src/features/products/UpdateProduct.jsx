@@ -7,10 +7,10 @@ import '/src/styles/admin.css';
 import { useGetProductById, useUpdateProduct } from '../../services/hooks/products';
 
 function UpdateProduct() {
-  const {id} = useParams(); 
-  console.log(id,"parameters");
-  
-  const { data: product, isLoading } = useGetProductById(id); 
+  const { id } = useParams();
+
+
+  const { data: product, isLoading } = useGetProductById(id);
   const { mutate: updateProduct } = useUpdateProduct();
 
   const [fileNames, setFileNames] = useState({
@@ -40,8 +40,8 @@ function UpdateProduct() {
   const handleSubmit = (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
-   console.log("Form Entries:", Object.fromEntries(formData.entries()));
-    
+    console.log("Form Entries:", Object.fromEntries(formData.entries()));
+
     // Update API call
     updateProduct({ id, data: formData });
   };
@@ -61,33 +61,33 @@ function UpdateProduct() {
           <div className="image-uploads-container">
             <div className="main-image-upload">
               <label htmlFor="primary-image" className="image-placeholder main-placeholder">
-                <LuImagePlus size={30} color="#7E525C"/>
+                <LuImagePlus size={30} color="#7E525C" />
                 <span className="placeholder-text">{fileNames.primary}</span>
-                <input 
-                  type="file" 
-                  name="primaryImage" 
-                  className="hidden-input" 
-                  id="primary-image" 
-                  accept="image/*" 
+                <input
+                  type="file"
+                  name="primaryImage"
+                  className="hidden-input"
+                  id="primary-image"
+                  accept="image/*"
                   onChange={(e) => handleFileChange(e, 'primary')}
                 />
               </label>
             </div>
-            
+
             <div className="secondary-images-row">
               {[1, 2].map((num) => (
                 <div key={num} className="secondary-image-upload">
                   <label htmlFor={`secondary-image-${num}`} className="image-placeholder secondary-placeholder">
                     <LuImagePlus size={20} color="#7E525C" />
-                    <span className="placeholder-text" style={{fontSize: '10px'}}>
+                    <span className="placeholder-text" style={{ fontSize: '10px' }}>
                       {num === 1 ? fileNames.secondary1 : fileNames.secondary2}
                     </span>
-                    <input 
-                      type="file" 
-                      name={`secondaryImage_${num}`} 
-                      className="hidden-input" 
-                      id={`secondary-image-${num}`} 
-                      accept="image/*" 
+                    <input
+                      type="file"
+                      name={`secondaryImage_${num}`}
+                      className="hidden-input"
+                      id={`secondary-image-${num}`}
+                      accept="image/*"
                       onChange={(e) => handleFileChange(e, num === 1 ? 'secondary1' : 'secondary2')}
                     />
                   </label>
@@ -103,21 +103,21 @@ function UpdateProduct() {
           <div className="form-fields-container">
             <div className="form-group">
               <label>Product Identity</label>
-              <input 
-                name="name" 
-                type="text" 
-                defaultValue={product?.data.name} 
-                className="styled-input" 
-                required 
+              <input
+                name="name"
+                type="text"
+                defaultValue={product?.data.name}
+                className="styled-input"
+                required
               />
             </div>
 
             <div className="form-group">
               <label>Fragrance Story</label>
-              <textarea 
-                name="story" 
-                defaultValue={product?.data.description} 
-                className="styled-input styled-textarea" 
+              <textarea
+                name="story"
+                defaultValue={product?.data.description}
+                className="styled-input styled-textarea"
                 rows="4"
               ></textarea>
             </div>
@@ -162,7 +162,7 @@ function UpdateProduct() {
 
             <div className="form-actions-section">
               <button type="submit" className="publish-btn">
-                <MdOutlineFileUpload size={20} color="#FFFFFF"/>
+                <MdOutlineFileUpload size={20} color="#FFFFFF" />
                 Update Product
               </button>
             </div>
