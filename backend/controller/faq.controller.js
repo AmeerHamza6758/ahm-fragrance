@@ -66,7 +66,7 @@ const faqController = {
 
     updateFaq: async (req, res) => {
         try {
-            const { id } = req.query;
+            const { id } = req.params;
             const { question, answer } = req.body;
 
             const faq = await Faq.findById(id);
@@ -88,7 +88,7 @@ const faqController = {
 
     deleteFaq: async (req, res) => {
         try {
-            const { id } = req.query;
+            const { id } = req.params;
 
             const faq = await Faq.findById(id);
 

@@ -86,7 +86,7 @@ function FaqPage() {
     const result = await confirmationPopup("Delete this FAQ query permanently?");
     if (result.isConfirmed) {
       try {
-        await faqApi.delete(id);
+        await faqApi.remove(id);
         setFaqData((prev) => prev.filter((faq) => faq._id !== id));
         successToaster("FAQ removed.");
       } catch (err) {

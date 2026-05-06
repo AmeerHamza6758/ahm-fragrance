@@ -61,8 +61,8 @@ export const stockApi = {
 export const faqApi = {
   list: () => http.get("/api/faq/getAllFaq"),
   create: (payload) => http.post("/api/faq/addFaq", payload),
-  update: (id, payload) => http.put(`/api/faq/updateFaq?id=${id}`, payload),
-  remove: (id) => http.delete(`/api/faq/deleteFaq?id=${id}`),
+  update: (id, payload) => http.put(`/api/faq/updateFaq/${id}`, payload),
+  remove: (id) => http.delete(`/api/faq/deleteFaq/${id}`),
 };
 
 export const cmsApi = {
