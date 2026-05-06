@@ -8,6 +8,8 @@ import { useGetProductById, useUpdateProduct } from '../../services/hooks/produc
 
 function UpdateProduct() {
   const { id } = useParams();
+  (id, "parameters");
+
   console.log(id, "parameters");
 
   const { data: product, isLoading } = useGetProductById(id);
