@@ -167,7 +167,7 @@ const getStock = async (req, res) => {
 
     // CASE 1: Get specific product stock details (returns all variant stocks for that product)
     if (productId) {
-      const product = await Product.findById(productId).populate('category_id', 'name');
+      const product = await Product.findById(productId).populate('category_id', 'name').populate('image_id');
       if (!product) return res.status(404).json({ success: false, message: 'Product not found' });
 
       const variants = product.variants || [];
@@ -192,10 +192,24 @@ const getStock = async (req, res) => {
           stockHistory: s?.stockHistory || []
         };
       }));
+      
+      const baseUrl = (process.env.API_BASE_URL || 'http://localhost:4000').replace(/\/+$/, "");
+      const processedStockDetails = stockDetails.map(s => {
+        if (s.productId && s.productId.images) {
+          s.productId.images = s.productId.images.map(img => {
+            if (img.path) {
+              const normalizedPath = img.path.replace(/\\/g, "/").replace(/^publics?\//, "");
+              img.url = `${baseUrl}/${normalizedPath}`;
+            }
+            return img;
+          });
+        }
+        return s;
+      });
 
       return res.status(200).json({
         success: true,
-        data: stockDetails,
+        data: processedStockDetails,
         pagination: { totalItems: stockDetails.length, totalPages: 1, currentPage: 1 }
       });
     }
@@ -217,6 +231,14 @@ const getStock = async (req, res) => {
         }
       },
       { $unwind: { path: '$category', preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: 'images',
+          localField: 'image_id',
+          foreignField: '_id',
+          as: 'images'
+        }
+      },
       { $unwind: { path: '$variants', preserveNullAndEmptyArrays: true } },
       {
         $lookup: {
@@ -234,7 +256,7 @@ const getStock = async (req, res) => {
           productId: {
             _id: '$_id',
             name: '$name',
-            images: '$image_id',
+            images: '$images',
             category: '$category.name'
           },
           variantId: '$variants._id',
@@ -299,9 +321,23 @@ const getStock = async (req, res) => {
 
     const summary = summaryRes.length > 0 ? summaryRes[0] : { total: 0, lowStock: 0, outOfStock: 0 };
 
+    const baseUrl = (process.env.API_BASE_URL || 'http://localhost:4000').replace(/\/+$/, "");
+    const processedStocks = stocks.map(s => {
+      if (s.productId && s.productId.images) {
+        s.productId.images = s.productId.images.map(img => {
+          if (img.path) {
+            const normalizedPath = img.path.replace(/\\/g, "/").replace(/^publics?\//, "");
+            img.url = `${baseUrl}/${normalizedPath}`;
+          }
+          return img;
+        });
+      }
+      return s;
+    });
+
     return res.status(200).json({
       success: true,
-      data: stocks,
+      data: processedStocks,
       pagination: {
         currentPage: pPage,
         totalPages: Math.ceil(totalEntries / pLimit),
