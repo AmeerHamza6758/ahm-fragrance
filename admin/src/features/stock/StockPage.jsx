@@ -120,7 +120,7 @@ function StockPage() {
         <div className="catalog-table-header stock-registry-grid-layout">
           <div className="header-cell">Product & Category</div>
           <div className="text-center">Inventory</div>
-          <div className="text-center">Reserved</div>
+          <div className="text-center">ML</div>
           <div className="text-center">Threshold</div>
           <div className="text-center">Stock Value</div>
           <div className="header-cell">Last Restock</div>
@@ -156,9 +156,6 @@ function StockPage() {
                     <span className="user-name">{stock.productId?.name || "Unknown Product"}</span>
                     <div className="product-meta-tags">
                        <span className="meta-tag category">{stock.productId?.category || 'N/A'}</span>
-                       {stock.variantSize && (
-                         <span className="meta-tag variant">{stock.variantSize}</span>
-                       )}
                     </div>
                   </div>
                 </div>
@@ -170,7 +167,7 @@ function StockPage() {
                 </div>
 
                 <div className="text-center">
-                   <span className="reserved-count">{stock.reservedQuantity || 0}</span>
+                   <span className="reserved-count">{stock.variantSize || 'N/A'}</span>
                 </div>
 
                 <div className="text-center">

@@ -149,9 +149,9 @@ function AnalyticPage() {
                            <span>{item.refunded} </span>
                            <span>{item.deliverd} </span>
                            <span className='paid-status'>PROCESSED</span>
-                           <span>{item.gross} </span>
-                           <span>{item.refunds} </span>
-                           <span style={{ fontWeight: 600 }}>{item.net} </span>
+                           <span>{(item.gross || 0).toLocaleString()} </span>
+                           <span>{(item.refunds || 0).toLocaleString()} </span>
+                           <span style={{ fontWeight: 600 }}>{(item.net || 0).toLocaleString()} </span>
                         </div>  
                     ))
                 )}      

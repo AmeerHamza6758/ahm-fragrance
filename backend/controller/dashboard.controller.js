@@ -119,9 +119,9 @@ const dashboardController = {
         order: d.totalOrders,
         refunded: d.refundedOrders,
         deliverd: d.deliveredOrders,
-        gross: d.grossRevenue.toLocaleString(),
-        refunds: d.refundsAmount.toLocaleString(),
-        net: (d.grossRevenue - d.refundsAmount).toLocaleString()
+        gross: d.grossRevenue,
+        refunds: d.refundsAmount,
+        net: d.grossRevenue - d.refundsAmount
       }));
 
       res.json({

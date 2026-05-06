@@ -196,7 +196,6 @@ function ProductsPage() {
         <div className="catalog-table-header">
           <span>Product</span>
           <span>Status</span>
-          <span>Price</span>
           <span>Category</span>
           <span>Tags</span>
           <span>Actions</span>
@@ -230,7 +229,6 @@ function ProductsPage() {
                   Active
                 </span>
               </div>
-              <span>PKR {item.variants?.[0]?.price || "N/A"}</span>
               <span>{item.category_id?.name || "Uncategorized"}</span>
 
               <div>

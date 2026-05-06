@@ -119,8 +119,8 @@ function ViewStockDetails() {
                           <span className="value">Rs. {(entry.quantity * (entry.variantPrice || 0)).toLocaleString()}</span>
                         </div>
                         <div className="stat-item">
-                          <label>Reserved</label>
-                          <span className="value">{entry.reservedQuantity || 0}</span>
+                          <label>ML</label>
+                          <span className="value">{entry.variantSize || 'N/A'}</span>
                         </div>
                         <div className="stat-item">
                           <label>Threshold</label>
