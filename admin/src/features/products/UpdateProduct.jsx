@@ -8,7 +8,7 @@ import { useGetProductById, useUpdateProduct } from '../../services/hooks/produc
 
 function UpdateProduct() {
   const { id } = useParams();
-
+  console.log(id, "parameters");
 
   const { data: product, isLoading } = useGetProductById(id);
   const { mutate: updateProduct } = useUpdateProduct();
