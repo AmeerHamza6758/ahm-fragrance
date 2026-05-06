@@ -2,10 +2,8 @@ import React, { useState } from "react";
 import "../../styles/admin.css";
 import Pagination from "../../components/Pagination";
 import Loader from "../../components/Loader";
-import { useGetStock, useManageStock } from "../../services/hooks/stock";
-import { FiEdit } from "react-icons/fi";
+import { useGetStock } from "../../services/hooks/stock";
 import { GrView } from "react-icons/gr";
-import { IoClose } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import { API_BASE_URL } from "../../services/http";
 
@@ -14,13 +12,9 @@ function StockPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState("");
   const [search, setSearch] = useState("");
-  const [editingStock, setEditingStock] = useState(null); // {productId, name, currentQuantity}
-  const [updateAmount, setUpdateAmount] = useState("");
-  const [operation, setOperation] = useState("add");
   const entriesPerPage = 10;
 
   const { data: stockRes, isLoading, isError } = useGetStock(currentPage, entriesPerPage, statusFilter, search);
-  const manageStockMutation = useManageStock();
 
   const stocks = stockRes?.data?.data || [];
   const summary = stockRes?.data?.summary || { total: 0, lowStock: 0, outOfStock: 0 };
@@ -31,24 +25,7 @@ function StockPage() {
     setCurrentPage(page);
   };
 
-  const [reason, setReason] = useState("");
 
-  const handleUpdateStock = () => {
-    if (!updateAmount || isNaN(updateAmount)) return;
-    
-    manageStockMutation.mutate({
-      productId: editingStock.productId,
-      quantity: parseInt(updateAmount),
-      operation: operation,
-      reason: reason || "manual_admin_update"
-    }, {
-      onSuccess: () => {
-        setEditingStock(null);
-        setUpdateAmount("");
-        setReason("");
-      }
-    });
-  };
 
   const formatDate = (dateString) => {
     if (!dateString) return "Never";
@@ -195,19 +172,6 @@ function StockPage() {
                     onClick={() => navigate(`/stock/view/${stock.productId?._id}`)}
                     title="View Details"
                   />
-                  <FiEdit
-                    className="action-icon-btn edit"
-                    size={18}
-                    onClick={() => setEditingStock({
-                      productId: stock.productId?._id,
-                      name: stock.productId?.name,
-                      currentQuantity: stock.quantity,
-                      variants: stock.productId?.variants,
-                      variantId: stock.variantId,
-                      variantSize: stock.variantSize
-                    })}
-                    title="Quick Update"
-                  />
                 </div>
               </div>
             );
@@ -226,73 +190,6 @@ function StockPage() {
         )}
       </div>
 
-      {/* Stock Management Modal */}
-      {editingStock && (
-        <div className="stock-modal-overlay">
-          <div className="stock-modal">
-            <div className="modal-header">
-              <h3>Manage Inventory</h3>
-              <IoClose 
-                size={24} 
-                className="close-icon" 
-                onClick={() => setEditingStock(null)} 
-              />
-            </div>
-            <div className="modal-body">
-              <div className="product-summary">
-                <label>Fragrance</label>
-                <p>{editingStock.name}</p>
-                <label>Current Stock</label>
-                <p>{editingStock.currentQuantity} Units</p>
-              </div>
-
-              <div className="management-controls">
-                <div className="op-toggle">
-                  <button 
-                    className={operation === 'add' ? 'active' : ''} 
-                    onClick={() => setOperation('add')}
-                  >Add Stock</button>
-                  <button 
-                    className={operation === 'deduct' ? 'active' : ''} 
-                    onClick={() => setOperation('deduct')}
-                  >Deduct Stock</button>
-                </div>
-                
-                <div className="input-row">
-                   <div className="input-group">
-                    <label>Quantity</label>
-                    <input 
-                      type="number"
-                      placeholder="e.g. 50"
-                      className="styled-input"
-                      value={updateAmount}
-                      onChange={(e) => setUpdateAmount(e.target.value)}
-                    />
-                  </div>
-                  <div className="input-group">
-                    <label>Reason</label>
-                    <input 
-                      type="text"
-                      placeholder="e.g. Restock"
-                      className="styled-input"
-                      value={reason}
-                      onChange={(e) => setReason(e.target.value)}
-                    />
-                  </div>
-                </div>
-
-                <button 
-                  className="save-btn"
-                  onClick={handleUpdateStock}
-                  disabled={manageStockMutation.isPending}
-                >
-                  {manageStockMutation.isPending ? "Updating..." : "Confirm Update"}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
