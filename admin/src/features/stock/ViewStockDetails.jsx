@@ -62,7 +62,9 @@ function ViewStockDetails() {
   };
 
   const productImg = product?.images?.[0]?.url || 
-    (product?.images?.[0]?.path ? `${API_BASE_URL}/${product.images[0].path.replace(/\\/g, '/')}` : null);
+    (product?.images?.[0]?.path 
+      ? `${API_BASE_URL}/${product.images[0].path.replace(/\\/g, "/").replace(/^publics?\//, "")}` 
+      : null);
 
   return (
     <div className="stock-details-container">

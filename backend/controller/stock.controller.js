@@ -167,7 +167,7 @@ const getStock = async (req, res) => {
 
     // CASE 1: Get specific product stock details (returns all variant stocks for that product)
     if (productId) {
-      const product = await Product.findById(productId).populate('category_id', 'name').populate('image_id');
+      const product = await Product.findById(productId).populate('category_id', 'name').populate('image_id').lean();
       if (!product) return res.status(404).json({ success: false, message: 'Product not found' });
 
       const variants = product.variants || [];
