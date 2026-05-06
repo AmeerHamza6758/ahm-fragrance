@@ -1,8 +1,5 @@
 import { getCMSContent } from "@/lib/api/endpoints/cms";
 import Image from "next/image";
-import icon_truck from "/public/icons/shipping-truck-icon.svg";
-import icon_clock from "/public/icons/shipping-clock-icon.svg";
-import icon_badge from "/public/icons/shipping-returns-badge-icon.svg";
 
 export default async function ShippingReturnsPage() {
   const data = await getCMSContent('shipping-returns').catch(() => null);
@@ -38,7 +35,7 @@ export default async function ShippingReturnsPage() {
               <div className="shipping-info-card">
                 <div className="shipping-info-heading">
                   <span className="shipping-info-heading-icon">
-                    <Image src={icon_truck} alt="Truck Icon" width={24} height={24} />
+                    <Image src="/Icons/shipping-truck-icon.svg" alt="Truck Icon" width={24} height={24} />
                   </span>
                   <h2 className="shipping-info-title">The Journey</h2>
                 </div>
@@ -51,7 +48,7 @@ export default async function ShippingReturnsPage() {
                 <div className="shipping-info-points">
                   <div className="shipping-info-point">
                     <span className="shipping-info-point-icon">
-                      <Image src={icon_clock} alt="Clock Icon" width={20} height={20} />
+                      <Image src="/Icons/shipping-clock-icon.svg" alt="Clock Icon" width={20} height={20} />
                     </span>
                     <div>
                       <h4 className="shipping-info-point-title">Express Delivery</h4>
@@ -61,7 +58,7 @@ export default async function ShippingReturnsPage() {
 
                   <div className="shipping-info-point">
                     <span className="shipping-info-point-icon">
-                      <Image src={icon_badge} alt="Badge Icon" width={20} height={20} />
+                      <Image src="/Icons/shipping-returns-badge-icon.svg" alt="Badge Icon" width={20} height={20} />
                     </span>
                     <div>
                       <h4 className="shipping-info-point-title">Quality Assurance</h4>

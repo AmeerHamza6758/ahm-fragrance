@@ -11,6 +11,12 @@ const nextConfig = {
         port: parsedApiUrl.port || "",
         pathname: "/**",
       },
+      // Production backend (explicit allow-list)
+      {
+        protocol: "https",
+        hostname: "api.ahmfragrances.com",
+        pathname: "/**",
+      },
     ],
   },
 };
