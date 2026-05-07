@@ -61,6 +61,11 @@ export interface ResetPasswordPayload {
   newPassword: string;
 }
 
+export interface UpdatePasswordPayload {
+  oldPassword: string;
+  newPassword: string;
+}
+
 export interface UpdateProfilePayload {
   userName?: string;
   phone?: string;
@@ -176,5 +181,13 @@ export const getProfile = async (id: string): Promise<UserResponse> => {
  */
 export const updateProfile = async (payload: UpdateProfilePayload) => {
   const { data } = await apiClient.put("/api/auth/update-profile", payload);
+  return data;
+};
+
+/**
+ * PUT /api/auth/update-password — Update current user password
+ */
+export const updatePassword = async (payload: UpdatePasswordPayload) => {
+  const { data } = await apiClient.put("/api/auth/update-password", payload);
   return data;
 };

@@ -1,7 +1,4 @@
-/**
- * useAuth Hook
- * React Query mutations for signIn, signUp, OTP verification, and password reset
- */
+
 
 import {
   signIn,
@@ -13,6 +10,7 @@ import {
   resetPassword,
   getProfile,
   updateProfile,
+  updatePassword,
   SignInPayload,
   SignUpPayload,
   VerifyEmailOtpPayload,
@@ -22,6 +20,7 @@ import {
   VerifyPasswordResetOtpResult,
   ResetPasswordPayload,
   UpdateProfilePayload,
+  UpdatePasswordPayload,
   UserResponse,
   AuthResult,
 } from "../endpoints/auth";
@@ -84,5 +83,11 @@ export const useUpdateProfile = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["profile"] });
     },
+  });
+};
+
+export const useUpdatePassword = () => {
+  return useMutation({
+    mutationFn: (payload: UpdatePasswordPayload) => updatePassword(payload),
   });
 };
