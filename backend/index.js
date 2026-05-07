@@ -11,12 +11,21 @@ const { imageModel } = require("./models/images.model");
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/images', express.static(path.join(__dirname, 'publics/images')));
 
-
 // Middleware
+app.use(cors({
+  origin: [
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "https://ahmfragrances.com",
+    "https://www.ahmfragrances.com",
+    "https://admin.ahmfragrances.com"
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+  credentials: true
+}));
+
 app.use(express.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-app.use(cors());
+app.use(express.urlencoded({ extended: true }));
 app.use(express.static("publics"))
 
 // Routes
@@ -35,12 +44,6 @@ app.use("/api/cms", require("./router/cms.router"));
 app.use("/api/dashboard", require("./router/dashboard.router"));
 app.use("/api/contact", require("./router/contact.router"));
 app.use("/api/circle", require("./router/circle.router"));
-
-
-
-
-
-
 
 // multer
 const storage = multer.diskStorage({
