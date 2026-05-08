@@ -1,7 +1,6 @@
 import { getCMSContent } from "@/lib/api/endpoints/cms";
 import Image from "next/image";
 import about_bg from "/public/Images/Background.jpg.jpeg";
-import { notFound } from "next/navigation";
 
 export default async function AboutUsPage() {
   const data = await getCMSContent('about-us');
@@ -69,8 +68,8 @@ export default async function AboutUsPage() {
               designed to evoke memories and inspire confidence.
             </p>
             <blockquote className="italic border-l-4 border-[#7e525c] pl-6 py-2 my-10 text-xl text-[#7e525c]">
-              "Luxury shouldn't be a distant dream. It should be the essence you 
-              carry with you every day."
+              &quot;Luxury shouldn&apos;t be a distant dream. It should be the essence you
+              carry with you every day.&quot;
             </blockquote>
             <p>
               Our commitment to excellence extends beyond the fragrance itself. From
@@ -103,7 +102,7 @@ export default async function AboutUsPage() {
           />
           <PromiseCard 
             title="7-Day Return" 
-            desc="Hassle-free returns if our scent doesn’t speak to you."
+            desc="Hassle-free returns if our scent doesn&apos;t speak to you."
             icon={<path d="M12 11v4m0 0l2-2m-2 2l-2-2" />}
           />
           <PromiseCard 

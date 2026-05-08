@@ -7,6 +7,9 @@
 **/coverage/
 **/*.tsbuildinfo
 
+# ---- Backend generated/public assets ----
+backend/public/
+
 # ---- Logs ----
 **/*.log
 npm-debug.log*

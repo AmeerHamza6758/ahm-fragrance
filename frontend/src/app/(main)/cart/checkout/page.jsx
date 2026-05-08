@@ -1,10 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useGetCart, useCreateOrder } from "@/lib/api";
 import { buildProductImageUrl } from "@/lib/utils/imageUrl";
+import { getCartSnapshot } from "@/lib/cart/getCartSnapshot";
 import {
   getStoredCheckoutProfile,
   saveCheckoutProfile,
@@ -13,10 +15,12 @@ import {
 export default function CheckoutPage() {
   const { data: cartData } = useGetCart();
   const { mutate: placeOrder, isPending: isPlacingOrder } = useCreateOrder();
+  const router = useRouter();
 
-  const cartItems = Array.isArray(cartData)
-    ? cartData
-    : (cartData?.items ?? cartData?.data?.items ?? []);
+  const cartSnapshot = getCartSnapshot(cartData);
+  const cartItems = cartSnapshot.items;
+  const deliveryCharges = cartSnapshot.deliveryCharges;
+  const hasOutOfStock = cartSnapshot.hasOutOfStock;
 
   // const [promoCode, setPromoCode] = useState("");
   const [form, setForm] = useState(() => ({
@@ -27,12 +31,23 @@ export default function CheckoutPage() {
   const [orderData, setOrderData] = useState(null);
   const [orderError, setOrderError] = useState("");
 
-  const subtotal = cartItems.reduce(
+  const computedSubtotal = cartItems.reduce(
     (sum, item) =>
       sum + (item.price ?? item.productId?.price ?? 0) * (item.quantity ?? 1),
     0,
   );
-  const total = subtotal;
+  const subtotal = cartSnapshot.subtotal ?? computedSubtotal;
+  const total = cartSnapshot.totalAmount ?? subtotal + deliveryCharges;
+
+  useEffect(() => {
+    if (cartItems.length === 0) {
+      router.replace("/cart");
+      return;
+    }
+    if (hasOutOfStock) {
+      router.replace("/cart");
+    }
+  }, [cartItems.length, hasOutOfStock, router]);
 
   const handleInput = (e) => {
     const { name, value, type, checked } = e.target;
@@ -48,6 +63,16 @@ export default function CheckoutPage() {
 
   const handleOrder = (e) => {
     e.preventDefault();
+    if (cartItems.length === 0) {
+      setOrderError("Your cart is empty. Please add products before checkout.");
+      return;
+    }
+    if (hasOutOfStock) {
+      setOrderError(
+        "Some items in your cart are out of stock. Please update your cart before placing an order.",
+      );
+      return;
+    }
     if (!form.agreed) return;
     setOrderError("");
 
@@ -374,20 +399,7 @@ export default function CheckoutPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#FDF9F5] pt-10 pb-16 px-4 md:px-8">
-      {/* Breadcrumb */}
-      {/* <div className="max-w-5xl mx-auto mb-8">
-        <p className="text-[10px] tracking-[0.18em] font-semibold text-[#6b6460] uppercase flex items-center gap-2">
-          <Link href="/cart" className="hover:text-[#7e525c] transition">
-            CART
-          </Link>
-          <span className="text-[#b8a9a7]">&rsaquo;</span>
-          <span className="text-[#7e525c]">DETAILS</span>
-          <span className="text-[#b8a9a7]">&rsaquo;</span>
-          <span>CONFIRMED</span>
-        </p>
-      </div> */}
-
+    <main className="min-h-screen bg-[#FDF9F5] pt-6 sm:pt-10 pb-10 sm:pb-16 px-4 md:px-8">
       {/* Step Indicator */}
       <div className="max-w-5xl mx-auto mb-12">
         <div className="flex items-center justify-center gap-0 relative">
@@ -710,40 +722,11 @@ export default function CheckoutPage() {
               </span>
             </div>
             <div className="flex items-center justify-between text-sm">
-              <span className="text-[#6b6460]">Shipping</span>
-              <span className="inline-flex items-center gap-1 bg-[#f5f0eb] text-[#7e525c] text-[10px] tracking-widest font-bold px-3 py-1 rounded-full uppercase">
-                <svg width="12" height="12" fill="none" viewBox="0 0 24 24">
-                  <rect
-                    x="2"
-                    y="7"
-                    width="15"
-                    height="11"
-                    rx="2"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                  />
-                  <path
-                    d="M17 11h2l3 4v2h-5V11z"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinejoin="round"
-                  />
-                  <circle
-                    cx="7"
-                    cy="19"
-                    r="1.5"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                  />
-                  <circle
-                    cx="17"
-                    cy="19"
-                    r="1.5"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                  />
-                </svg>
-                COD
+              <span className="text-[#6b6460]">Delivery Charges</span>
+              <span className="font-semibold text-[#1c1c19]">
+                {deliveryCharges > 0
+                  ? `PKR ${deliveryCharges.toLocaleString()}`
+                  : "Free"}
               </span>
             </div>
             <div className="flex items-center justify-between pt-3 border-t border-[#ede9e4]">

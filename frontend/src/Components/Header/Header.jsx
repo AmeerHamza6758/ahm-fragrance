@@ -7,6 +7,7 @@ import { queryClient, useFavorites, useGetCart } from "@/lib/api";
 import { useEffect, useState } from "react";
 import logo from "@/public/golden logo.png"
 import Image from "next/image";
+import { getCartSnapshot } from "@/lib/cart/getCartSnapshot";
 export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
@@ -20,9 +21,7 @@ export default function Header() {
     return pathname === href ? "active" : "";
   };
 
-  const cartItems = Array.isArray(cartData)
-    ? cartData
-    : (cartData?.items ?? cartData?.data?.items ?? []);
+  const cartItems = getCartSnapshot(cartData).items;
   const cartCount = cartItems.reduce(
     (sum, item) => sum + (item.quantity ?? 1),
     0,

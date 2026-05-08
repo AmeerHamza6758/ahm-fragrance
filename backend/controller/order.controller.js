@@ -77,8 +77,8 @@ const getCheckoutSummary = async (req, res) => {
       data: {
         items,
         subtotal,
-        deliveryCharges: 0, // Free delivery as per your terms
-        totalAmount: subtotal,
+        deliveryCharges: 150,
+        totalAmount: subtotal + 150,
         cartItemCount: cartItems.length
       }
     });

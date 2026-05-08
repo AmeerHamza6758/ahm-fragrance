@@ -63,7 +63,7 @@ export default function WomensPage() {
   return (
     <main className="bg-background min-h-screen pt-6 pb-10 md:pt-10 md:pb-16">
       <section className="text-center pb-4 px-4">
-        <h1 className="text-[#7E525C] text-5xl sm:text-6xl md:text-7xl font-noto font-normal">
+        <h1 className="text-[#7E525C] text-4xl sm:text-5xl md:text-6xl font-noto font-normal">
           For Women
         </h1>
         <div className="flex items-center justify-center gap-3 mt-3">

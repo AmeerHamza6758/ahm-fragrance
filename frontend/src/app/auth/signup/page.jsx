@@ -87,7 +87,6 @@ export default function SignupPage() {
     if (touched[name]) {
       setErrors((prev) => ({ ...prev, [name]: validate(name, value, nextForm) }));
     }
-    // Cross-validate confirmPassword when password changes
     if (name === "password" && touched.confirmPassword) {
       setErrors((prev) => ({
         ...prev,
@@ -104,7 +103,6 @@ export default function SignupPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
     // Validate all fields
     const newErrors = {};
     Object.keys(form).forEach((key) => {

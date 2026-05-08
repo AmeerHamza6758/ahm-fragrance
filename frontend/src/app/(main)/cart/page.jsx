@@ -1,8 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { X, Minus, Plus } from "lucide-react";
-import { useState, useEffect } from "react";
+import { X } from "lucide-react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import truck_icon from "/public/Icons/product-details-truck-icon.svg";
 import cash_icon from "/public/Icons/product-details-cash-icon.svg";
@@ -11,6 +11,7 @@ import { useGetCart, useRemoveFromCart } from "@/lib/api";
 import { buildProductImageUrl } from "@/lib/utils/imageUrl";
 import { Handbag } from 'lucide-react';
 import Loader from "@/Components/Loader/Loader";
+import { getCartSnapshot } from "@/lib/cart/getCartSnapshot";
 
 
 export default function CartPage() {
@@ -20,31 +21,27 @@ export default function CartPage() {
   const [discount] = useState(0);
   const router = useRouter();
 
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const cartSnapshot = getCartSnapshot(cartData);
+  const cartItems = cartSnapshot.items;
+  const deliveryCharges = cartSnapshot.deliveryCharges;
+  const hasOutOfStock = cartSnapshot.hasOutOfStock;
 
-  const cartItems = Array.isArray(cartData)
-    ? cartData
-    : (cartData?.items ?? cartData?.data?.items ?? []);
-
-  const subtotal = cartItems.reduce(
+  const computedSubtotal = cartItems.reduce(
     (sum, item) =>
       sum + (item.price ?? item.productId?.price ?? 0) * (item.quantity ?? 1),
     0,
   );
- const deliveryCharges = 150; 
-const total = subtotal + deliveryCharges - discount;
 
-  if (!mounted) return <div className="min-h-screen bg-[#FDF9F5]" />;
+  const subtotal = cartSnapshot.subtotal ?? computedSubtotal;
+  const total =
+    cartSnapshot.totalAmount ?? subtotal + deliveryCharges - discount;
 
   return (
-    <main className="cart-page-main pt-10 pb-16 bg-[#FDF9F5]">
-      <section className="cart-section max-w-7xl mx-auto px-4 md:px-6">
+    <main className="min-h-screen bg-background pt-6 pb-10 md:pt-10 md:pb-16">
+      <section className="max-w-7xl mx-auto px-4 md:px-6">
         {/* Page Title Section */}
         <section className="text-center pb-12">
-          <h1 className="text-[#7E525C] text-5xl md:text-7xl font-serif font-normal">
+          <h1 className="text-[#7E525C] text-4xl sm:text-5xl md:text-6xl font-noto font-normal">
             Your Shopping Bag
           </h1>
           <div className="flex items-center justify-center gap-3 mt-6">
@@ -195,7 +192,9 @@ const total = subtotal + deliveryCharges - discount;
                     Shipping
                   </span>
                   <span className="text-[#7E525C] font-semibold ">
-                    150
+                    {deliveryCharges > 0
+                      ? `PKR ${deliveryCharges.toLocaleString()}`
+                      : "Free"}
                   </span>
                 </div>
 
@@ -212,8 +211,12 @@ const total = subtotal + deliveryCharges - discount;
               </div>
 
               <button
-                className="w-full mt-10 bg-[#7E525C] text-white py-5 rounded-full text-[10px] font-bold tracking-[3px] hover:bg-[#6a444d] transition-all uppercase"
-                onClick={() => router.push("/cart/checkout")}
+                disabled={cartLoading || cartItems.length === 0 || hasOutOfStock}
+                className="w-full mt-10 bg-[#7E525C] disabled:opacity-50 text-white py-5 rounded-full text-[10px] font-bold tracking-[3px] hover:bg-[#6a444d] transition-all uppercase"
+                onClick={() => {
+                  if (cartItems.length === 0 || hasOutOfStock) return;
+                  router.push("/cart/checkout");
+                }}
               >
                 PROCEED TO CHECKOUT
               </button>

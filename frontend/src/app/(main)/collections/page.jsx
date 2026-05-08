@@ -51,7 +51,7 @@ export default function CollectionsPage() {
   return (
     <main className="pt-6 pb-10 md:pt-10 md:pb-16">
       <section className="text-center pb-4 px-4">
-        <h1 className="text-[#7E525C] text-5xl sm:text-6xl md:text-7xl font-noto font-normal">
+        <h1 className="text-[#7E525C] text-4xl sm:text-5xl md:text-6xl font-noto font-normal">
           Our Collection
         </h1>
         <div className="flex items-center justify-center gap-3 mt-3">
@@ -65,18 +65,21 @@ export default function CollectionsPage() {
 
       {/* Category Cards */}
       <section className="mx-auto px-4 sm:px-6 py-8">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-8">
+        <div className="flex sm:grid sm:grid-cols-3 gap-4 sm:gap-8 overflow-x-auto sm:overflow-visible snap-x snap-mandatory -mx-4 px-4 sm:mx-0 sm:px-0">
           {[
             { img: img_1, title: "For Men" },
             { img: img_2, title: "For Women" },
             { img: img_3, title: "Best Sellers" },
           ].map((item, idx) => (
-            <div key={idx} className="relative overflow-hidden h-[220px] sm:h-[300px] w-full rounded-[32px_12px_32px_12px] sm:rounded-[48px_16px_48px_16px]">
+            <div
+              key={idx}
+              className="relative overflow-hidden h-[190px] sm:h-[300px] w-[82vw] max-w-[360px] sm:w-full sm:max-w-none shrink-0 snap-start rounded-[28px_12px_28px_12px] sm:rounded-[48px_16px_48px_16px]"
+            >
               <Image
                 src={item.img}
                 alt={item.title}
                 fill
-                sizes="(max-width: 639px) 100vw, 33vw"
+                sizes="(max-width: 639px) 85vw, 33vw"
                 className="object-cover object-center"
               />
               <div className="absolute bottom-6 left-6 flex flex-col items-start justify-start">

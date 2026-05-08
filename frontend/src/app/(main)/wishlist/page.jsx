@@ -81,23 +81,9 @@ export default function WishlistPage() {
 
   return (
     <main className="min-h-screen bg-background pt-6 pb-10 md:pt-10 md:pb-16 overflow-x-hidden">
-      {/* Breadcrumb */}
-      {/* <div className="mx-auto max-w-7xl px-18 p lg:px-8 md:px-6 sm:px-5">
-        <nav className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.9px] text-secondary/60 md:text-[10px] sm:flex-wrap sm:gap-2">
-          <Link href="/" className="hover:text-primary transition-colors">
-            HOME
-          </Link>
-
-          <span className="text-foreground/50">/</span>
-          <span className="text-primary font-semibold tracking-[1px]">
-            WISHLIST
-          </span>
-        </nav>
-      </div> */}
-
       {/* Page Title */}
       <section className="text-center pb-14 px-4 ">
-        <h1 className="text-[#7E525C] text-5xl sm:text-6xl md:text-7xl font-noto font-normal">
+        <h1 className="text-[#7E525C] text-4xl sm:text-5xl md:text-6xl font-noto font-normal">
           My Wishlist
         </h1>
         <div className="flex items-center justify-center gap-3 mt-4">
@@ -139,12 +125,12 @@ export default function WishlistPage() {
       {/* You May Also Like */}
       <div className="mx-auto max-w-7xl px-10 pb-32 lg:px-8 md:px-6 sm:px-5">
         {/* Header row */}
-        <div className="mb-12 flex flex-row items-end justify-between gap-6 w-full">
+        <div className="mb-12 flex flex-col md:flex-row items-center md:items-end justify-between gap-6 w-full">
           <div className="flex flex-col">
-            <h2 className="font-noto font-bold text-foreground mb-4 text-[24px] sm:text-[28px] md:text-[32px] lg:text-[36px] leading-tight">
+            <h2 className="font-noto font-bold text-foreground mb-4 text-lg sm:text-2xl md:text-3xl lg:text-4xl leading-tight">
               You May Also Like
             </h2>
-            <p className="text-sm text-muted">
+            <p className="text-xs sm:text-sm text-muted">
               Based on your refined preferences
             </p>
           </div>

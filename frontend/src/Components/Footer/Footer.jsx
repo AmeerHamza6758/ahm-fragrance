@@ -42,13 +42,13 @@ export default function Footer() {
 
         <div className="footer-col">
           <h4>Shop</h4>
-          <Link href="/mens">Men's Collection</Link>
-          <Link href="/womens">Women's Collection</Link>
+          <Link href="/mens">Men&apos;s Collection</Link>
+          <Link href="/womens">Women&apos;s Collection</Link>
           <Link href="/collections">Gift Sets</Link>
           <Link href="/collections">New Arrivals</Link>
         </div>
 
-        <div className="footer-col">
+        <div className="footer-col footer-company">
           <h4>Company</h4>
           <Link href="/about-us">About Us</Link>
           <Link href="/contact-us">Contact Us</Link>
@@ -57,7 +57,7 @@ export default function Footer() {
           <Link href="/company/shipping-returns">Shipping &amp; Returns</Link>
         </div>
 
-        <div className="footer-col">
+        <div className="footer-col footer-connect">
           <h4>Connect</h4>
           <a href="tel:03044524449">03044524449</a>
           <a href="mailto:ahmfragrance@gmail.com">ahmfragrance@gmail.com</a>
@@ -67,7 +67,7 @@ export default function Footer() {
           </div>
           
           <div className="mt-6">
-            <h4 className="!mb-3">Join Fragrance Circle</h4>
+            <h4 className="mb-3!">Join Fragrance Circle</h4>
             <form onSubmit={handleSubmit} className="flex flex-row items-center gap-0 max-w-[320px]">
               <input
                 type="email"
