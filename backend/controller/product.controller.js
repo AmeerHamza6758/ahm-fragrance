@@ -4,6 +4,8 @@ const Tag = require('../models/tag.model');
 const Images = require('../models/images.model');
 const Stock = require('../models/stock.model');
 const mongoose = require('mongoose');
+const fs = require('fs');
+const path = require('path');
 
 const formatError = (err) => {
     if (err.name === 'ValidationError') {
@@ -248,18 +250,37 @@ const productController = {
             const product = await Product.findById(req.params.id);
             if (!product) return res.status(404).json({ message: 'Product not found' });
 
-            // Delete associated images from the images collection
+            // 1. Delete associated physical image files and DB records
             if (product.image_id && product.image_id.length > 0) {
+                const imageDocs = await Images.imageModel.find({ _id: { $in: product.image_id } });
+                
+                for (const img of imageDocs) {
+                    if (img.path) {
+                        try {
+                            const fullPath = path.join(__dirname, '..', img.path);
+                            if (fs.existsSync(fullPath)) {
+                                fs.unlinkSync(fullPath);
+                            }
+                        } catch (fileErr) {
+                            console.error(`[File Cleanup] ❌ Failed to delete file: ${img.path}`, fileErr.message);
+                        }
+                    }
+                }
+                
+                // Delete image records from DB
                 await Images.imageModel.deleteMany({ _id: { $in: product.image_id } });
             }
 
-            // Delete associated stock entries to maintain data integrity
+            // 2. Delete associated stock entries to maintain data integrity
             await Stock.deleteMany({ productId: req.params.id });
 
+            // 3. Delete the product itself
             await Product.findByIdAndDelete(req.params.id);
-            res.json({ message: 'Product deleted successfully' });
+            
+            res.json({ message: 'Product and associated assets deleted successfully' });
         } catch (err) {
-            res.status(400).json({ error: err.message });
+            console.error("[DeleteProduct Error]", err);
+            res.status(400).json({ status: 0, message: err.message });
         }
     },
 
