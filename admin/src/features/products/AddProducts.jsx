@@ -85,6 +85,8 @@ function AddProducts() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (addProductMutation.isPending || addProductMutation.isSuccess) return;
     
     // 1. Client-side validation
     if (!productName.trim()) {
@@ -391,10 +393,10 @@ function AddProducts() {
               <button
                 type="submit"
                 className="publish-btn"
-                disabled={addProductMutation.isPending}
+                disabled={addProductMutation.isPending || addProductMutation.isSuccess}
               >
                 <MdOutlineFileUpload size={20} color="#FFFFFF" />
-                {addProductMutation.isPending ? "Publishing..." : "Publish Product"}
+                {addProductMutation.isSuccess ? "Redirecting..." : (addProductMutation.isPending ? "Publishing..." : "Publish Product")}
               </button>
             </div>
           </div>

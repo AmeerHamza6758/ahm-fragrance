@@ -10,7 +10,7 @@ import { errorToaster, successToaster, warningToaster } from "@/utils/alert-serv
 
 export default function LoginPage() {
   const router = useRouter();
-  const { mutate: signIn, isPending } = useSignIn();
+  const { mutate: signIn, isPending, isSuccess } = useSignIn();
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({ email: "", password: "" });
   const [touched, setTouched] = useState({});
@@ -50,6 +50,8 @@ export default function LoginPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (isPending || isSuccess) return;
 
     // Validate all fields
     const newErrors = {};
@@ -170,9 +172,9 @@ export default function LoginPage() {
           <button
             type="submit"
             className="w-full py-4 bg-[#7e525c] text-white rounded-full text-[16px] font-semibold tracking-wider font-sans shadow hover:bg-[#6b4350] transition-colors mt-2 disabled:opacity-60 disabled:cursor-not-allowed"
-            disabled={isPending}
+            disabled={isPending || isSuccess}
           >
-            {isPending ? "Signing in..." : "Sign In"}
+            {isSuccess ? "Redirecting..." : (isPending ? "Signing in..." : "Sign In")}
           </button>
         </form>
         <p className="text-center mt-8 text-[15px] text-[#a08a8a] font-sans">

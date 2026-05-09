@@ -13,9 +13,9 @@ function ResetPasswordInner() {
   const searchParams = useSearchParams();
   const email = searchParams.get("email") || "";
 
-  const { mutate: verifyOtp, isPending: isVerifying } =
+  const { mutate: verifyOtp, isPending: isVerifying, isSuccess: isVerifySuccess } =
     useVerifyPasswordResetOtp();
-  const { mutate: resetPwd, isPending: isResetting } = useResetPassword();
+  const { mutate: resetPwd, isPending: isResetting, isSuccess: isResetSuccess } = useResetPassword();
 
   // Step 1: verify OTP — Step 2: set new password
   const [step, setStep] = useState(1);
@@ -69,6 +69,7 @@ function ResetPasswordInner() {
 
   const handleVerifyOtp = (e) => {
     e.preventDefault();
+    if (isVerifying || isVerifySuccess) return;
     const otpCode = code.join("");
     if (otpCode.length !== 6) return;
     setOtpError("");
@@ -97,6 +98,7 @@ function ResetPasswordInner() {
 
   const handleResetPassword = (e) => {
     e.preventDefault();
+    if (isResetting || isResetSuccess) return;
     setPwdError("");
     if (newPassword !== confirmPassword) {
       setPwdError("Passwords do not match.");
@@ -109,7 +111,9 @@ function ResetPasswordInner() {
     resetPwd(
       { tempToken, newPassword },
       {
-        onSuccess: () => router.push("/auth/login?reset=success"),
+        onSuccess: () => {
+          router.push("/auth/login?reset=success");
+        },
         onError: (err) => {
           setPwdError(
             err?.response?.data?.message ??
@@ -188,10 +192,10 @@ function ResetPasswordInner() {
 
               <button
                 type="submit"
-                disabled={!isFull || isVerifying}
+                disabled={!isFull || isVerifying || isVerifySuccess}
                 className="w-full py-4 bg-[#7e525c] text-white rounded-full text-[16px] font-semibold tracking-wider font-sans shadow hover:bg-[#6b4350] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                {isVerifying ? "Verifying..." : "Verify Code"}
+                {isVerifySuccess ? "Success..." : (isVerifying ? "Verifying..." : "Verify Code")}
               </button>
             </form>
 
@@ -335,10 +339,10 @@ function ResetPasswordInner() {
 
               <button
                 type="submit"
-                disabled={isResetting || !newPassword || !confirmPassword}
+                disabled={isResetting || isResetSuccess || !newPassword || !confirmPassword}
                 className="w-full py-4 bg-[#7e525c] text-white rounded-full text-[16px] font-semibold tracking-wider font-sans shadow hover:bg-[#6b4350] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                {isResetting ? "Resetting..." : "Reset Password"}
+                {isResetSuccess ? "Redirecting..." : (isResetting ? "Resetting..." : "Reset Password")}
               </button>
             </form>
           </>

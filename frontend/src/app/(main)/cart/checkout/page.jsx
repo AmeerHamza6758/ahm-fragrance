@@ -68,6 +68,7 @@ export default function CheckoutPage() {
 
   const handleOrder = (e) => {
     e.preventDefault();
+    if (isPlacingOrder || orderPlaced) return;
     if (cartItems.length === 0) {
       setOrderError("Your cart is empty. Please add products before checkout.");
       return;
@@ -80,15 +81,6 @@ export default function CheckoutPage() {
     }
     if (!form.agreed) return;
     setOrderError("");
-
-    const token =
-      typeof window !== "undefined" ? localStorage.getItem("token") : null;
-    const profile = getStoredCheckoutProfile();
-
-    if (!token) {
-      window.location.assign("/auth/login");
-      return;
-    }
     const items = cartItems.map((item) => ({
       productId:
         typeof item.productId === "object" && item.productId !== null
@@ -555,10 +547,10 @@ export default function CheckoutPage() {
           )}
           <button
             type="submit"
-            disabled={!form.agreed || isPlacingOrder}
+            disabled={!form.agreed || isPlacingOrder || orderPlaced}
             className="w-full bg-[#7e525c] disabled:opacity-50 text-white py-4 rounded-full text-xs font-bold tracking-[0.2em] uppercase flex items-center justify-center gap-2 hover:bg-[#6a3f47] transition"
           >
-            {isPlacingOrder ? "PLACING ORDER..." : "PLACE ORDER (COD)"}
+            {orderPlaced ? "ORDER CONFIRMED" : (isPlacingOrder ? "PLACING ORDER..." : "PLACE ORDER (COD)")}
             <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
               <path
                 d="M5 12h14M13 6l6 6-6 6"

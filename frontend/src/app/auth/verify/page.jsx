@@ -10,8 +10,8 @@ function VerifyInner() {
   const searchParams = useSearchParams();
   const email = searchParams.get("email") || (typeof window !== "undefined" ? sessionStorage.getItem("verify_email") : "") || "";
 
-  const { mutate: verifyOtp, isPending } = useVerifyEmailOtp();
   const { mutate: resendOtp, isPending: isResending } = useResendEmailOtp();
+  const { mutate: verifyOtp, isPending, isSuccess } = useVerifyEmailOtp();
 
   const [code, setCode] = useState(["", "", "", "", "", ""]);
   const inputRefs = useRef([]);
@@ -54,6 +54,7 @@ function VerifyInner() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (isPending || isSuccess) return;
     const otpCode = code.join("");
     if (otpCode.length !== 6) return;
     setError("");
@@ -162,10 +163,10 @@ function VerifyInner() {
 
           <button
             type="submit"
-            disabled={!isFull || isPending}
+            disabled={!isFull || isPending || isSuccess}
             className="w-full py-4 bg-[#7e525c] text-white rounded-full text-[16px] font-semibold tracking-wider font-sans shadow hover:bg-[#6b4350] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            {isPending ? "Verifying..." : "Verify & Proceed"}
+            {isSuccess ? "Redirecting..." : (isPending ? "Verifying..." : "Verify & Proceed")}
           </button>
         </form>
 

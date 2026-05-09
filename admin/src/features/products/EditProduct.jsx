@@ -122,6 +122,8 @@ function EditProduct() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (updateMutation.isPending || updateMutation.isSuccess) return;
     
     // 1. Client-side validation
     if (!productName.trim()) {
@@ -434,10 +436,10 @@ function EditProduct() {
               <button 
                 type="submit" 
                 className="publish-btn" 
-                disabled={updateMutation.isPending}
+                disabled={updateMutation.isPending || updateMutation.isSuccess}
               >
                 <MdOutlineFileUpload size={20} color="#FFFFFF"/>
-                {updateMutation.isPending ? "Refining Essence..." : "Save Changes"}
+                {updateMutation.isSuccess ? "Redirecting..." : (updateMutation.isPending ? "Refining Essence..." : "Save Changes")}
               </button>
             </div>
           </div>

@@ -11,7 +11,7 @@ import { Eye, EyeOff } from "lucide-react";
 
 export default function SignupPage() {
   const router = useRouter();
-  const { mutate: signUp, isPending } = useSignUp();
+  const { mutate: signUp, isPending, isSuccess } = useSignUp();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [form, setForm] = useState({
@@ -103,6 +103,9 @@ export default function SignupPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (isPending || isSuccess) return;
+
     // Validate all fields
     const newErrors = {};
     Object.keys(form).forEach((key) => {
@@ -460,13 +463,13 @@ export default function SignupPage() {
 
             <button
               type="submit"
-              disabled={isPending}
+              disabled={isPending || isSuccess}
               className="w-full mt-1 py-3 rounded-full text-[15px] font-semibold tracking-wide font-sans text-white transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
               style={{
                 background: "linear-gradient(90deg, #7e525c 0%, #9b6370 100%)",
               }}
             >
-              {isPending ? "Creating account..." : "Create Account"}
+              {isSuccess ? "Redirecting..." : (isPending ? "Creating account..." : "Create Account")}
             </button>
           </form>
 

@@ -7,12 +7,13 @@ import { useSendPasswordResetOtp } from "@/lib/api/hooks/useAuth";
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
-  const { mutate: sendOtp, isPending } = useSendPasswordResetOtp();
+  const { mutate: sendOtp, isPending, isSuccess } = useSendPasswordResetOtp();
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isPending || isSuccess) return;
     if (!email) return;
     setError("");
     sendOtp(
@@ -84,10 +85,10 @@ export default function ForgotPasswordPage() {
 
           <button
             type="submit"
-            disabled={isPending || !email}
+            disabled={isPending || isSuccess || !email}
             className="w-full py-4 bg-[#7e525c] text-white rounded-full text-[16px] font-semibold tracking-wider font-sans shadow hover:bg-[#6b4350] transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
-            {isPending ? "Sending..." : "Send Recovery Code →"}
+            {isSuccess ? "Redirecting..." : (isPending ? "Sending..." : "Send Recovery Code →")}
           </button>
         </form>
 
