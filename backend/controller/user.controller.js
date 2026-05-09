@@ -91,12 +91,21 @@ const authController = {
             </div>
         `;
 
-        await transporter.sendMail({
-            from: `"No Reply" <${process.env.EMAIL_USER}>`,
-            to: newUser.email,
-            subject: "Verify Your Email - AHM Fragrances",
-            html: emailHtml
-        });
+        try {
+            await transporter.sendMail({
+                from: `"AHM Fragrances" <${process.env.EMAIL_USER}>`,
+                to: newUser.email,
+                subject: "Verify Your Email - AHM Fragrances",
+                html: emailHtml
+            });
+        } catch (emailError) {
+            console.error("Email Sending Error:", emailError);
+            await userModel.findByIdAndDelete(newUser._id);
+            return res.status(500).json({ 
+                message: "We couldn't send the verification email. Please check your email address or try again later.",
+                error: emailError.message 
+            });
+        }
 
         return res.status(200).json({ 
             message: "User registered successfully. Please check your email for OTP verification.",
