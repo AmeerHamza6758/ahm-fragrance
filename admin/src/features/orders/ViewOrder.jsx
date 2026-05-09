@@ -99,7 +99,7 @@ function ViewOrder() {
                 <div key={idx} className="order-item-row">
                   <div className="item-identity">
                     <span className="item-name">{item.name}</span>
-                    <span className="item-id">ID: {item.productId?._id || item.productId}</span>
+                    {/* <span className="item-id">ID: {order.orderNumber}</span> */}
                   </div>
                   <span>PKR {item.price?.toLocaleString()}</span>
                   <span>{item.quantity}</span>
@@ -126,7 +126,7 @@ function ViewOrder() {
         </div>
 
         {/* Customer & Delivery Info */}
-        <div className="visual-section" style={{ gridColumn: "span 1" }}>
+        <div className="" style={{ gridColumn: "span 1" }}>
           <div className="admin-card">
             <h3 className="card-heading">Delivery Sanctuary</h3>
             <div className="delivery-info-stack">

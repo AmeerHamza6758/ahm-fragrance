@@ -6,7 +6,7 @@ const Loader = ({ fullScreen = false, size = "md", className = "" }) => {
     sm: "w-6 h-6 border-2",
     md: "w-10 h-10 border-4",
     lg: "w-16 h-16 border-4",
-    xl: "w-24 h-24 border-8",
+    xl: "w-20 h-20 border-8",
   };
 
   const spinnerSize = sizeClasses[size] || sizeClasses.md;

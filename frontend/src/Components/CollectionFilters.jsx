@@ -37,7 +37,7 @@ export default function CollectionFilters({
 
   return (
     <section className="w-full px-4 sm:px-6 lg:px-8 py-4">
-      <div className="w-full flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-start lg:gap-8">
+      <div className="w-full flex flex-col md:flex-row gap-6 lg:flex-row lg:items-center lg:justify-start lg:gap-8">
         <div className="flex flex-col sm:flex-row sm:items-center gap-3 w-full lg:w-auto">
           <span className="text-[#7E525C] text-xs lg:text-lg font-bold tracking-widest whitespace-nowrap">
             SORT:

@@ -4,8 +4,6 @@ const parsedApiUrl = new URL(apiUrl);
 
 const nextConfig = {
   eslint: {
-    // Lint is still available via `npm run lint`, but production builds won't fail
-    // due to existing lint issues in unrelated files.
     ignoreDuringBuilds: true,
   },
   images: {
@@ -16,7 +14,6 @@ const nextConfig = {
         port: parsedApiUrl.port || "",
         pathname: "/**",
       },
-      // Production backend (explicit allow-list)
       {
         protocol: "https",
         hostname: "api.ahmfragrances.com",

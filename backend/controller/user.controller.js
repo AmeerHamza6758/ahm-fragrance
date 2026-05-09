@@ -70,7 +70,7 @@ const authController = {
             },
             otpCode: newOtp,
             otpType: 'email_verification',
-            otpExpiresAt: new Date(Date.now() + 60 * 1000), // 60 seconds
+            otpExpiresAt: new Date(Date.now() + 10 * 60 * 1000), // 10 Minutes
             isEmailVerified: false
         });
 
@@ -84,7 +84,7 @@ const authController = {
                 <div style="background-color: #f4f4f4; padding: 15px; text-align: center; font-size: 32px; font-weight: bold; letter-spacing: 5px;">
                     ${newOtp}
                 </div>
-                <p>This OTP will expire in <strong>60 seconds</strong>.</p>
+                <p>This OTP will expire in <strong>10 Minutes</strong>.</p>
                 <p>If you didn't create an account, please ignore this email.</p>
                 <hr>
                 <small>This is an automated message, please do not reply.</small>
@@ -128,12 +128,48 @@ const authController = {
                     .json({ message: "invalid password or user name" });
             }
 
+            if (!user.isEmailVerified) {
+                // Generate new OTP
+                const newOtp = (Math.floor(100000 + Math.random() * 900000)).toString();
+                user.otpCode = newOtp;
+                user.otpType = 'email_verification';
+                user.otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 Minutes
+                await user.save();
+
+                // Send OTP email
+                const emailHtml = `
+                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                        <h2>Verify Your Email - AHM Fragrances</h2>
+                        <p>You attempted to sign in, but your email is not yet verified. Please use the OTP below to verify your account:</p>
+                        <div style="background-color: #f4f4f4; padding: 15px; text-align: center; font-size: 32px; font-weight: bold; letter-spacing: 5px;">
+                            ${newOtp}
+                        </div>
+                        <p>This OTP will expire in <strong>10 Minutes</strong>.</p>
+                        <p>If you didn't request this, please ignore this email.</p>
+                        <hr>
+                        <small>This is an automated message, please do not reply.</small>
+                    </div>
+                `;
+
+                await transporter.sendMail({
+                    from: `"No Reply" <${process.env.EMAIL_USER}>`,
+                    to: user.email,
+                    subject: "Verify Your Email - AHM Fragrances",
+                    html: emailHtml
+                });
+
+                return res.status(403).json({ 
+                    message: "User is not verified. A new OTP has been sent to your email.", 
+                    status: "unverified",
+                    email: user.email 
+                });
+            }
+
             const token = jwt.sign(
                 { userId: user._id, email: user.email },
                 process.env.JWT_SECRET,
                 { expiresIn: process.env.EXPIRES_JWT }
             );
-
 
             res.status(200).json({ message: "logon successfull", user, token });
         } catch (error) {
@@ -141,8 +177,6 @@ const authController = {
             res.status(500).json({ message: error.message });
         }
     },
-
-
 
     test: async (req, res) => {
         try {
@@ -162,7 +196,6 @@ const generateOtp = () => {return (Math.floor(100000 + Math.random() * 900000)).
 
 const otpHandler = async (req, res) => {
   const { email, type, otpCode } = req.body;
-
   if (!email || !type) {
     return res.status(400).json({ 
       success: false,
@@ -187,16 +220,15 @@ const otpHandler = async (req, res) => {
     }
 
     if (otpCode) {
-
       if (
         !user.otpCode ||
-        user.otpCode.toString() !== otpCode.toString() ||
+        user.otpCode.toString().trim() !== otpCode.toString().trim() ||
         user.otpExpiresAt < new Date() ||
         user.otpType !== type
       ) {
         return res.status(400).json({ 
           success: false,
-          message: 'Invalid or expired OTP.' 
+          message: 'Invalid or expired OTP.'
         });
       }
 
@@ -248,7 +280,7 @@ const otpHandler = async (req, res) => {
       const newOtp = generateOtp();
       user.otpCode = newOtp;
       user.otpType = type;
-      user.otpExpiresAt = new Date(Date.now() + 60 * 1000); 
+      user.otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 Minutes
       user.otpVerifiedAt = null;
       await user.save();
 

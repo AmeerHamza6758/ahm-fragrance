@@ -3,11 +3,12 @@
 import { useState, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useVerifyEmailOtp, useResendEmailOtp } from "@/lib/api/hooks/useAuth";
+import { successToaster, errorToaster as globalErrorToaster } from "@/utils/alert-service";
 
 function VerifyInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const email = searchParams.get("email") || "";
+  const email = searchParams.get("email") || (typeof window !== "undefined" ? sessionStorage.getItem("verify_email") : "") || "";
 
   const { mutate: verifyOtp, isPending } = useVerifyEmailOtp();
   const { mutate: resendOtp, isPending: isResending } = useResendEmailOtp();
@@ -59,7 +60,11 @@ function VerifyInner() {
     verifyOtp(
       { email, otpCode },
       {
-        onSuccess: () => router.push("/auth/login"),
+        onSuccess: () => {
+          successToaster("Email verified successfully! You can now sign in.");
+          sessionStorage.removeItem("verify_email");
+          router.push("/auth/login");
+        },
         onError: (err) => {
           setError(
             err?.response?.data?.message ??

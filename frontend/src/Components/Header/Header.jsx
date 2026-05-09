@@ -1,13 +1,61 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { Heart, Menu, ShoppingCart, User, X } from "lucide-react";
+import { Heart, Menu, ShoppingCart, Truck, User, X } from "lucide-react";
 import Link from "next/link";
 import { queryClient, useFavorites, useGetCart } from "@/lib/api";
 import { useEffect, useState } from "react";
-import logo from "@/public/golden logo.png"
+import logo from "@/public/Images/brand-logo.png"
 import Image from "next/image";
 import { getCartSnapshot } from "@/lib/cart/getCartSnapshot";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay, EffectFade } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/effect-fade";
+
+function PreHeader() {
+  const messages = [
+    { text: "FREE DELIVERY ON ALL ORDERS ACROSS PAKISTAN", icon: "🚚", highlight: "LIMITED TIME" },
+    { text: "PREMIUM QUALITY INSPIRED FRAGRANCES", icon: "✨", highlight: "HANDCRAFTED" },
+    { text: "UPTO 30% OFF ON SELECTED COLLECTIONS", icon: "🔥", highlight: "SALE LIVE" },
+    { text: "EXPERIENCE THE ESSENCE OF LUXURY", icon: "💎", highlight: "PURE OIL" },
+  ];
+
+  return (
+    <div className="w-full bg-gradient-to-r from-[#633e47] via-[#7e525c] to-[#633e47] py-2 overflow-hidden border-b border-white/5 shadow-sm">
+      <Swiper
+        modules={[Autoplay, EffectFade]}
+        effect="fade"
+        fadeEffect={{ crossFade: true }}
+        autoplay={{ delay: 4000, disableOnInteraction: false }}
+        loop={true}
+        speed={1000}
+        className="w-full h-full"
+      >
+        {messages.map((item, idx) => (
+          <SwiperSlide key={idx}>
+            <div className="flex items-center justify-center gap-2 md:gap-4 text-white py-1">
+              {/* Highlight Tag */}
+              <span className="hidden md:inline-block px-2 py-0.5 rounded-full bg-white/10 text-[8px] font-bold tracking-widest border border-white/20">
+                {item.highlight}
+              </span>
+
+              <div className="flex items-center gap-2 text-[9px] md:text-[11px] font-medium tracking-[0.25em] uppercase">
+                <span className="text-sm md:text-base animate-pulse">{item.icon}</span>
+                <span className="drop-shadow-sm">{item.text}</span>
+                <span className="text-sm md:text-base animate-pulse">{item.icon}</span>
+              </div>
+
+              <span className="hidden md:inline-block px-2 py-0.5 rounded-full bg-white/10 text-[8px] font-bold tracking-widest border border-white/20">
+                {item.highlight}
+              </span>
+            </div>
+          </SwiperSlide>
+        ))}
+      </Swiper>
+    </div>
+  );
+}
 export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
@@ -15,8 +63,6 @@ export default function Header() {
   const { data: wishlistProducts = [] } = useFavorites();
   const [menuOpen, setMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  // const isAuthPage = pathname?.startsWith("/auth/");
-
   const isActive = (href) => {
     return pathname === href ? "active" : "";
   };
@@ -60,12 +106,11 @@ export default function Header() {
     { href: "/collections", label: "Collections" },
     { href: "/mens", label: "Men" },
     { href: "/womens", label: "Women" },
-    // { href: "/about-us", label: "About Us" },
-    // { href: "/contact-us", label: "Contact Us" },
   ];
 
   return (
     <>
+      <PreHeader />
       <header className="header">
         <Link href="/" className="logo flex items-center justify-center">
           <Image
@@ -150,7 +195,15 @@ export default function Header() {
             />
             {cartCount > 0 && <span className="cart-count">{cartCount}</span>}
           </Link>
-
+          <Link href="/track-order" className="wishlist-icon-wrapper group" title="Track Order">
+            <Truck
+              size={30}
+              fill={pathname === "/track-order" ? "#7e525c" : "none"}
+              stroke="#7e525c"
+              strokeWidth={2}
+              className="transition-colors"
+            />
+          </Link>
           {/* Hamburger Button — visible only on mobile */}
           <button
             className="hamburger-btn"

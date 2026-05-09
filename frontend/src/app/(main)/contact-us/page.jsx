@@ -42,30 +42,19 @@ export default function ContactPage() {
       setIsSubmitting(false);
     }
   };
-
-  useEffect(() => {
-    let isMounted = true;
-
     const fetchFaqs = async () => {
       try {
         const list = await getFaqs();
-        if (isMounted) {
-          setFaqs(list);
-        }
+        setFaqs(list);
       } catch (error) {
         console.error("Error fetching FAQs:", error);
       } finally {
-        if (isMounted) {
-          setFaqLoading(false);
-        }
+        setFaqLoading(false);
       }
     };
-
+    
+  useEffect(() => {
     fetchFaqs();
-
-    return () => {
-      isMounted = false;
-    };
   }, []);
 
   return (

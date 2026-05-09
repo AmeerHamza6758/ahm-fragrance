@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useGetProfile, useUpdatePassword, useUpdateProfile } from "@/lib/api/hooks/useAuth";
 import { getStoredCheckoutProfile, persistAuthSession } from "@/lib/store/userProfileStore";
-import { successToaster, errorToaster } from "@/utils/alert-service";
+import { successToaster, errorToaster, warningToaster } from "@/utils/alert-service";
 import { Calendar, Eye, EyeOff, Loader2, MapPin, Phone, Shield, User } from "lucide-react";
 import Loader from "@/Components/Loader/Loader";
 
@@ -16,6 +16,10 @@ export default function ProfilePage() {
     const profile = getStoredCheckoutProfile();
     if (!profile.id) {
       router.push("/auth/login");
+    } else if (!profile.isEmailVerified) {
+      sessionStorage.setItem("verify_email", profile.email);
+      warningToaster("Please verify your email to access your profile.");
+      router.push("/auth/verify");
     } else {
       setUserId(profile.id);
     }

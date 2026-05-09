@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useSignIn } from "@/lib/api/hooks/useAuth";
 import { persistAuthSession } from "@/lib/store/userProfileStore";
 import { Eye, EyeOff } from "lucide-react";
-import { errorToaster } from "@/utils/alert-service";
+import { errorToaster, successToaster, warningToaster } from "@/utils/alert-service";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -67,11 +67,20 @@ export default function LoginPage() {
     signIn(form, {
       onSuccess: (data) => {
         persistAuthSession({ token: data?.token, user: data?.user });
+        successToaster("Sign in successful!");
         router.push("/");
       },
       onError: (err) => {
+        const errorData = err?.response?.data;
+        if (errorData?.status === "unverified") {
+          sessionStorage.setItem("verify_email", form.email);
+          warningToaster(errorData?.message || "Please verify your email to continue.");
+          router.push("/auth/verify");
+          return;
+        }
+        
         errorToaster(
-          err?.response?.data?.message ||
+          errorData?.message ||
             err?.message ||
             "Invalid email or password. Please try again.",
         );

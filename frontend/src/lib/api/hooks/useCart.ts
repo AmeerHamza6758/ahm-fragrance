@@ -1,5 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { addToCart, getCart, removeFromCartApi, createOrder, CreateOrderPayload, addRatingReview, RatingReviewPayload, getAllReviews, checkUserReviewStatus } from "../endpoints";
+import { 
+  addToCart, 
+  getCart, 
+  removeFromCartApi, 
+  createOrder, 
+  CreateOrderPayload, 
+  addRatingReview, 
+  RatingReviewPayload, 
+  getAllReviews, 
+  checkUserReviewStatus,
+  trackOrderApi,
+  TrackOrderPayload
+} from "../endpoints";
 
 export function useGetCart() {
   const isAuthenticated =
@@ -66,6 +78,13 @@ export function useCheckReviewStatus(productId: string) {
     queryFn: () => checkUserReviewStatus(productId),
     enabled: isAuthenticated && !!productId,
     staleTime: 0,
+  });
+}
+
+export function useTrackOrder() {
+  return useMutation({
+    mutationFn: (payload: TrackOrderPayload) => 
+      trackOrderApi(payload.orderNumber, payload.contact),
   });
 }
 

@@ -101,7 +101,7 @@
 }
 
 .logo img {
-  width: 84px;
+  width: 70px;
   height: auto;
   max-height: 56px;
 }
@@ -385,7 +385,7 @@
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.45);
-  z-index: 999;
+  z-index: 9999;
 }
 
 .mobile-nav {
@@ -2137,7 +2137,6 @@ p.product-price {
   color: rgb(var(--color-text-subtle));
   font-size: 14px;
   line-height: 22px;
-  margin-bottom: 12px;
 }
 
 .footer-col a:last-child {

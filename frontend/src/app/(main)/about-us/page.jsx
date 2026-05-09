@@ -14,7 +14,7 @@ export default async function AboutUsPage() {
   return (
     <main className="bg-[#fdf9f5] w-full min-h-screen page-main-spacing">
       {/* Hero Section */}
-      <section className="relative w-full h-125 sm:h-150 md:h-175 flex items-center justify-center overflow-hidden">
+      <section className="relative w-full h-125 sm:h-140 md:h-155 flex items-center justify-center overflow-hidden">
         <Image
           src={about_bg}
           alt="Our Story Background"

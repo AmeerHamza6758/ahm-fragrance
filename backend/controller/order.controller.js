@@ -5,6 +5,7 @@ const Product = require('../models/product.model');
 const Stock = require('../models/stock.model');
 const generateOrderNumber = require('../utils/generateOrderNumber');
 const checkDuplicateOrder = require('../utils/checkDuplicateOrder');
+const transporter = require("../config/transporter");
 
 const normalizeSize = (size) => String(size || '50ml').trim().toLowerCase();
 
@@ -24,7 +25,14 @@ const getCheckoutSummary = async (req, res) => {
 
     
     // Get user's cart items with product details
-    const cartItems = await Cart.find({ customerId: userId }).populate('productId');
+    const cartItems = await Cart.find({ customerId: userId }).populate({
+      path: 'productId',
+      populate: [
+        { path: 'image_id' },
+        { path: 'category_id' },
+        { path: 'tag_id' }
+      ]
+    });
     
     if (!cartItems || cartItems.length === 0) {
       return res.status(400).json({
@@ -66,7 +74,9 @@ const getCheckoutSummary = async (req, res) => {
         price: currentPrice,
         size: item.size || '50ml',
         quantity: item.quantity,
-        image: product.images?.[0] || '',
+        image: product.image_id?.[0]?.path || '',
+        tag: product.tag_id?.name || '',
+        category: product.category_id?.name || '',
         total: itemTotal
       });
     }
@@ -77,8 +87,8 @@ const getCheckoutSummary = async (req, res) => {
       data: {
         items,
         subtotal,
-        deliveryCharges: 150,
-        totalAmount: subtotal + 150,
+        deliveryCharges: 0,
+        totalAmount: subtotal,
         cartItemCount: cartItems.length
       }
     });
@@ -144,20 +154,11 @@ const createOrder = async (req, res) => {
       });
     }
     
-    const duplicateCheck = await checkDuplicateOrder(userId, items);
-    if (duplicateCheck.isDuplicate) {
-      return res.status(409).json({
-        success: false,
-        message: `You have already ordered these product(s) within the last 1 hour: ${duplicateCheck.duplicateProducts.join(', ')}. Please wait before ordering again or contact us through email or phonenumber.`,
-        duplicateProducts: duplicateCheck.duplicateProducts
-      });
-    }
-    
     let subtotal = 0;
     const orderProducts = [];
     const stockUpdates = [];
     
-     const deliveryCharges = 150;
+     const deliveryCharges = 0;
 
     for (const item of items) {
       const product = await Product.findOne({ 
@@ -282,9 +283,79 @@ const createOrder = async (req, res) => {
       }
     }
     
+    // Send order confirmation email
+    try {
+      const productListHtml = order.products.map(p => `
+          <tr>
+              <td style="padding: 10px; border-bottom: 1px solid #eee;">${p.name} (${p.size})</td>
+              <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: center;">${p.quantity}</td>
+              <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right;">PKR ${p.price.toLocaleString()}</td>
+          </tr>
+      `).join('');
+
+      const emailHtml = `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
+              <h2 style="color: #7E525C;">Order Confirmation - AHM Fragrances</h2>
+              <p>Dear ${order.customerInfo.name},</p>
+              <p>Thank you for your order! We have received your request and are currently processing it.</p>
+              
+              <div style="background-color: #F9F6F2; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                  <p><strong>Order Number:</strong> ${order.orderNumber}</p>
+                  <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+                  <p><strong>Payment Method:</strong> Cash on Delivery (COD)</p>
+                  <div style="margin-top: 15px;">
+                      <a href="${process.env.FRONTEND_URL}/track-order?orderNumber=${order.orderNumber}&contact=${order.customerInfo.email}" 
+                         style="background-color: #7E525C; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">
+                         Track Your Order
+                      </a>
+                  </div>
+              </div>
+
+              <table style="width: 100%; border-collapse: collapse;">
+                  <thead>
+                      <tr style="background-color: #eee;">
+                          <th style="padding: 10px; text-align: left;">Product</th>
+                          <th style="padding: 10px; text-align: center;">Qty</th>
+                          <th style="padding: 10px; text-align: right;">Price</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      ${productListHtml}
+                  </tbody>
+              </table>
+
+              <div style="text-align: right; margin-top: 20px;">
+                  <p><strong>Subtotal:</strong> PKR ${order.subtotal.toLocaleString()}</p>
+                  <p><strong>Shipping:</strong> PKR ${order.deliveryCharges.toLocaleString()}</p>
+                  <h3 style="color: #7E525C;">Total Amount: PKR ${order.totalAmount.toLocaleString()}</h3>
+              </div>
+
+              <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+              
+              <h4 style="color: #7E525C;">Shipping Details:</h4>
+              <p>${order.customerInfo.address}, ${order.customerInfo.city}, ${order.customerInfo.province}</p>
+              <p><strong>Phone:</strong> ${order.customerInfo.phone}</p>
+
+              <p style="margin-top: 40px; font-size: 14px; color: #666;">
+                  If you have any questions, please contact us at <a href="mailto:support@ahmfragrances.com">support@ahmfragrances.com</a>
+              </p>
+          </div>
+      `;
+
+      await transporter.sendMail({
+          from: `"AHM Fragrances" <${process.env.EMAIL_USER}>`,
+          to: order.customerInfo.email,
+          subject: `Order Confirmation - ${order.orderNumber}`,
+          html: emailHtml
+      });
+    } catch (emailError) {
+      console.error("Failed to send order confirmation email:", emailError);
+      // We don't block the response if email fails
+    }
+
     return res.status(201).json({
       success: true,
-      message: 'Order placed successfully! You will receive delivery within 3-5 working days.',
+      message: 'Order placed successfully! You will receive a confirmation email shortly.',
       data: {
         order,
         lowStockAlerts: lowStockProducts.length > 0 ? lowStockProducts : null
@@ -535,6 +606,63 @@ const getOrderById = async (req, res) => {
   }
 };
 
+const trackOrder = async (req, res) => {
+  try {
+    const { orderNumber, contact } = req.query;
+    const userId = req.user?.userId;
+
+    let query = {};
+
+    if (userId) {
+      // If logged in, find user's orders
+      query.customerId = userId;
+      if (orderNumber) {
+        query.orderNumber = orderNumber.trim();
+      }
+    } else {
+      // If not logged in, must provide orderNumber and contact
+      if (!orderNumber || !contact) {
+        return res.status(400).json({
+          success: false,
+          message: 'Order number and email/phone are required for guest tracking.'
+        });
+      }
+      query.orderNumber = orderNumber.trim();
+      query.$or = [
+        { 'customerInfo.email': contact.trim().toLowerCase() },
+        { 'customerInfo.phone': contact.trim() }
+      ];
+    }
+
+    const orders = await Order.find(query)
+      .populate({
+        path: 'products.productId',
+        populate: { path: 'image_id' }
+      })
+      .sort({ createdAt: -1 });
+
+    if (!orders || orders.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: userId 
+          ? (orderNumber ? `Order #${orderNumber} not found in your account.` : 'No orders found in your account.')
+          : 'No order found with these details. Please check your Order Number and Contact info.'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: userId && !orderNumber ? orders : (orders.length === 1 ? orders[0] : orders)
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to retrieve order(s)',
+      error: error.message
+    });
+  }
+};
+
 const updateOrderStatus = async (req, res) => {
   try {
     const { id } = req.params;
@@ -567,5 +695,6 @@ module.exports = {
   getPendingOrdersCount,
   getAllOrders,
   getOrderById,
-  updateOrderStatus
+  updateOrderStatus,
+  trackOrder
 };

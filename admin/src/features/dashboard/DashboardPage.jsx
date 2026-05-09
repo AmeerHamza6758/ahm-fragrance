@@ -146,7 +146,7 @@ function DonutCard({ title, data, dataKey, unit, colors, isCurrency }) {
     <div className="analytics-card glass-card" style={{ 
       background: 'rgba(255, 255, 255, 0.8)', 
       backdropFilter: 'blur(10px)',
-      padding: '2rem', 
+      padding: '20px', 
       borderRadius: '20px', 
       border: '1px solid rgba(237, 230, 225, 0.5)', 
       display: 'flex', 
@@ -157,7 +157,7 @@ function DonutCard({ title, data, dataKey, unit, colors, isCurrency }) {
       transition: 'all 0.3s ease'
     }}>
       <h3 className="section-title-small" style={{ marginBottom: '1rem', color: '#7e525c', fontSize: '1.1rem', textAlign: 'center', fontWeight: 600 }}>{title}</h3>
-      <div style={{ height: '280px', width: '100%', position: 'relative' }}>
+      <div style={{ height: '220px', width: '100%', position: 'relative' }}>
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie

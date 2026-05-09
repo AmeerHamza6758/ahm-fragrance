@@ -4,7 +4,7 @@ import { useMemo, useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useParams } from "next/navigation";
-import { Heart, Star, Minus, Plus , Package } from "lucide-react";
+import { Heart, Star, Minus, Plus , Package, ShoppingBag } from "lucide-react";
 import { successToaster, errorToaster } from "@/utils/alert-service";
 import {
   useFavorites,
@@ -227,9 +227,10 @@ export default function ProductDetails() {
               <button
                 onClick={handleAddToCart}
                 disabled={isAddingToCart}
-                className="w-full sm:w-[240px] bg-[#6a4450] text-white py-4 rounded-full text-xs font-bold tracking-widest hover:bg-[#4d313a] transition-all shadow-lg disabled:opacity-50"
+                className="w-full sm:w-[240px] bg-[#6a4450] text-white py-4 rounded-full text-xs font-bold tracking-widest hover:bg-[#4d313a]
+                 transition-all shadow-lg disabled:opacity-50 flex items-center gap-2 justify-center"
               >
-                {isAddingToCart ? "ADDING TO BAG..." : "ORDER NOW (COD)"}
+               <ShoppingBag size={16} /> <span>{isAddingToCart ? "ADDING TO BAG..." : "ADD TO BAG"}</span>
               </button>
               <button
                 onClick={handleWishlistToggle}

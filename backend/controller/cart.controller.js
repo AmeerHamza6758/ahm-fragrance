@@ -142,7 +142,14 @@ const getCart = async (req, res) => {
     const userId = req.user.userId;
 
     const cartItems = await Cart.find({ customerId: userId })
-      .populate('productId');
+      .populate({
+        path: 'productId',
+        populate: [
+          { path: 'image_id' },
+          { path: 'category_id' },
+          { path: 'tag_id' }
+        ]
+      });
 
     if (!cartItems || cartItems.length === 0) {
       return res.status(200).json({
@@ -152,8 +159,8 @@ const getCart = async (req, res) => {
           items: [],
           subtotal: 0,
           totalItems: 0,
-          deliveryCharges: 150,
-          totalAmount: 150
+          deliveryCharges: 0,
+          totalAmount: 0
         }
       });
     }
@@ -205,7 +212,9 @@ const getCart = async (req, res) => {
         originalPrice: product.discountPrice || currentPrice,
         quantity: item.quantity,
         size: selectedSize,
-        image: product.images?.[0] || '',
+        image: product.image_id?.[0]?.path || '',
+        tag: product.tag_id?.name || '',
+        category: product.category_id?.name || '',
         total: itemTotal,
         isAvailable: !isOutOfStock,
         stockAvailable: stock?.quantity || 0,
@@ -218,7 +227,7 @@ const getCart = async (req, res) => {
       }
     }
 
-    const deliveryCharges = 150;
+    const deliveryCharges = 0;
     const totalAmount = subtotal + deliveryCharges;
 
     return res.status(200).json({

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const {authMiddleware} = require('../middleware/auth.middleware');
+const {authMiddleware, optionalAuthMiddleware} = require('../middleware/auth.middleware');
 const {
   getCheckoutSummary,
   createOrder,
@@ -8,7 +8,8 @@ const {
   getPendingOrdersCount,
   getAllOrders,
   getOrderById,
-  updateOrderStatus
+  updateOrderStatus,
+  trackOrder
 } = require('../controller/order.controller');
 
 // router.use(authMiddleware);
@@ -16,6 +17,7 @@ const {
 
 router.get('/checkout', authMiddleware,getCheckoutSummary);
 router.get('/pendingOrders', getPendingOrdersCount);
+router.get('/track', optionalAuthMiddleware, trackOrder);
 router.get('/all', getAllOrders);
 router.get('/:id', getOrderById);
 

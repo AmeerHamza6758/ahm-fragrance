@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Truck } from "lucide-react";
 import { useGetCart, useCreateOrder } from "@/lib/api";
 import { buildProductImageUrl } from "@/lib/utils/imageUrl";
 import { getCartSnapshot } from "@/lib/cart/getCartSnapshot";
@@ -11,6 +12,7 @@ import {
   getStoredCheckoutProfile,
   saveCheckoutProfile,
 } from "@/lib/store/userProfileStore";
+import { warningToaster, successToaster } from "@/utils/alert-service";
 
 export default function CheckoutPage() {
   const { data: cartData } = useGetCart();
@@ -40,6 +42,9 @@ export default function CheckoutPage() {
   const total = cartSnapshot.totalAmount ?? subtotal + deliveryCharges;
 
   useEffect(() => {
+    // If order was just placed successfully, don't redirect to cart
+    if (orderPlaced) return;
+
     if (cartItems.length === 0) {
       router.replace("/cart");
       return;
@@ -47,7 +52,7 @@ export default function CheckoutPage() {
     if (hasOutOfStock) {
       router.replace("/cart");
     }
-  }, [cartItems.length, hasOutOfStock, router]);
+  }, [cartItems.length, hasOutOfStock, router, orderPlaced]);
 
   const handleInput = (e) => {
     const { name, value, type, checked } = e.target;
@@ -78,11 +83,12 @@ export default function CheckoutPage() {
 
     const token =
       typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    const profile = getStoredCheckoutProfile();
+
     if (!token) {
       window.location.assign("/auth/login");
       return;
     }
-
     const items = cartItems.map((item) => ({
       productId:
         typeof item.productId === "object" && item.productId !== null
@@ -120,6 +126,7 @@ export default function CheckoutPage() {
 
     placeOrder(payload, {
       onSuccess: (res) => {
+        successToaster("Order Placed Successfully!");
         setOrderData(res?.data?.order ?? res);
         setOrderPlaced(true);
       },
@@ -222,61 +229,59 @@ export default function CheckoutPage() {
               <div className="flex flex-col divide-y divide-[#e8e2dc]">
                 {orderProducts
                   ? orderProducts.map((product, idx) => (
+                    <div key={idx} className="flex items-center gap-4 py-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="font-serif text-sm font-normal text-[#1c1c19]">
+                          {product.name}
+                        </div>
+                        <div className="text-xs text-[#9a8c87] mt-0.5 uppercase tracking-wider">
+                          {product.tag || "Fragrance"} | {product.category || "General"} | Qty: {product.quantity}
+                        </div>
+                      </div>
+                      <div className="text-sm font-semibold text-[#1c1c19] shrink-0">
+                        PKR {(product.total ?? product.price * product.quantity).toLocaleString()}
+                      </div>
+                    </div>
+                  ))
+                  : cartItems.map((item, idx) => {
+                    const name = item.productId?.name ?? item.name ?? "Product";
+                    const price = item.price ?? item.productId?.variants?.[0]?.price ?? 0;
+                    const qty = item.quantity ?? 1;
+                    const imageRaw =
+                      item.image ||
+                      item.productId?.image_id?.[0]?.path ||
+                      item.productId?.image;
+                    let imageSrc = "/Images/best-1.svg";
+                    if (imageRaw) {
+                      imageSrc = buildProductImageUrl(imageRaw);
+                    }
+                    return (
                       <div key={idx} className="flex items-center gap-4 py-4">
+                        <div className="relative w-16 h-16 rounded-xl overflow-hidden shrink-0 bg-[#ede9e3]">
+                          <Image
+                            src={imageSrc}
+                            alt={name}
+                            fill
+                            className="object-cover"
+                            onError={(e) => {
+                              e.target.src = "/Images/best-1.svg";
+                            }}
+                          />
+                        </div>
                         <div className="flex-1 min-w-0">
-                          <div className="font-serif text-sm font-normal text-[#1c1c19]">
-                            {product.name}
+                          <div className="text-sm font-normal text-[#1c1c19]">
+                            {name} — {item.size ?? "50ml"}
                           </div>
-                          <div className="text-xs text-[#9a8c87] mt-0.5">
-                            Qty: {product.quantity}
+                          <div className="text-xs text-[#9a8c87] mt-0.5 uppercase tracking-wider">
+                            {item.tag || "Fragrance"} | {item.category || "General"}
                           </div>
                         </div>
                         <div className="text-sm font-semibold text-[#1c1c19] shrink-0">
-                          PKR {(product.total ?? product.price * product.quantity).toLocaleString()}
+                          PKR {(price * qty).toLocaleString()}
                         </div>
                       </div>
-                    ))
-                  : cartItems.map((item, idx) => {
-                      const name = item.productId?.name ?? item.name ?? "Product";
-                      const price = item.price ?? item.productId?.variants?.[0]?.price ?? 0;
-                      const qty = item.quantity ?? 1;
-                      const imageRaw =
-                        item.productId?.image_id?.path ??
-                        item.image_id?.path ??
-                        item.productId?.image ??
-                        item.image ??
-                        null;
-                      let imageSrc = "/Images/best-1.svg";
-                      if (imageRaw) {
-                        imageSrc = buildProductImageUrl(imageRaw);
-                      }
-                      return (
-                        <div key={idx} className="flex items-center gap-4 py-4">
-                          <div className="relative w-16 h-16 rounded-xl overflow-hidden shrink-0 bg-[#ede9e3]">
-                            <Image
-                              src={imageSrc}
-                              alt={name}
-                              fill
-                              className="object-cover"
-                              onError={(e) => {
-                                e.target.src = "/Images/best-1.svg";
-                              }}
-                            />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="font-serif text-sm font-normal text-[#1c1c19]">
-                              {name} — {item.size ?? "50ml"}
-                            </div>
-                            <div className="text-xs text-[#9a8c87] mt-0.5">
-                              Eau de Parfum
-                            </div>
-                          </div>
-                          <div className="text-sm font-semibold text-[#1c1c19] shrink-0">
-                            PKR {(price * qty).toLocaleString()}
-                          </div>
-                        </div>
-                      );
-                    })}
+                    );
+                  })}
               </div>
 
               {/* Totals - from API response */}
@@ -287,7 +292,7 @@ export default function CheckoutPage() {
                 </div>
                 <div className="flex justify-between text-sm text-[#6b6460]">
                   <span>Delivery Charges</span>
-                  <span>{orderDeliveryCharges > 0 ? `PKR ${orderDeliveryCharges.toLocaleString()}` : "Free"}</span>
+                  <span>PKR {orderDeliveryCharges}</span>
                 </div>
                 <div className="flex justify-between pt-2 border-t border-[#e8e2dc] mt-1">
                   <span className="font-serif text-base text-[#7e525c]">
@@ -304,94 +309,18 @@ export default function CheckoutPage() {
           {/* Action Buttons */}
           <div className="flex items-center gap-4 mt-10">
             <Link
+              href={`/track-order?orderNumber=${displayOrderNumber}&contact=${form.email}`}
+              className="flex items-center gap-2 bg-[#7e525c] text-white px-8 py-3.5 rounded-full text-sm font-semibold tracking-wide hover:bg-[#6a3f47] transition shadow-md"
+            >
+              <Truck size={18} />
+              Track Your Order
+            </Link>
+            <Link
               href="/collections"
-              className="bg-[#7e525c] text-white px-8 py-3.5 rounded-full text-sm font-semibold tracking-wide hover:bg-[#6a3f47] transition"
+              className="flex items-center justify-center bg-[#ede9e3] text-[#6b6460] px-8 py-3.5 rounded-full text-sm font-semibold tracking-wide hover:bg-[#e3ded7] transition"
             >
               Continue Shopping
             </Link>
-            <a
-              href={`https://wa.me/?text=Track my order ${displayOrderNumber}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 bg-[#ede9e3] text-[#6b6460] px-8 py-3.5 rounded-full text-sm font-semibold tracking-wide hover:bg-[#e3ded7] transition"
-            >
-              <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
-                <rect
-                  x="3"
-                  y="5"
-                  width="18"
-                  height="14"
-                  rx="2"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                />
-                <path
-                  d="M3 7l9 6 9-6"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                />
-              </svg>
-              Track on WhatsApp
-            </a>
-          </div>
-
-          {/* Social Footer */}
-          <div className="mt-12 flex flex-col items-center gap-3">
-            <p className="text-[9px] tracking-[0.2em] text-[#9a8c87] uppercase font-semibold">
-              Follow Our Journey on Instagram &amp; Facebook
-            </p>
-            <div className="flex items-center gap-4">
-              <a
-                href="https://instagram.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-9 h-9 rounded-full border border-[#ddd8d2] flex items-center justify-center text-[#6b6460] hover:border-[#7e525c] hover:text-[#7e525c] transition"
-              >
-                <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
-                  <rect
-                    x="3"
-                    y="3"
-                    width="18"
-                    height="18"
-                    rx="5"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                  />
-                  <circle
-                    cx="12"
-                    cy="12"
-                    r="4"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                  />
-                  <circle cx="17.5" cy="6.5" r="1" fill="currentColor" />
-                </svg>
-              </a>
-              <a
-                href="https://facebook.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-9 h-9 rounded-full border border-[#ddd8d2] flex items-center justify-center text-[#6b6460] hover:border-[#7e525c] hover:text-[#7e525c] transition"
-              >
-                <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
-                  <circle
-                    cx="12"
-                    cy="12"
-                    r="9"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                  />
-                  <path
-                    d="M15 8h-2a1 1 0 00-1 1v2H9v3h3v6h3v-6h2l.5-3H15V9"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </a>
-            </div>
           </div>
         </div>
       </main>
@@ -724,9 +653,7 @@ export default function CheckoutPage() {
             <div className="flex items-center justify-between text-sm">
               <span className="text-[#6b6460]">Delivery Charges</span>
               <span className="font-semibold text-[#1c1c19]">
-                {deliveryCharges > 0
-                  ? `PKR ${deliveryCharges.toLocaleString()}`
-                  : "Free"}
+                PKR {deliveryCharges.toLocaleString()}
               </span>
             </div>
             <div className="flex items-center justify-between pt-3 border-t border-[#ede9e4]">

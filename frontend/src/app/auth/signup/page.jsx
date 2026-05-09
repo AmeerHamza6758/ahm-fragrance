@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useSignUp } from "@/lib/api/hooks/useAuth";
 import Image from "next/image";
 import { saveCheckoutProfile } from "@/lib/store/userProfileStore";
-import { errorToaster } from "@/utils/alert-service";
+import { errorToaster, successToaster } from "@/utils/alert-service";
 import { Eye, EyeOff } from "lucide-react";
 
 export default function SignupPage() {
@@ -144,7 +144,9 @@ export default function SignupPage() {
       },
       {
         onSuccess: () => {
-          router.push(`/auth/verify?email=${encodeURIComponent(form.email)}`);
+          sessionStorage.setItem("verify_email", form.email);
+          successToaster("Account created! Please verify your email.");
+          router.push("/auth/verify");
         },
         onError: (err) => {
           errorToaster(

@@ -60,89 +60,84 @@ export default function CartPage() {
             {cartLoading ? (
               <Loader />
             ) : cartItems.length === 0 ? (
-             <div className="bg-[#F9F6F2] rounded-[32px] p-20 flex flex-col items-center justify-center text-center">
-  <p className="text-[#7E525C] font-serif text-xl mb-10">
-    Your bag is empty
-  </p>
-  
-  <button
-    onClick={() => router.push("/collections")}
-    className="text-[#4E4543] text-xs  tracking-widest flex items-center gap-2 transition-opacity hover:opacity-70"
-  >
-   EXPLORE COLLECTIONS <Handbag className="" size={20} />
-  </button>
-</div>
+              <div className="bg-[#F9F6F2] rounded-[32px] p-20 flex flex-col items-center justify-center text-center">
+                <p className="text-[#7E525C] font-serif text-xl mb-10">
+                  Your bag is empty
+                </p>
+
+                <button
+                  onClick={() => router.push("/collections")}
+                  className="text-[#4E4543] text-xs  tracking-widest flex items-center gap-2 transition-opacity hover:opacity-70"
+                >
+                  EXPLORE COLLECTIONS <Handbag className="" size={20} />
+                </button>
+              </div>
             ) : (
               cartItems.map((item, idx) => {
-               
-                
+
+
                 const cartId = item.cartId ?? item._id ?? idx;
                 const name = item.productId?.name ?? item.name ?? "Product";
                 const price = item.price ?? item.productId?.price ?? 0;
                 const imageRaw =
-                  item.productId?.image_id?.path ??
-                  item.productId?.image ??
-                  item.image;
+                  item.image ||
+                  item.productId?.image_id?.[0]?.path ||
+                  item.productId?.image;
                 const imageSrc = imageRaw
                   ? buildProductImageUrl(imageRaw)
                   : "/Images/best-1.svg";
+                return (
+                  <div
+                    key={cartId}
+                    className="relative flex bg-[#eff0e9] rounded-[24px] p-4 md:p-5 items-center gap-5 group"
+                  >
+                    {/* Product Image - Reduced height from 56 to 40/48 */}
+                    <div className="relative w-24 h-30 md:w-36 md:h-38 shrink-0 overflow-hidden rounded-[18px]">
+                      <Image
+                        src={imageSrc}
+                        alt={name}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
 
-               
-                 return (
-  <div
-    key={cartId}
-    className="relative flex bg-[#F9F6F2] rounded-[24px] p-4 md:p-5 items-center gap-5 group"
-  >
-    {/* Product Image - Reduced height from 56 to 40/48 */}
-    <div className="relative w-24 h-32 md:w-36 md:h-40 shrink-0 overflow-hidden rounded-[18px]">
-      <Image
-        src={imageSrc}
-        alt={name}
-        fill
-        className="object-cover"
-      />
-    </div>
+                    {/* Product Info & Controls - Removed high min-height */}
+                    <div className="flex flex-col flex-1 self-stretch justify-between py-2">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h3 className="text-[#7E525C] text-lg md:text-xl font-serif leading-tight">
+                            {name}
+                          </h3>
+                          <p className="text-[#A69391] text-[11px] mt-1">
+                            {item.tag || "Fragrance"} | {item.category || "General"} | {item.size ?? "50ml"}
+                          </p>
+                        </div>
+                        {/* Remove Button */}
+                        <button
+                          onClick={() => removeItem(String(cartId))}
+                          className="text-red-800 hover:text-[#8b6f76] transition-colors cursor-pointer p-1"
+                        >
+                          <X size={18} strokeWidth={3} />
+                        </button>
+                      </div>
 
-    {/* Product Info & Controls - Removed high min-height */}
-    <div className="flex flex-col flex-1 self-stretch justify-between py-2">
-      <div className="flex justify-between items-start">
-        <div>
-          <h3 className="text-[#7E525C] text-lg md:text-xl font-serif leading-tight">
-            {name}
-          </h3>
-          <p className="text-[#A69391] text-[11px] mt-1">
-            Eau de Parfum | {item.size ?? "50ml"}
-          </p>
-        </div>
-        {/* Remove Button */}
-        <button
-          onClick={() => removeItem(String(cartId))}
-          className="text-[#7e525c] hover:text-[#8b6f76] transition-colors cursor-pointer p-1"
-        >
-          <X size={18} strokeWidth={1.5} />
-        </button>
-      </div>
+                      <div className="flex justify-between items-end mt-4">
+                        {/* Quantity Selector */}
+                        <div
+                          className="flex items-center justify-center"
+                        >
+                          <span className="text-sm font-bold text-primary mr-2">QTY:</span>
+                          <span className="text-xs font-semibold text-[#4E4543] border border-[#D1C3C1] rounded-md px-4 py-1">{item.quantity ?? 1}</span>
+                        </div>
+                        {/* Price */}
+                        <p className="text-[#7E525C] font-serif text-base md:text-lg whitespace-nowrap">
+                          PKR {price.toLocaleString()}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                );
 
-      <div className="flex justify-between items-end mt-4">
-        {/* Quantity Selector */}
-        <div
-          className="flex items-center justify-center min-w-[60px] px-4 py-1.5"
-          style={{
-            border: "1px solid #D1C3C1",
-            borderRadius: "6px",
-          }}
-        >
-          <span className="text-sm text-[#4E4543]">{item.quantity ?? 1}</span>
-        </div>
-        {/* Price */}
-        <p className="text-[#7E525C] font-serif text-base md:text-lg whitespace-nowrap">
-          PKR {price.toLocaleString()}
-        </p>
-      </div>
-    </div>
-  </div>
-);
-             
               })
             )}
 
@@ -192,9 +187,7 @@ export default function CartPage() {
                     Shipping
                   </span>
                   <span className="text-[#7E525C] font-semibold ">
-                    {deliveryCharges > 0
-                      ? `PKR ${deliveryCharges.toLocaleString()}`
-                      : "Free"}
+                    PKR {deliveryCharges?.toLocaleString()}
                   </span>
                 </div>
 
@@ -202,8 +195,8 @@ export default function CartPage() {
 
                 <div className="flex justify-between items-center text-[#7E525C]">
                   <span className="text-3xl font-serif font-medium text-[#7E525C]">
-        Total
-      </span>
+                    Total
+                  </span>
                   <span className="text-xl font-serif font-semibold">
                     PKR {total.toLocaleString()}
                   </span>

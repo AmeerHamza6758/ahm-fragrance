@@ -73,3 +73,15 @@ export async function checkUserReviewStatus(productId: string) {
   const response = await apiClient.get(`/api/rating-review/check-status?productId=${productId}`);
   return response.data;
 }
+
+export interface TrackOrderPayload {
+  orderNumber: string;
+  contact: string;
+}
+
+export async function trackOrderApi(orderNumber: string, contact: string) {
+  const response = await apiClient.get(`/api/order/track`, {
+    params: { orderNumber, contact }
+  });
+  return response.data;
+}

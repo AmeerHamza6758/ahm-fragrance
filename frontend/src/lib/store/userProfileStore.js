@@ -21,6 +21,7 @@ const emptyProfile = () => ({
   city: "",
   postal: "",
   province: "",
+  isEmailVerified: false,
 });
 
 const mapCheckoutProfile = (raw = {}) => ({
@@ -32,6 +33,7 @@ const mapCheckoutProfile = (raw = {}) => ({
   city: raw.city || "",
   postal: raw.postal || "",
   province: raw.province || "",
+  isEmailVerified: raw.isEmailVerified || false,
 });
 
 const mapUserToCheckoutProfile = (user = {}) => ({
@@ -43,6 +45,7 @@ const mapUserToCheckoutProfile = (user = {}) => ({
   city: user.address?.city || "",
   postal: user.address?.postalCode || "",
   province: user.address?.province || "",
+  isEmailVerified: user.isEmailVerified || false,
 });
 
 export const getStoredCheckoutProfile = () => {

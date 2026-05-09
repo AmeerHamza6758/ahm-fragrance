@@ -35,7 +35,7 @@ const orderSchema = new mongoose.Schema({
 },
   deliveryCharges: { 
     type: Number, 
-    default: 150 
+    default: 0 
 },
   totalAmount: { 
     type: Number, 

@@ -185,7 +185,7 @@ export default function WishlistPage() {
                         {product.name}
                       </h3>
                     </Link>
-                    <p className="text-secondary text-xs tracking-wider">{product.description}</p>
+                    <p className="text-secondary text-xs tracking-wider line-clamp-3">{product.description}</p>
                     <div className="flex items-center justify-between mt-2">
 
                       <div className="flex items-center gap-2">
