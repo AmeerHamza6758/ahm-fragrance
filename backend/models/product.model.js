@@ -29,6 +29,13 @@ const productSchema = new mongoose.Schema({
         min: 0,
         max: 100
       },
+      currentPrice: {
+        type: Number,
+        required: true,
+        default: function() {
+          return this.price - (this.price * (this.discountPercentage || 0) / 100);
+        }
+      },
       stock: {
         type: Number,
         default: 0,
@@ -64,6 +71,31 @@ const productSchema = new mongoose.Schema({
     default: 0
   },
 }, { timestamps: true });
+
+// ✅ Pre-save hook to calculate currentPrice for each variant
+productSchema.pre('save', function (next) {
+  if (this.variants && this.variants.length > 0) {
+    this.variants.forEach(variant => {
+      const price = variant.price || 0;
+      const discount = variant.discountPercentage || 0;
+      variant.currentPrice = price - (price * discount / 100);
+    });
+  }
+  next();
+});
+
+// ✅ Also handle findOneAndUpdate
+productSchema.pre('findOneAndUpdate', function (next) {
+  const update = this.getUpdate();
+  if (update.variants && Array.isArray(update.variants)) {
+    update.variants.forEach(variant => {
+      const price = variant.price || 0;
+      const discount = variant.discountPercentage || 0;
+      variant.currentPrice = price - (price * discount / 100);
+    });
+  }
+  next();
+});
 
 productSchema.virtual('currentPrice').get(function () {
   if (this.variants && this.variants.length > 0) {

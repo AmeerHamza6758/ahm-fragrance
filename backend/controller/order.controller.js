@@ -22,8 +22,6 @@ const getVariantForSize = (product, size) => {
 const getCheckoutSummary = async (req, res) => {
   try {
     const userId = req.user.userId;
-
-    
     // Get user's cart items with product details
     const cartItems = await Cart.find({ customerId: userId }).populate({
       path: 'productId',
@@ -54,17 +52,17 @@ const getCheckoutSummary = async (req, res) => {
         });
       }
       
+      const selectedVariant = getVariantForSize(product, item.size || '50ml');
       // Check stock availability
-      const stock = await Stock.findOne({ productId: product._id });
+      const stock = await Stock.findOne({ productId: product._id, variantId: selectedVariant?._id });
       if (!stock || stock.quantity < item.quantity) {
         return res.status(400).json({
           success: false,
-          message: `Insufficient stock for ${product.name}. Available: ${stock?.quantity || 0}`
+          message: `Insufficient stock for ${product.name} (${item.size || '50ml'}). Available: ${stock?.quantity || 0}`
         });
       }
       
-      const selectedVariant = getVariantForSize(product, item.size || '50ml');
-      const currentPrice = selectedVariant?.price ?? 0;
+      const currentPrice = selectedVariant?.currentPrice ?? selectedVariant?.price ?? 0;
       const itemTotal = currentPrice * item.quantity;
       subtotal += itemTotal;
       
@@ -106,17 +104,13 @@ const getCheckoutSummary = async (req, res) => {
 const createOrder = async (req, res) => {
   try {
         const userId = req.user.userId;
-
     const { items, customerInfo, agreedToTerms } = req.body;
-    
-
     if (!items || items.length === 0) {
       return res.status(400).json({
         success: false,
         message: 'No items in order. Please add products to cart.'
       });
     }
-    
 
     if (!agreedToTerms) {
       return res.status(400).json({
@@ -125,7 +119,6 @@ const createOrder = async (req, res) => {
       });
     }
     
-
     const requiredFields = ['name', 'phone', 'email', 'address', 'city', 'postalCode', 'province'];
     for (const field of requiredFields) {
       if (!customerInfo[field]) {
@@ -188,16 +181,16 @@ const createOrder = async (req, res) => {
         });
       }
       
-      const stock = await Stock.findOne({ productId: product._id });
+      const selectedVariant = getVariantForSize(product, item.size || '50ml');
+      const stock = await Stock.findOne({ productId: product._id, variantId: selectedVariant?._id });
       if (!stock || stock.quantity < item.quantity) {
         return res.status(400).json({
           success: false,
-          message: `Insufficient stock for ${product.name}. Available: ${stock?.quantity || 0}. Please reduce quantity.`
+          message: `Insufficient stock for ${product.name} (${item.size || '50ml'}). Available: ${stock?.quantity || 0}. Please reduce quantity.`
         });
       }
       
-      const selectedVariant = getVariantForSize(product, item.size || '50ml');
-      const currentPrice = selectedVariant?.price ?? 0;
+      const currentPrice = selectedVariant?.currentPrice ?? selectedVariant?.price ?? 0;
       const itemTotal = currentPrice * item.quantity;
       subtotal += itemTotal;
       
@@ -250,8 +243,11 @@ const createOrder = async (req, res) => {
     
     // Deduct stock and log history
     for (const update of stockUpdates) {
+      const item = items.find(i => i.productId === String(update.productId)); // Find corresponding item to get size
+      const variant = getVariantForSize(await Product.findById(update.productId), item?.size || '50ml');
+      
       await Stock.findOneAndUpdate(
-        { productId: update.productId },
+        { productId: update.productId, variantId: variant?._id },
         {
           $set: { quantity: update.quantity },
           $push: {
@@ -413,13 +409,15 @@ const cancelOrder = async (req, res) => {
     
     // Restore stock for each product in the cancelled order
     for (const item of order.products) {
-      const stock = await Stock.findOne({ productId: item.productId });
+      // Note: order.products should ideally store variantId, but if not we use size
+      const variant = getVariantForSize(await Product.findById(item.productId), item.size || '50ml');
+      const stock = await Stock.findOne({ productId: item.productId, variantId: variant?._id });
       if (stock) {
         const previousQuantity = stock.quantity;
         const newQuantity = stock.quantity + item.quantity;
         
         await Stock.findOneAndUpdate(
-          { productId: item.productId },
+          { productId: item.productId, variantId: variant?._id },
           {
             $set: { quantity: newQuantity },
             $push: {

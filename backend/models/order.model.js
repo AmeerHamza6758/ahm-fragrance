@@ -22,8 +22,7 @@ const orderSchema = new mongoose.Schema({
     price: { type: Number },  
     quantity: { 
         type: Number, 
-        min: 1, 
-        max: 5 
+        min: 1
     },
     total: { type: Number },
     size: { type: String }

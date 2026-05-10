@@ -17,10 +17,8 @@ const getVariantForSize = (product, size) => {
 const addToCart = async (req, res) => {
   try {
     const userId = req.user.userId;
-
     const { productId, quantity = 1, size = '50ml' } = req.body;
     const normalizedSize = normalizeSize(size);
-
     if (!productId) {
       return res.status(400).json({
         success: false,
@@ -47,25 +45,22 @@ const addToCart = async (req, res) => {
       });
     }
 
-    if (Array.isArray(product.variants) && product.variants.length > 0) {
-      const selectedVariant = getVariantForSize(product, normalizedSize);
-      if (!selectedVariant) {
-        return res.status(400).json({
-          success: false,
-          message: 'Invalid size selected for this product',
-        });
-      }
-    }
-
-    const stock = await Stock.findOne({ productId: product._id });
-    if (!stock || stock.quantity < quantity) {
+    const selectedVariant = getVariantForSize(product, normalizedSize);
+    if (!selectedVariant) {
       return res.status(400).json({
         success: false,
-        message: `Insufficient stock for ${product.name}. Available: ${stock?.quantity || 0}`
+        message: `Size '${size}' is not available for this product`
       });
     }
 
-    // Check if product already in cart
+    const stock = await Stock.findOne({ productId: product._id, variantId: selectedVariant._id });
+    if (!stock || stock.quantity < quantity) {
+      return res.status(400).json({
+        success: false,
+        message: `Insufficient stock for ${product.name} (${normalizedSize}). Available: ${stock?.quantity || 0}`
+      });
+    }
+
     const existingCartItem = await Cart.findOne({
       customerId: userId,
       productId: product._id,
@@ -94,7 +89,7 @@ const addToCart = async (req, res) => {
           product: {
             id: product._id,
             name: product.name,
-            price: getVariantForSize(product, normalizedSize)?.price ?? product.variants?.[0]?.price ?? 0,
+            price: selectedVariant?.currentPrice ?? selectedVariant?.price ?? 0,
             image: product.images?.[0] || ''
           }
         }
@@ -121,8 +116,8 @@ const addToCart = async (req, res) => {
         product: {
           id: product._id,
           name: product.name,
-          price: getVariantForSize(product, normalizedSize)?.price ?? product.variants?.[0]?.price ?? 0,
-          image: product.images?.[0] || ''
+          price: selectedVariant?.currentPrice ?? selectedVariant?.price ?? 0,
+          image: product.image_id?.[0]?.path || ''
         }
       }
     });
@@ -138,9 +133,7 @@ const addToCart = async (req, res) => {
 
 const getCart = async (req, res) => {
   try {
-
     const userId = req.user.userId;
-
     const cartItems = await Cart.find({ customerId: userId })
       .populate({
         path: 'productId',
@@ -194,13 +187,14 @@ const getCart = async (req, res) => {
       }
 
       // Check stock availability
-      const stock = await Stock.findOne({ productId: product._id });
+      const selectedSize = item.size || '50ml';
+      const selectedVariant = getVariantForSize(product, selectedSize);
+      
+      const stock = await Stock.findOne({ productId: product._id, variantId: selectedVariant?._id });
       const isOutOfStock = !stock || stock.quantity < item.quantity;
 
       // Use latest price with selected variant when available
-      const selectedSize = item.size || '50ml';
-      const selectedVariant = getVariantForSize(product, selectedSize);
-      const currentPrice = selectedVariant?.price ?? product.variants?.[0]?.price ?? 0;
+      const currentPrice = selectedVariant?.currentPrice ?? selectedVariant?.price ?? 0;
       const itemTotal = currentPrice * item.quantity;
       subtotal += itemTotal;
 
@@ -329,12 +323,13 @@ const updateCartItem = async (req, res) => {
       });
     }
 
-    const stock = await Stock.findOne({ productId: product._id });
+    const selectedVariant = getVariantForSize(product, cartItem.size || '50ml');
+    const stock = await Stock.findOne({ productId: product._id, variantId: selectedVariant?._id });
 
     if (!stock || stock.quantity < quantity) {
       return res.status(400).json({
         success: false,
-        message: `Insufficient stock for ${product.name}. Available: ${stock?.quantity || 0}`,
+        message: `Insufficient stock for ${product.name} (${cartItem.size || '50ml'}). Available: ${stock?.quantity || 0}`,
         debug: {
           stockAvailable: stock?.quantity || 0,
           requestedQuantity: quantity
@@ -347,8 +342,7 @@ const updateCartItem = async (req, res) => {
     await cartItem.save();
 
     const updatedCart = await Cart.findById(cartItem._id).populate('productId');
-    const selectedVariant = getVariantForSize(product, cartItem.size || '50ml');
-    const unitPrice = selectedVariant?.price ?? product.variants?.[0]?.price ?? 0;
+    const unitPrice = selectedVariant?.currentPrice ?? selectedVariant?.price ?? 0;
     const itemTotal = unitPrice * quantity;
 
     return res.status(200).json({
@@ -360,7 +354,7 @@ const updateCartItem = async (req, res) => {
           id: product._id,
           name: product.name,
           price: unitPrice,
-          image: product.images?.[0] || ''
+          image: product.image_id?.[0]?.path || ''
         },
         itemTotal,
         debug: {

@@ -53,13 +53,18 @@ const productController = {
                 category_id,
                 tag_id,
                 image_id: Array.isArray(image_id) ? image_id : (image_id ? [image_id] : []),
-                variants: variants.map(v => ({
-                    _id: new mongoose.Types.ObjectId(),
-                    size: v.size,
-                    price: v.price ?? 0,
-                    discountPercentage: v.discountPercentage ?? 0,
-                    stock: v.stock ?? 0
-                }))
+                variants: variants.map(v => {
+                    const price = v.price ?? 0;
+                    const discount = v.discountPercentage ?? 0;
+                    return {
+                        _id: new mongoose.Types.ObjectId(),
+                        size: v.size,
+                        price: price,
+                        discountPercentage: discount,
+                        currentPrice: price - (price * discount / 100),
+                        stock: v.stock ?? 0
+                    };
+                })
             });
 
             await product.save();
@@ -70,12 +75,8 @@ const productController = {
 
             // ✅ Create initial stock entries for each variant
             if (savedProduct.variants && savedProduct.variants.length > 0) {
-
-
                 for (const v of savedProduct.variants) {
                     try {
-
-
                         await Stock.create({
                             productId: savedProduct._id,
                             variantId: v._id,
@@ -92,7 +93,6 @@ const productController = {
 
                     } catch (variantErr) {
                         console.error(`[Stock Sync] ❌ Failed for variant ${v.size}:`, variantErr.message);
-                        // If it's a duplicate key error, we log it clearly
                         if (variantErr.code === 11000) {
                             console.error(`[Stock Sync] Duplicate Key Error: ${JSON.stringify(variantErr.keyValue)}`);
                         }
@@ -165,13 +165,18 @@ const productController = {
 
             let updatedVariants = product.variants;
             if (variants && Array.isArray(variants)) {
-                updatedVariants = variants.map(v => ({
-                    _id: v._id || new mongoose.Types.ObjectId(),
-                    size: v.size,
-                    price: v.price ?? 0,
-                    discountPercentage: v.discountPercentage ?? 0,
-                    stock: v.stock ?? 0
-                }));
+                updatedVariants = variants.map(v => {
+                    const price = v.price ?? 0;
+                    const discount = v.discountPercentage ?? 0;
+                    return {
+                        _id: v._id || new mongoose.Types.ObjectId(),
+                        size: v.size,
+                        price: price,
+                        discountPercentage: discount,
+                        currentPrice: price - (price * discount / 100),
+                        stock: v.stock ?? 0
+                    };
+                });
             }
 
             const updateData = {
@@ -191,7 +196,6 @@ const productController = {
                     model: 'images'
                 });
 
-            // ✅ Sync stock entries for updated variants
             try {
                 if (updatedProduct.variants && updatedProduct.variants.length > 0) {
                     for (const v of updatedProduct.variants) {

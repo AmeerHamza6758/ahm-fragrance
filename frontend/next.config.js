@@ -9,9 +9,15 @@ const nextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: parsedApiUrl.protocol.replace(":", ""),
-        hostname: parsedApiUrl.hostname,
-        port: parsedApiUrl.port || "",
+        protocol: "http",
+        hostname: "localhost",
+        port: "4000",
+        pathname: "/**",
+      },
+      {
+        protocol: "http",
+        hostname: "127.0.0.1",
+        port: "4000",
         pathname: "/**",
       },
       {
