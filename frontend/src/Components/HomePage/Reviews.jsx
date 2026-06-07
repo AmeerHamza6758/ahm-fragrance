@@ -1,29 +1,28 @@
 "use client";
 import React from 'react';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { EffectCoverflow, Autoplay } from 'swiper/modules';
 import { useGetAllReviews } from "@/lib/api/hooks/useCart";
 import Loader from "@/Components/Loader/Loader";
 
-import 'swiper/css';
-import 'swiper/css/effect-coverflow';
-
 const STATIC_FALLBACK = [
-  { _id: "1", rating: 5, reviewText: "I'm amazed by the quality of Ocean Drift. It lasts literally 12+ hours on my skin.", userName: "Ahmed Khan", productName: "Ocean Drift", avatarUrl: "https://i.pravatar.cc/96?img=12" },
-  { _id: "2", rating: 5, reviewText: "The Velvet Peony is identical to my favorite high-end designer perfume. High quality!", userName: "Sara Malik", productName: "Velvet Peony", avatarUrl: "https://i.pravatar.cc/96?img=5" },
-  { _id: "4", rating: 5, reviewText: "Elegant scent profile and excellent projection. I received compliments all evening.", userName: "Hira Nadeem", productName: "Rose Noir", avatarUrl: "https://i.pravatar.cc/96?img=32" },
-  { _id: "5", rating: 5, reviewText: "Midnight Oud is simply masterpiece. Dark, smoky, and extremely sophisticated.", userName: "Zain Ali", productName: "Midnight Oud", avatarUrl: "https://i.pravatar.cc/96?img=11" },
-  { _id: "6", rating: 5, reviewText: "Best purchase of the year. The longevity is better than original designer brands.", userName: "Mariam J.", productName: "Golden Sillage", avatarUrl: "https://i.pravatar.cc/96?img=26" },
-  { _id: "7", rating: 4, reviewText: "Fresh and energetic. Perfect for daily office wear. Will definitely buy again.", userName: "Usman Ghani", productName: "Aqua Intense", avatarUrl: "https://i.pravatar.cc/96?img=18" },
-  { _id: "8", rating: 5, reviewText: "The dry down of Royal Leather is incredible. It smells like pure wealth!", userName: "Sana Parvez", productName: "Royal Leather", avatarUrl: "https://i.pravatar.cc/96?img=44" },
+  { _id: "1", rating: 5, reviewText: "Best purchase of the year. The longevity is better than original designer brands.", userName: "Mariam J.", productName: "Golden Sillage" },
+  { _id: "2", rating: 4, reviewText: "The dry down of Royal Leather is incredible. It smells like pure wealth!", userName: "Sana Parvez", productName: "Royal Leather" },
+  { _id: "3", rating: 3.5, reviewText: "Midnight Oud is simply masterpiece. Dark, smoky, and extremely sophisticated.", userName: "Zain Ali", productName: "Midnight Oud" },
 ];
 
 function StarRating({ rating = 5 }) {
+  // Ensure rating is a number between 0 and 5
+  const normalizedRating = Math.min(5, Math.max(0, Number(rating) || 0));
+  
   return (
-    <div className="flex gap-1">
+    <div className="flex gap-0.5">
       {[1, 2, 3, 4, 5].map((s) => (
-        <span key={s} style={{ color: s <= rating ? "#7e525c" : "#d4c4c8" }} className="text-lg">
-          &#9733;
+        <span 
+          key={s} 
+          className={`text-sm md:text-base ${
+            s <= normalizedRating ? "text-yellow-400" : "text-gray-200"
+          }`}
+        >
+          ★
         </span>
       ))}
     </div>
@@ -35,98 +34,84 @@ export default function Reviews() {
 
   const reviews = (() => {
     const raw = Array.isArray(data) ? data : (data?.data ?? data?.reviews ?? []);
-    const sorted = [...raw].sort((a, b) => {
-      if ((b.rating || 0) !== (a.rating || 0)) {
-        return (b.rating || 0) - (a.rating || 0);
-      }
-      return (b._id || "").toString().localeCompare((a._id || "").toString());
-    });
-    const final = sorted.length > 0 ? sorted : STATIC_FALLBACK.sort((a, b) => b.rating - a.rating);
-    if (final.length > 0 && final.length < 6) {
-      return [...final, ...final, ...final];
+    if (raw.length > 0) {
+      return raw.slice(0, 3);
     }
-    return final;
+    return STATIC_FALLBACK;
   })();
 
   return (
-    <section className="pt-10 bg-white overflow-hidden">
-      <h1 className="text-[#7E525C] text-2xl sm:text-2xl md:text-4xl font-noto font-normal text-center pb-12">
-        Voices of Luxury
-      </h1>
+    <section className="py-10 md:py-20 sm:py-10 bg-[#fdf9f5] relative overflow-hidden">
+      
+      {/* Decorative Background Elements */}
+      <div className="absolute top-20 left-0 w-64 h-64 bg-[#6c444e]/5 rounded-full blur-3xl"></div>
+      <div className="absolute bottom-20 right-0 w-80 h-80 bg-[#6c444e]/5 rounded-full blur-3xl"></div>
+      
+      <div className="max-w-7xl mx-auto px-4 md:px-8 relative z-10 bg-white">
+        
+        {/* Heading */}
+        <div className="text-center mb-10 md:mb-14">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl pt-15 font-bold text-[#1a1a1a] mb-3 font-['Noto_Serif',Georgia,serif]">
+            Voices of <span className="text-[#6c444e]">Luxury</span>
+          </h2>
+          <p className="text-sm md:text-base text-gray-500 max-w-2xl mx-auto">
+            Hear genuine feedback from our customers who trust us for quality, reliability, and great results.
+          </p>
+        </div>
 
-      {isLoading ? (
-        <Loader />
-      ) : (
-        <div className="relative w-full max-w-[90%] md:max-w-6xl mx-auto">
-          <Swiper
-            key={`rev-v4-${reviews.length}`}
-            effect={'coverflow'}
-            grabCursor={true}
-            centeredSlides={true}
-            loop={true}
-            loopedSlides={6}
-            speed={800}
-            slidesPerView={1.2}
-            spaceBetween={0}
-            breakpoints={{
-              640: { slidesPerView: 2, spaceBetween: 20 },
-              1024: { slidesPerView: 3, spaceBetween: 24 },
-            }}
-            autoplay={{
-              delay: 1000,
-              disableOnInteraction: false,
-              pauseOnMouseEnter: true
-            }}
-            coverflowEffect={{
-              rotate: 0,
-              stretch: 0,
-              depth: 120,
-              modifier: 2.5,
-              slideShadows: false,
-            }}
-            modules={[EffectCoverflow, Autoplay]}
-            className="max-w-6xl !pb-14 overflow-hidden"
-          >
+        {isLoading ? (
+          <Loader />
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 pb-10">
             {reviews.map((review, idx) => {
               const name = review.userName || "Anonymous User";
               const text = review.reviewText || review.review || "";
+              const rating = review.rating ?? 5;
+              const productName = review.productName || "";
 
               return (
-                <SwiperSlide key={`rev-v4-${review._id || idx}-${idx}`}>
-                  <div className="bg-white rounded-2xl p-6 m-2 md:p-8 border border-[#7e525c] shadow-lg h-full flex flex-col transition-all duration-300 hover:shadow-xl">
-                    <div className="mb-4">
-                      <StarRating rating={review.rating ?? 5} />
-                      {review.productName && (
-                        <p className="text-[10px] md:text-xs mt-2 text-[#7e525c] font-semibold uppercase tracking-widest">
-                          {review.productName}
-                        </p>
-                      )}
-                    </div>
-
-                    <p className="text-gray-600 italic mb-4 flex-grow leading-relaxed text-sm md:text-base">
-                      &ldquo;{text}&rdquo;
-                    </p>
-
-                    <div className="flex items-center gap-4 border-t border-gray-100 pt-4 mt-auto">
-                      <div className="text-left">
-                        <h4 className="font-bold text-gray-800 text-xs md:text-sm">{name}</h4>
-                        <span className="text-[10px] text-gray-400 uppercase font-medium">Verified Buyer</span>
-                      </div>
-                    </div>
+                <div 
+                  key={`review-${review._id || idx}`}
+                  className="bg-white rounded-2xl p-5 md:p-6 border-2 border-[#6c444e]/20 shadow-md hover:shadow-lg hover:border-[#6c444e]/40 transition-all duration-300 h-full flex flex-col"
+                >
+                  {/* Rating Stars */}
+                  <div className="mb-3">
+                    <StarRating rating={rating} />
                   </div>
-                </SwiperSlide>
+                  
+                  {/* Product Name Badge */}
+                  {productName && (
+                    <div className="inline-block self-start mb-2">
+                      <span className="text-[10px] md:text-[11px] bg-[#6c444e]/10 text-[#6c444e] font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                        {productName}
+                      </span>
+                    </div>
+                  )}
+                  
+                  {/* Review Text */}
+                  <p className="text-gray-700 text-sm md:text-base leading-relaxed mb-4 flex-grow">
+                    “{text}”
+                  </p>
+                  
+                  {/* Customer Name */}
+                  <div className="border-t border-gray-100 pt-3 mt-2">
+                    <h4 className="font-bold text-gray-800 text-sm md:text-base">
+                      {name}
+                    </h4>
+                  
+                    {/* Verified Buyer */}
+                    <span className="text-[10px] text-green-600 font-medium mt-1 inline-block">
+                      ✓ Verified Buyer
+                    </span>
+                  </div>
+                  
+                </div>
               );
             })}
-          </Swiper>
-        </div>
-      )}
-
-      <style jsx global>{`
-        .swiper-slide {
-          height: auto;
-        }
-      `}</style>
-
+          </div>
+        )}
+        
+      </div>
     </section>
   );
 }

@@ -2,11 +2,11 @@ import { Hourglass, Package, ShoppingBag } from "lucide-react";
 
 export default function ValuesSection() {
   return (
- <section className="values-section mb-16">
+    <section className="values-section ">
       <div className="values-container">
 
         <div className="value-card">
-          <div className="value-icon">
+          <div className="value-icon bg-[#6c444e]/10 text-[#6c444e]">
             <Hourglass size={28} />
           </div>
           <h3>Long Lasting</h3>
@@ -17,7 +17,7 @@ export default function ValuesSection() {
         </div>
 
         <div className="value-card">
-          <div className="value-icon">
+          <div className="value-icon bg-[#6c444e]/10 text-[#6c444e]">
             <Package size={28} />
           </div>
           <h3>Premium Packaging</h3>
@@ -28,7 +28,7 @@ export default function ValuesSection() {
         </div>
 
         <div className="value-card">
-          <div className="value-icon">
+          <div className="value-icon bg-[#6c444e]/10 text-[#6c444e]">
             <ShoppingBag size={28} />
           </div>
           <h3>Affordable Luxury</h3>

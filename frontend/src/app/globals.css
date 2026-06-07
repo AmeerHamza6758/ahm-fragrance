@@ -479,18 +479,21 @@ button{
   background: url("/Images/hero-bg-pic.svg") right center / cover no-repeat;
   overflow: hidden;
 }
-
 .hero-box::before {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg,
-      rgb(var(--color-bg-canvas)) 0%,
-      rgba(253, 249, 245, 0.4) 40%,
-      rgba(253, 249, 245, 0) 100%);
+  /* Stronger gradient - text clearly dikhega */
+  background: linear-gradient(
+    90deg,
+    rgb(var(--color-bg-canvas)) 0%,
+    rgb(var(--color-bg-canvas)) 15%,
+    rgba(253, 249, 245, 0.8) 35%,
+    rgba(253, 249, 245, 0.3) 70%,
+    rgba(253, 249, 245, 0) 100%
+  );
   z-index: 1;
 }
-
 .hero-content {
   position: relative;
   z-index: 2;

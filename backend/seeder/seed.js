@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const Faq = require("../models/faq.model");
 const User = require("../models/user.model");
+const Product = require("../models/product.model");
 
 const MONGO_URI =
   process.env.DB_URL ||
@@ -15,7 +16,11 @@ async function connectDB() {
 }
 
 async function clearSeededCollections() {
-  await Promise.all([Faq.deleteMany({}), User.deleteMany({ role: "admin" })]);
+  await Promise.all([
+    Faq.deleteMany({}), 
+    User.deleteMany({ role: "admin" }),
+    Product.deleteMany({}) 
+  ]);
 }
 
 async function seedUsers() {
@@ -103,10 +108,9 @@ async function seedFaqs() {
       question: "Are there any exclusive deals or sales?",
       answer:
         "Yes—limited-time discounts run throughout the year. Join our newsletter and follow our socials to get early access to drops and sale alerts.",
-    },
+    }
   ];
 
-  // Upsert by question to keep seeder idempotent
   await Promise.all(
     faqs.map((faq) =>
       Faq.updateOne(
@@ -118,25 +122,84 @@ async function seedFaqs() {
   );
 }
 
+//  Dummy Products Function Code
+async function seedProducts() {
+  const dummyProducts = [
+    {
+      name: "Luxury Oud Supreme",
+      description: "An intense, long-lasting oriental woody fragrance perfect for evenings.",
+      isActive: true,
+      rating: 5,
+      category_id: new mongoose.Types.ObjectId(), 
+      tag_id: new mongoose.Types.ObjectId(),  
+      image_id: [], 
+      variants: [
+        {
+          size: "50ml",
+          price: 3500,
+          discountPercentage: 10, 
+          stock: 10
+        },
+        {
+          size: "100ml",
+          price: 6000,
+          discountPercentage: 15, 
+          stock: 5
+        }
+      ]
+    },
+    {
+      name: "Floral Bliss Essence",
+      description: "A delightful mix of fresh jasmine and red roses for day-long freshness.",
+      isActive: true,
+      rating: 4.5,
+      category_id: new mongoose.Types.ObjectId(),
+      tag_id: new mongoose.Types.ObjectId(),
+      image_id: [],
+      variants: [
+        {
+          size: "30ml",
+          price: 2500,
+          discountPercentage: 0,
+          stock: 25
+        },
+        {
+          size: "100ml",
+          price: 5000,
+          discountPercentage: 20,
+          stock: 12
+        }
+      ]
+    },
+    
+  ];
+
+  await Product.deleteMany({});
+  await Product.insertMany(dummyProducts);
+  console.log("  Variant Products Seeded Successfully!");
+}
+
 async function runSeeder() {
   try {
+    console.log("Connecting to Database...");
     await connectDB();
-
 
     if (shouldReset) {
       await clearSeededCollections();
+      console.log("Database cleared successfully.");
     }
 
     await seedUsers();
     await seedFaqs();
+    await seedProducts(); 
 
-
+    console.log("All Seeding completed successfully!");
   } catch (error) {
     console.error("Seeder failed:", error.message);
     process.exitCode = 1;
   } finally {
     await mongoose.connection.close();
-
+    console.log("Database connection closed.");
   }
 }
 
