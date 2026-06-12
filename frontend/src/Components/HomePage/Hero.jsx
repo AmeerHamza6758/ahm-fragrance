@@ -14,7 +14,7 @@ export default function Hero() {
       
       <div className="relative z-10 max-w-7xl mx-auto px-5 md:px-8 lg:px-12 py-16 md:py-24 lg:py-22 ">
         
-        <div className="max-w-xl  bg-white/30 backdrop-blur-sm rounded-2xl p-6 md:p-8 lg:p-10">
+        <div className="md:max-w-xl sm:max-w-lg max-w-lg bg-white/30 backdrop-blur-sm rounded-2xl p-6  md:p-8 lg:p-10">
           
           <h1 className="text-[28px] sm:text-4xl md:text-5xl lg:text-5xl font-bold leading-[1.2] mb-3 font-['Noto_Serif',Georgia,serif] tracking-[-1px] text-[#1a1a1a]">
             Discover premium

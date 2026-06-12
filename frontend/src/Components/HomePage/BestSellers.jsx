@@ -9,7 +9,7 @@ export default function BestSellers() {
   const visibleProducts = products.slice(0, 8);
 
   return (
-    <section className="py-16 md:py-24 bg-[#fdf9f5] relative overflow-hidden">
+    <section className="py-10 md:py-24 bg-[#fdf9f5] relative overflow-hidden">
       
       {/* Decorative Background Elements */}
       <div className="absolute top-20 right-0 w-64 h-64 bg-[#6c444e]/5 rounded-full blur-3xl"></div>

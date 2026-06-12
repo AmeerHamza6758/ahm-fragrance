@@ -13,6 +13,7 @@ import {
 import { buildProductImageUrl } from "@/lib/utils/imageUrl";
 import ProductCard from "@/src/Components/ProductCard";
 import Loader from "@/Components/Loader/Loader";
+import {  ShoppingBag, Sparkles, TrendingUp } from "lucide-react";
 
 const getProductId = (product) => product?._id || product?.id;
 
@@ -104,10 +105,40 @@ export default function WishlistPage() {
           <div className="py-16 text-center text-primary">
             Failed to load wishlist.
           </div>
-        ) : enrichedWishlistProducts.length === 0 ? (
-          <div className="py-16 text-center text-primary">
-            Your wishlist is empty.
-          </div>
+        )  : enrichedWishlistProducts.length === 0 ? (
+  <div className="py-1 md:py-2 px-4">
+    <div className="max-w-2xl mx-auto text-center">
+      {/* Heart Icon */}
+      <div className="inline-block mb-5">
+        <div className="bg-[#7E525C]/5 rounded-full p-5 md:p-7">
+          <Heart size={60} className="text-[#7E525C] mx-auto" strokeWidth={1.5} />
+        </div>
+      </div>
+
+      {/* Title */}
+      <h3 className="text-2xl md:text-3xl font-noto text-[#7E525C] mb-3">
+        Your Wishlist is Empty
+      </h3>
+      
+      {/* Description */}
+      <p className="text-[#4E4543] text-sm md:text-base mb-8 max-w-md mx-auto">
+        It seems you haven't added any products to your wishlist yet. 
+        Start exploring our collection and save your favorite fragrances!
+      </p>
+
+      {/* CTA Buttons */}
+      <div className="flex flex-col sm:flex-row gap-4 justify-center">
+        <Link
+          href="/collections"
+          className="inline-flex items-center justify-center gap-2 bg-[#7E525C] text-white px-8 py-3 rounded-full text-sm font-semibold uppercase tracking-wider hover:bg-[#5d3b44] transition-colors shadow-md"
+        >
+          <ShoppingBag size={18} />
+          EXPLORE COLLECTIONS
+        </Link>
+      </div>
+    </div>
+  </div>
+
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-[repeat(auto-fit,minmax(220px,260px))] justify-items-center md:justify-items-stretch md:justify-start gap-x-5 gap-y-10">
             {enrichedWishlistProducts.map((product) => (
