@@ -18,10 +18,10 @@ export default function SignupPage() {
     userName: "",
     email: "",
     phone: "",
-    address: "",
-    city: "",
-    postal: "",
-    province: "",
+  //  address: "",
+    // city: "",
+    // postal: "",
+    // province: "",
     password: "",
     confirmPassword: "",
   });
@@ -126,10 +126,10 @@ export default function SignupPage() {
       name: form.userName,
       email: form.email,
       phone: form.phone,
-      address: form.address,
-      city: form.city,
-      postal: form.postal,
-      province: form.province,
+      // address: form.address,
+      // city: form.city,
+      // postal: form.postal,
+      // province: form.province,
     });
 
     signUp(
@@ -138,12 +138,12 @@ export default function SignupPage() {
         email: form.email,
         password: form.password,
         phone: form.phone,
-        address: {
-          street: form.address,
-          city: form.city,
-          province: form.province,
-          postalCode: form.postal,
-        },
+        // address: {
+        //   street: form.address,
+        //   city: form.city,
+        //   province: form.province,
+        //   postalCode: form.postal,
+        // },
       },
       {
         onSuccess: () => {
@@ -284,7 +284,7 @@ export default function SignupPage() {
             </div>
 
             {/* Address */}
-            <div className="flex flex-col gap-1.25">
+            {/* <div className="flex flex-col gap-1.25">
               <label
                 htmlFor="address"
                 className="text-xs font-semibold uppercase tracking-[0.13em] text-[#7e525c] font-sans"
@@ -306,10 +306,10 @@ export default function SignupPage() {
               {touched.address && errors.address && (
                 <span className="text-xs text-red-500 mt-1 ml-1">{errors.address}</span>
               )}
-            </div>
+            </div> */}
 
             {/* City + Postal */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {/* <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="flex flex-col gap-1.25">
                 <label
                   htmlFor="city"
@@ -356,10 +356,10 @@ export default function SignupPage() {
                   <span className="text-xs text-red-500 mt-1 ml-1">{errors.postal}</span>
                 )}
               </div>
-            </div>
+            </div> */}
 
             {/* Province */}
-            <div className="flex flex-col gap-1.25">
+            {/* <div className="flex flex-col gap-1.25">
               <label
                 htmlFor="province"
                 className="text-xs font-semibold uppercase tracking-[0.13em] text-[#7e525c] font-sans"
@@ -393,7 +393,7 @@ export default function SignupPage() {
               {touched.province && errors.province && (
                 <span className="text-xs text-red-500 mt-1 ml-1">{errors.province}</span>
               )}
-            </div>
+            </div> */}
 
             {/* Password row */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
